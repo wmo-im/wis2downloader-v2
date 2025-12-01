@@ -16,24 +16,67 @@ from urllib.parse import urlsplit
 
 from task_manager.worker import app as app
 
+from redis.sentinel import Sentinel
+
+from functools import lru_cache
+
+
+LOGGER = get_task_logger(__name__)
+
+DATA_BASEPATH = os.getenv("DATA","/data") # this needs checking
+
 STATUS_SUCCESS = "SUCCESS"
 STATUS_FAILED = "FAILED"
 STATUS_SKIPPED = "SKIPPED"
-STATUS_VALID_CONDITIONS = [STATUS_SUCCESS, STATUS_FAILED, STATUS_SKIPPED]
+STATUS_PENDING = "PENDING"
+STATUS_VALID_CONDITIONS = [STATUS_SUCCESS, STATUS_FAILED, STATUS_SKIPPED, STATUS_PENDING]
 REDIS_TTL_SECONDS = int(os.getenv("REDIS_TTL_SECONDS", 3600))
 LOCK_EXPIRE = int(os.getenv("REDIS_MESSAGE_LOCK", 300))
 
 _pool = urllib3.PoolManager()
 hash_module = importlib.import_module("hashlib")
 
-# environment variables
-DATA_BASEPATH = os.getenv("DATA","/data") # this needs checking
-REDIS_HOST = os.getenv("REDIS_HOST","redis")
-REDIS_PORT = os.getenv("REDIS_PORT","6379")
+SENTINEL_HOSTS_STR = os.getenv('REDIS_SENTINEL_HOSTS')
+MASTER_NAME = os.getenv('REDIS_PRIMARY_NAME', 'redis-primary')
+REDIS_DB = int(os.getenv('REDIS_DATABASE', 0))
 
-LOGGER = get_task_logger(__name__)
+# 2. Parse the Sentinel host string into a list of tuples
+# e.g., "host1:port1,host2:port2" -> [('host1', 26379), ('host2', 26379)]
+SENTINEL_HOSTS = []
+if SENTINEL_HOSTS_STR:
+    for pair in SENTINEL_HOSTS_STR.split(','):
+        host, port = pair.split(':')
+        SENTINEL_HOSTS.append((host, int(port)))
 
-redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
+
+
+_sentinel = None
+_redis_client = None
+
+@lru_cache(maxsize=1)
+def get_redis_client():
+    """
+    Initializes and returns the Redis master client via Sentinel.
+    Uses lru_cache to ensure the connection is only established once.
+    """
+    global _sentinel, _redis_client
+    if _redis_client is None:
+        print(f"Connecting to Redis Sentinel at: {SENTINEL_HOSTS}")
+        try:
+            _sentinel = Sentinel(SENTINEL_HOSTS,
+                                 socket_timeout=1,
+                                 socket_connect_timeout=1,
+                                 retry_on_timeout=True)
+            _redis_client = _sentinel.master_for(MASTER_NAME, db=REDIS_DB)
+            # Test connection
+            _redis_client.ping()
+            print("Successfully connected to Redis master.")
+        except Exception as e:
+            print(f"Error connecting to Redis Sentinel: {e}")
+            # In a critical failure scenario, raise the error or use a fallback
+            raise ConnectionError(f"Could not connect to Redis: {e}")
+
+    return _redis_client
 
 TRACKER = "wis2:notifications:data:tracker"
 
@@ -79,9 +122,16 @@ def set_status(key, type, status):
     if type not in ('by-msg-id', 'by-hash', 'by-data-id'):
         LOGGER.error(f"Invalid type {type}")
         return
+    if status not in STATUS_VALID_CONDITIONS:
+        LOGGER.error(f"Invalid status '{status}' for {key} ({type})")
     tracker_id = f"{TRACKER}:{type}:{key}"
-    redis_client.hset(tracker_id, 'status', status)
-    redis_client.expire(tracker_id, REDIS_TTL_SECONDS)  # Set expiration
+
+    try:
+        redis_client = get_redis_client()
+        redis_client.hset(tracker_id, 'status', status)
+        redis_client.expire(tracker_id, REDIS_TTL_SECONDS)  # Set expiration
+    except Exception as e:
+        LOGGER.error(f"Redis error in set_status: {e}")
 
 
 def get_status(key, type):
@@ -94,11 +144,18 @@ def get_status(key, type):
         return status
 
     tracker_id = f"{TRACKER}:{type}:{key}"
-    if redis_client.hexists(tracker_id,'status'):
-        status = redis_client.hget(tracker_id,'status')
-        status = status.decode('utf-8')
-        if status not in STATUS_VALID_CONDITIONS:
-            LOGGER.warning(f"Invalid status '{status}' for {key}")
+
+    try:
+        redis_client = get_redis_client()
+        #sentinel = Sentinel(SENTINEL_HOSTS, socket_timeout=1)
+        #redis_client = sentinel.master_for(MASTER_NAME, db=REDIS_DB)
+        if redis_client.hexists(tracker_id, 'status'):
+            status = redis_client.hget(tracker_id, 'status')
+            status = status.decode('utf-8')
+            if status not in STATUS_VALID_CONDITIONS:
+                LOGGER.warning(f"Invalid status '{status}' for {key}")
+    except Exception as e:
+        LOGGER.error(f"Redis error in get_status: {e}")
 
     return status
 
@@ -305,6 +362,7 @@ def download_from_wis2(self, job):
     # acquire lock on ID to make sure we only process once.
     lock_key_identifier = filehash or data_id or message_id
     lock_key = f"wis2:notification:data:lock:{lock_key_identifier}"
+    redis_client = get_redis_client()
     lock_acquired = redis_client.set(lock_key, 1, nx=True, ex=LOCK_EXPIRE)
     if not lock_acquired:  # lock acquired by another worker
         LOGGER.warning(f"Could not acquire lock for {lock_key_identifier}, retrying in 10 seconds")
@@ -344,6 +402,7 @@ def download_from_wis2(self, job):
         # extract cache
         result['global_cache'] = urlsplit(download_url).hostname
 
+        # ToDo, remove hard coding and move to config.
         if result['global_cache'] in ("wis2.ncm.gov.sa"):
             result['status'] = STATUS_SKIPPED
             result['reason'] = "Global cache black listed, skipped"
@@ -361,6 +420,7 @@ def download_from_wis2(self, job):
 
         # ToDo - investigate whether we want to replace the following with aria2
         # download the data
+        result['status'] = STATUS_PENDING
         result['download_start'] = _now_utc_str()
         try:
             response = _pool.request('GET', download_url,
@@ -381,6 +441,17 @@ def download_from_wis2(self, job):
             result['status'] = STATUS_FAILED
             result['reason'] = f"Error {e} while downloading from {result['global_cache']}"
             result['error_class'] = str(e.__class__.__name__)
+
+        if result['status'] == STATUS_FAILED:
+            final_status = result.get('status', STATUS_FAILED)
+            LOGGER.error(f"Download failed for {download_url}, reason: {result['reason']}")
+            if lock_acquired:
+                redis_client.delete(lock_key)
+            set_status(message_id, 'by-msg-id', final_status)
+            set_status(data_id, 'by-data-id', final_status)
+            set_status(filehash, 'by-hash', final_status)
+            return result
+
         result['download_end'] = _now_utc_str()
 
         # verify and save the file

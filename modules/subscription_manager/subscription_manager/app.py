@@ -6,12 +6,16 @@ from urllib.parse import unquote
 import yaml
 import time
 from flask import Flask, request, jsonify, url_for, Response, render_template
-from prometheus_client import generate_latest, REGISTRY, CollectorRegistry, multiprocess
+from prometheus_client import generate_latest, REGISTRY, CollectorRegistry, \
+    multiprocess
 from prometheus_client import Counter, Gauge
 from task_manager.worker import app as celery_app
 import sys
 from flask_cors import CORS
+# Update import for Sentinel functionality
+from redis.sentinel import Sentinel
 import redis
+from functools import lru_cache
 
 from subscription_manager import (
     init_subscribers, load_config, persist_config, shutdown, SUBSCRIBERS
@@ -37,8 +41,8 @@ root_logger.addHandler(stream_handler)
 
 LOGGER = logging.getLogger(__name__)
 
-
-DATA_DIRECTORY = Path(os.getenv("DATA_BASEPATH", "/data/wis2-downloads")).resolve()
+DATA_DIRECTORY = Path(
+    os.getenv("DATA_BASEPATH", "/data/wis2-downloads")).resolve()
 
 
 def get_json() -> dict:
@@ -78,8 +82,6 @@ init_subscribers(CONFIG)
 # Persist config
 persist_config(CONFIG)
 
-
-
 # Now set up flask app
 FLASK_SECRET_KEY = os.getenv('FLASK_SECRET_KEY', 'dev')
 if FLASK_SECRET_KEY == 'dev':
@@ -87,26 +89,51 @@ if FLASK_SECRET_KEY == 'dev':
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_mapping(SECRET_KEY=FLASK_SECRET_KEY)
 
+# --- Redis Sentinel Client Setup for Application Use (e.g., Metrics) ---
+SENTINEL_HOSTS_STR = os.getenv('REDIS_SENTINEL_HOSTS')
+MASTER_NAME = os.getenv('REDIS_PRIMARY_NAME', 'redis-primary')
+REDIS_DB = int(os.getenv('REDIS_DATABASE', 0))
 
-# Setup Celery/Redis config
-app.config['CELERY_BROKER_URL'] = CONFIG.get('CELERY_BROKER_URL',
-                                             'redis://redis:6379/0')
-app.config['CELERY_RESULT_BACKEND'] = CONFIG.get('CELERY_RESULT_BACKEND',
-                                                 'redis://redis:6379/0')
-celery_app.conf.update(
-    broker_url=app.config['CELERY_BROKER_URL'],
-    result_backend=app.config['CELERY_RESULT_BACKEND']
-)
+SENTINEL_HOSTS = []
+if SENTINEL_HOSTS_STR:
+    for pair in SENTINEL_HOSTS_STR.split(','):
+        host, port = pair.split(':')
+        SENTINEL_HOSTS.append((host, int(port)))
 
-REDIS_HOST = os.getenv("REDIS_HOST", "redis")
-REDIS_PORT = os.getenv("REDIS_PORT", "6379")
+_sentinel = None
+_redis_client = None
 
-redis_client = redis.Redis(REDIS_HOST, REDIS_PORT, db=0)
+@lru_cache(maxsize=1)
+def get_redis_client():
+    """
+    Initializes and returns the Redis master client via Sentinel.
+    Uses lru_cache to ensure the connection is only established once.
+    """
+    global _sentinel, _redis_client
+    if _redis_client is None:
+        print(f"Connecting to Redis Sentinel at: {SENTINEL_HOSTS}")
+        try:
+            _sentinel = Sentinel(SENTINEL_HOSTS,
+                                 socket_timeout=1,
+                                 socket_connect_timeout=1,
+                                 retry_on_timeout=True)
+            _redis_client = _sentinel.master_for(MASTER_NAME, db=REDIS_DB)
+            # Test connection
+            _redis_client.ping()
+            print("Successfully connected to Redis master.")
+        except Exception as e:
+            print(f"Error connecting to Redis Sentinel: {e}")
+            # In a critical failure scenario, raise the error or use a fallback
+            raise ConnectionError(f"Could not connect to Redis: {e}")
+
+    return _redis_client
+
+
 CELERY_DEFAULT_QUEUE = os.getenv("CELERY_DEFAULT_QUEUE", "celery")
 CELERY_QUEUE_LENGTH = Gauge(
     'celery_queue_length_total',
     'Current number of tasks in the Celery default queue.',
-    ['queue_name'] # Using a label in case you want to monitor multiple queues
+    ['queue_name']  # Using a label in case you want to monitor multiple queues
 )
 
 
@@ -119,7 +146,9 @@ def load_openapi():
     else:
         return {}
 
+
 OPENAPI = load_openapi()
+
 
 # Define routes for subscription manager
 # GET list of subscriptions
@@ -137,7 +166,7 @@ def add_subscription():
     # First parse the request query
     data = get_json()
     # Get location (target) where we want to save the data for this topic
-    target = normalise_path(data.get('target',''))
+    target = normalise_path(data.get('target', ''))
     LOGGER.error(target)
 
     # Next we need to normalise the topic,
@@ -182,7 +211,8 @@ def delete_subscription(topic):
     if not topic:
         return "No topic passed"
     if topic not in CONFIG['topics']:
-        LOGGER.warning(f"topic {topic} not found, trying to unsubscribe anyway")
+        LOGGER.warning(
+            f"topic {topic} not found, trying to unsubscribe anyway")
 
     subscriptions = {}
     for broker, item in SUBSCRIBERS.items():
@@ -215,13 +245,16 @@ def expose_metrics():
     Expose the Prometheus metrics to be scraped.
     """
 
+    redis_client = get_redis_client()
     try:
+        # Use the Sentinel-aware redis_client to check queue length
         queue_length = redis_client.llen(CELERY_DEFAULT_QUEUE)
-        CELERY_QUEUE_LENGTH.labels(queue_name=CELERY_DEFAULT_QUEUE).set(queue_length)
+        CELERY_QUEUE_LENGTH.labels(queue_name=CELERY_DEFAULT_QUEUE).set(
+            queue_length)
         registry = CollectorRegistry()
         basedir = os.getenv('PROMETHEUS_MULTIPROC_DIR',
                             '/tmp/prometheus_metrics')
-        multiprocess.MultiProcessCollector(registry, path = basedir)
+        multiprocess.MultiProcessCollector(registry, path=basedir)
 
         # ToDo fix aggregation below
 
@@ -234,7 +267,8 @@ def expose_metrics():
         return Response(generate_latest(registry), mimetype="text/plain")
 
     except Exception as e:
-        LOGGER.error(f"Failed to generate metrics: {e}.")
+        LOGGER.error(
+            f"Failed to generate metrics: {e}. Check Sentinel connection.")
         error_message = "Error generating metrics"
         return Response(error_message, status=500, mimetype="text/plain")
 
@@ -242,7 +276,15 @@ def expose_metrics():
 # health check end point
 @app.route('/health')
 def health_check():
-    return Response(response=json.dumps({'status': 'healthy'}), status=200,
+    # Health check that pings the Sentinel-aware Redis client
+    try:
+        redis_client.ping()
+        status = 'healthy'
+    except Exception as e:
+        LOGGER.error(f"Redis Sentinel connection failed for health check: {e}")
+        status = 'unhealthy'
+
+    return Response(response=json.dumps({'status': status}), status=200,
                     mimetype="application/json")
 
 

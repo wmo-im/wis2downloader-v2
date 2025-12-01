@@ -5,8 +5,9 @@ info:
   version: 0.1.dev2
   description: API definition
 servers:
-  - url: https://127.0.0.1:5002
+  - url: http://localhost:5002
     description: Local development server
+host: localhost:5002
 paths:
   /subscriptions:
     get:
