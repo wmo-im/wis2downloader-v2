@@ -12,6 +12,10 @@ SENTINEL_HOSTS_STR = os.getenv('REDIS_SENTINEL_HOSTS')
 MASTER_NAME = os.getenv('REDIS_PRIMARY_NAME', 'redis-primary')
 REDIS_DB = int(os.getenv('REDIS_DATABASE', 0))
 
+# fallback to direct connection if no sentinel hosts are provided
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+
 SENTINEL_HOSTS = []
 if SENTINEL_HOSTS_STR:
     for pair in SENTINEL_HOSTS_STR.split(','):
@@ -29,18 +33,25 @@ def get_redis_client():
     """
     global _sentinel, _redis_client
     if _redis_client is None:
-        print(f"Connecting to Redis Sentinel at: {SENTINEL_HOSTS}")
+        LOGGER.info(f"Connecting to Redis Sentinel at: {SENTINEL_HOSTS}")
         try:
-            _sentinel = Sentinel(SENTINEL_HOSTS,
-                                 socket_timeout=1,
-                                 socket_connect_timeout=1,
-                                 retry_on_timeout=True)
-            _redis_client = _sentinel.master_for(MASTER_NAME, db=REDIS_DB)
+            if SENTINEL_HOSTS:
+                _sentinel = Sentinel(SENTINEL_HOSTS,
+                                     socket_timeout=1,
+                                     socket_connect_timeout=1,
+                                     retry_on_timeout=True)
+                _redis_client = _sentinel.master_for(MASTER_NAME, db=REDIS_DB)
+                LOGGER.info(f"Connected to Redis Sentinel at: {SENTINEL_HOSTS}")
+            else:
+                _redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT,
+                                            db=REDIS_DB)
+                LOGGER.info("Falling back to direct connection to Redis.")
             # Test connection
             _redis_client.ping()
-            print("Successfully connected to Redis master.")
+            LOGGER.info("Successfully connected to Redis")
+
         except Exception as e:
-            print(f"Error connecting to Redis Sentinel: {e}")
+            LOGGER.error(f"Error connecting to Redis: {e}")
             # In a critical failure scenario, raise the error or use a fallback
             raise ConnectionError(f"Could not connect to Redis: {e}")
 

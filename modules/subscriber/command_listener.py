@@ -19,11 +19,11 @@ class CommandListener(threading.Thread):
         super().__init__(daemon=True)
         self.subscriber = subscriber
         self.redis = redis.Redis(host=host, port=port, decode_responses=True)
-        self.pubsub = self.redis.pubsub(ignoore_subscribe_messages=True)
+        self.pubsub = self.redis.pubsub(ignore_subscribe_messages=True)
         self.channel = channel
         self.stop_event = threading.Event()
         LOGGER.info(f"Redis listener initialised for channel: {channel}")
-
+        
     def run(self):
         try:
             self.pubsub.subscribe(self.channel)
@@ -65,7 +65,7 @@ class CommandListener(threading.Thread):
 
         except json.JSONDecodeError as e:
             LOGGER.error(f'Failed to decode command: {message}')
-        except Excetion as e:
+        except Exception as e:
             LOGGER.error(f'Unexpected error: {e}')
 
     def stop(self):

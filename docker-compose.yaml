@@ -171,6 +171,26 @@ services:
       - redis-replica-2
     logging: *default-logging
 
+
+  subscriber-france:
+    container_name: subscriber
+    restart: always
+    build:
+      context: .
+      dockerfile: ./containers/subscription_manager/Dockerfile
+    environment:
+      GLOBAL_BROKER_HOST: globalbroker.meteo.fr
+      GLOBAL_BROKER_PORT: 443
+      GLOBAL_BROKER_USERNAME: ${GLOBAL_BROKER_USERNAME}
+      GLOBAL_BROKER_PASSWORD: ${GLOBAL_BROKER_PASSWORD}
+      GLOBAL_BROKER_PROTOCOL: websockets
+    depends_on:
+      - redis-primary
+      - redis-replica-1
+      - redis-replica-2
+    logging: *default-logging
+
+
 volumes:
   loki-data:
   prometheus-data:

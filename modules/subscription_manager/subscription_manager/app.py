@@ -14,12 +14,10 @@ import sys
 from flask_cors import CORS
 # Update import for Sentinel functionality
 from redis.sentinel import Sentinel
+from redis.exceptions import ConnectionError
 import redis
 from functools import lru_cache
 
-from subscription_manager import (
-    init_subscribers, load_config, persist_config, shutdown, SUBSCRIBERS
-)
 
 # set up logging
 log_formatter = logging.Formatter(
@@ -72,15 +70,14 @@ def normalise_path(userpath: str) -> str | None:
 
     return str(resolved_path.relative_to(DATA_DIRECTORY))
 
-
 # Load config
 CONFIG = load_config()
 
 # Initialise subscribers and topics
-init_subscribers(CONFIG)
+# init_subscribers(CONFIG)
 
 # Persist config
-persist_config(CONFIG)
+# persist_config(CONFIG)
 
 # Now set up flask app
 FLASK_SECRET_KEY = os.getenv('FLASK_SECRET_KEY', 'dev')
@@ -93,7 +90,7 @@ app.config.from_mapping(SECRET_KEY=FLASK_SECRET_KEY)
 SENTINEL_HOSTS_STR = os.getenv('REDIS_SENTINEL_HOSTS')
 MASTER_NAME = os.getenv('REDIS_PRIMARY_NAME', 'redis-primary')
 REDIS_DB = int(os.getenv('REDIS_DATABASE', 0))
-
+GLOBAL_SUBSCRIPTION_KEY = "global:all_subscriptions"
 SENTINEL_HOSTS = []
 if SENTINEL_HOSTS_STR:
     for pair in SENTINEL_HOSTS_STR.split(','):
@@ -129,6 +126,41 @@ def get_redis_client():
     return _redis_client
 
 
+
+def publish_command(command, channel):
+    try:
+        redis_client = get_redis_client()
+        redis_client.publish(channel, json.dumps(command))
+        LOGGER.info(f"Published command to {channel}: {command}")
+        return True
+    except ConnectionError as e:
+        LOGGER.error(f"Failed to publish command to Redis: {e}")
+        return False
+    except Exception as e:
+        LOGGER.error(f"Unexpected error: {e}")
+        return False
+
+def persist_subscription(topic, save_path, filters):
+    try:
+        redis_client = get_redis_client()
+        data_to_persist = {
+            "topic": topic,
+            "save_path": save_path,
+            "filters": filters
+        }
+        redis_client.hset(GLOBAL_SUBSCRIPTION_KEY, topic, json.dumps(data_to_persist))
+        LOGGER.info(f"Persisted subscription for topic {topic}")
+        return True
+
+    except ConnectionError as e:
+        LOGGER.error(f"Failed to persist subscriptions to Redis: {e}")
+        return False
+
+    except Exception as e:
+        LOGGER.error(f"Unexpected error: {e}")
+        return False
+
+
 CELERY_DEFAULT_QUEUE = os.getenv("CELERY_DEFAULT_QUEUE", "celery")
 CELERY_QUEUE_LENGTH = Gauge(
     'celery_queue_length_total',
@@ -155,9 +187,29 @@ OPENAPI = load_openapi()
 @app.route('/subscriptions')
 def list_subscriptions():
     subscriptions = {}
-    for subscriber, item in SUBSCRIBERS.items():
-        subscriptions[subscriber] = item.active_subscriptions
-    return jsonify(subscriptions)
+    try:
+        redis_client = get_redis_client()
+        all_topics_bytes = redis_client.hgetall(GLOBAL_SUBSCRIPTION_KEY)
+        if not all_topics_bytes:
+            return jsonify(subscriptions), 200
+
+        for topic_bytes, data_bytes in all_topics_bytes.items():
+            topic = topic_bytes.decode('utf-8')
+            try:
+                details = json.loads(data_bytes.decode('utf-8'))
+                subscriptions[topic] = details
+
+            except json.JSONDecodeError:
+                LOGGER.warning(f"Failed to decode subscription for topic {topic}")
+                continue
+
+    except ConnectionError as e:
+        return jsonify({"error": f"Failed to connect to Redis: {e}"}), 503
+    except Exception as e:
+        return jsonify({"error": f"Unexpected error: {e}"}), 500
+
+
+    return jsonify(subscriptions), 200
 
 
 # POST (add) new subscription
@@ -175,19 +227,33 @@ def add_subscription():
     if topic is None:
         return jsonify({"error": "No topic provided"}), 400
 
+    command = {
+        "action": "subscribe",
+        "topic": topic,
+        "save_path": target,
+        "filters": []
+    }
+
+    if not publish_command(command, COMMAND_CHANNEL):
+        return jsonify({"error": "Failed to queue subscription command, Redis service unavailable"}), 503
+
+    # now persist
+    if not persist_subscription(topic, target, command.get("filters")):
+        return jsonify({"error": "Failed to persist subscription to redis"}), 503
+
     # Now iterate over subscribers and add new subscription
     # Todo - check we are now already subscribed.
     subscriptions = {}
-    for subscriber, item in SUBSCRIBERS.items():
-        subscriptions[subscriber] = item.subscribe(topic, target)
+    #for subscriber, item in SUBSCRIBERS.items():
+    #    subscriptions[subscriber] = item.subscribe(topic, target)
 
     # Now update config settings and save
-    CONFIG.setdefault('topics', {})[topic] = target
-    persist_config(CONFIG)
+    #CONFIG.setdefault('topics', {})[topic] = target
+    #persist_config(CONFIG)
 
     # Now create response
     response = jsonify(subscriptions)
-    response.status_code = 201
+    response.status_code = 202
     response.headers['Location'] = url_for('get_subscription', topic=topic)
     return response
 
@@ -197,11 +263,20 @@ def add_subscription():
 def get_subscription(topic):
     topic = unquote(topic)
     if not topic:
-        return "No topic passed"
-    subscriptions = {}
-    for broker, item in SUBSCRIBERS.items():
-        subscriptions[broker] = item.active_subscriptions[topic]
-    return jsonify(subscriptions)
+        return jsonify({"error": "No topic passed"}), 400
+    try:
+        redis_client = get_redis_client()
+        subscription_data = redis_client.hget(GLOBAL_SUBSCRIPTION_KEY, topic)
+        if subscription_data is None:
+            return jsonify({"error": f"Subscription for topic {topic} not found"}), 404
+
+        subscription_data = json.loads(subscription_data)
+        return jsonify(subscription_data), 200
+
+    except ConnectionError as e:
+        return jsonify({"error": f"Failed to connect to Redis: {e}"}), 503
+    except Exception as e:
+        return jsonify({"error": f"Unexpected error: {e}"}), 500
 
 
 # DELETE subscription
@@ -278,7 +353,7 @@ def expose_metrics():
 def health_check():
     # Health check that pings the Sentinel-aware Redis client
     try:
-        redis_client.ping()
+        get_redis_client().ping()
         status = 'healthy'
     except Exception as e:
         LOGGER.error(f"Redis Sentinel connection failed for health check: {e}")

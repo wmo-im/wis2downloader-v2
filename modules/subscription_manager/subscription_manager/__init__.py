@@ -25,9 +25,6 @@ CONFIG_FILE_LOCK = threading.Lock()
 # Now get the config file path
 CONFIG_PATH = os.getenv("CONFIG_PATH", "/app/config/config.json")
 
-SUBSCRIBERS: dict[str, Subscriber] = {}
-SUBSCRIBER_THREADS: dict[str, threading.Thread] = {}
-
 def load_config() -> dict:
     CONFIG_FILE_LOCK.acquire()
     try:
@@ -66,47 +63,6 @@ def save_config(config: dict) -> None:
             LOGGER.debug(f"Cleaned up temporary file: {_temp_file}")
     finally:
         CONFIG_FILE_LOCK.release()
-
-
-def persist_config(config: dict) -> None:
-    """Centralise config save and logging."""
-    save_config(config)
-    LOGGER.debug("Configuration persisted to disk")
-
-
-def init_subscribers(config: dict) -> None:
-    """Initialize broker connections and subscribe to configured topics."""
-    for broker_name, broker_config in config.get('brokers', {}).items():
-        session_id = broker_config.get('session', str(uuid4()))
-        host = broker_config.get('host')
-        port = broker_config.get('port')
-        username = broker_config.get('username')
-        password = broker_config.get('password')
-        protocol = broker_config.get('protocol')
-
-        if None in (host, port, username, password, protocol):
-            LOGGER.error(f"Missing configuration for broker {broker_name}")
-            continue
-
-        SUBSCRIBERS[broker_name] = Subscriber(
-            host=host, port=port, uid=username, pwd=password,
-            protocol=protocol, session=session_id)
-
-        # normalise and persist broker config back, required due to use of defaults
-        config['brokers'][broker_name] = {
-            'session': session_id, 'host': host, 'port': port,
-            'username': username, 'password': password, 'protocol': protocol
-        }
-
-        # create thread and start
-        thread = threading.Thread(target=SUBSCRIBERS[broker_name].start,
-                                  daemon=True)
-        SUBSCRIBER_THREADS[broker_name] = thread
-        thread.start()
-
-        # now subscribe to topics
-        for _topic, _target in config.get('topics', {}).items():
-            SUBSCRIBERS[broker_name].subscribe(_topic, _target)
 
 
 def shutdown():

@@ -33,7 +33,7 @@ CELERY_BROKER_TRANSPORT_OPTIONS_STR = os.environ.get(
     "CELERY_BROKER_TRANSPORT_OPTIONS", 
     '{"master_name": "redis-primary",'
     '"socket_connect_timeout": 1,'
-    '"socket_timeout": 1,,'
+    '"socket_timeout": 1,'
     '"retry_on_timeout": True,'
     '"retry_errors": ["BusyLoadingError"]}'
 )
@@ -74,7 +74,7 @@ app.conf.result_backend_transport_options = CELERY_RESULT_BACKEND_TRANSPORT_OPTI
 
 # Optionally set LOG_LEVEL for visibility
 app.conf.worker_log_level = os.getenv("LOG_LEVEL", "DEBUG").upper()
-
+I''
 
 # Import your tasks
 app.autodiscover_tasks(['task_manager.tasks','task_manager.tasks.wis2' ])

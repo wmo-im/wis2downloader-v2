@@ -18,8 +18,8 @@ def run_manager():
     broker_config = {
         'host': os.getenv("GLOBAL_BROKER_HOST"),
         'port': int(os.getenv("GLOBAL_BROKER_PORT")),
-        'uid': os.getenv("MQTT_USER", "everyone"),
-        'pwd': os.getenv("MQTT_PASS", "everyone"),
+        'uid': os.getenv("GLOBAL_BROKER_USERNAME", "everyone"),
+        'pwd': os.getenv("GLOBAL_BROKER_PASSWORD", "everyone"),
         'protocol': os.getenv("MQTT_PROTOCOL", "websockets"),
         'session': os.getenv("MQTT_SESSION_ID", str(uuid4()))
     }
