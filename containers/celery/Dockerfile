@@ -2,8 +2,7 @@ FROM ubuntu:noble
 
 ENV DEBIAN_FRONTEND="noninteractive" \
     TZ="Etc/UTC" \
-    PYTHONUNBUFFERED=1 \
-    PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus_metrics
+    PYTHONUNBUFFERED=1
 
 SHELL ["/bin/bash", "-c"]
 
@@ -15,8 +14,6 @@ RUN apt-get update -y && \
 # Create a non root user
 RUN groupadd -g 988 wis2 && \
     useradd -u 10001 -g wis2 -m -s /bin/bash wis2
-
-RUN mkdir -p ${PROMETHEUS_MULTIPROC_DIR} && chown wis2:wis2 ${PROMETHEUS_MULTIPROC_DIR}
 
 USER wis2
 WORKDIR /home/wis2
@@ -36,4 +33,4 @@ RUN cd ./app && \
     pip install -e subscription_manager
 
 # now the default command
-CMD ["/bin/bash", "-c", "export PROMETHEUS_MULTIPROC_DIR=${PROMETHEUS_MULTIPROC_DIR}/$HOSTNAME && mkdir -p ${PROMETHEUS_MULTIPROC_DIR} && rm -f ${PROMETHEUS_MULTIPROC_DIR}/* && source .venv/bin/activate && task_manager_start worker --concurrency=8 --max-tasks-per-child 100"]
+CMD ["/bin/bash", "-c", "source .venv/bin/activate && task_manager_start worker --concurrency=8 --max-tasks-per-child 100"]

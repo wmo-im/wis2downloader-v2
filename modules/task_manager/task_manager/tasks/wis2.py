@@ -53,32 +53,31 @@ DEFAULT_ACCEPTED_MEDIA_TYPES = [
 # define some metrics for prometheus
 
 NOTIFICATIONS_RECEIVED = Counter(
-    'notifications_received',
+    'wis2_notifications_received',
     'Total number of notifications received.',
     ['broker', 'cache', 'centre_id', 'topic']
 )
 
 NOTIFICATIONS_SKIPPED = Counter(
-    'notifications_skipped',
+    'wis2_notifications_skipped',
     'Total number of notifications skipped.',
     ['broker', 'cache', 'centre_id', 'topic', 'reason']
 )
 
 DOWNLOADS_FAILED = Counter(
-    'failed_downloads',
+    'wis2_downloads_failed',
     'Total number of failed downloads.',
     ['cache', 'centre_id', 'topic', 'reason', 'media_type']
 )
 
-
 DOWNLOADS_TOTAL_FILES = Counter(
-    'downloads_total_files',
+    'wis2_downloads_total',
     'Total number of files downloaded.',
     ['broker', 'cache', 'centre_id', 'topic', 'media_type']
 )
 
 DOWNLOADS_TOTAL_BYTES = Counter(
-    'downloads_total_bytes',
+    'wis2_downloads_bytes_total',
     'Total number of bytes downloaded.',
     ['broker', 'cache', 'centre_id', 'topic', 'media_type']
 )

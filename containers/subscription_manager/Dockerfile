@@ -36,4 +36,4 @@ RUN cd ./app && \
     pip install -e subscription_manager
 
 # now the default command
-CMD ["/bin/bash", "-c", "source .venv/bin/activate && gunicorn --bind 0.0.0.0:5001 --workers 1 --threads 2 subscription_manager.app:app"]
+CMD ["/bin/bash", "-c", "rm -rf /tmp/prometheus_metrics/* && source .venv/bin/activate && gunicorn --bind 0.0.0.0:5001 --workers 1 --threads 2 subscription_manager.app:app"]

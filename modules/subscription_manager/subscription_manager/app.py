@@ -121,9 +121,10 @@ def persist_subscription(topic, save_path, filters):
 
 CELERY_DEFAULT_QUEUE = os.getenv("CELERY_DEFAULT_QUEUE", "celery")
 CELERY_QUEUE_LENGTH = Gauge(
-    'celery_queue_length_total',
+    'wis2_celery_queue_length',
     'Current number of tasks in the Celery default queue.',
-    ['queue_name']  # Using a label in case you want to monitor multiple queues
+    ['queue_name'],
+    multiprocess_mode='livesum'
 )
 
 
@@ -268,36 +269,21 @@ def fetch_openapi():
 
 @app.route('/metrics')
 def expose_metrics():
-    """
-    Expose the Prometheus metrics to be scraped.
-    """
-
-    redis_client = get_redis_client()
+    """Expose Prometheus metrics to be scraped."""
     try:
-        # Use the Sentinel-aware redis_client to check queue length
+        redis_client = get_redis_client()
         queue_length = redis_client.llen(CELERY_DEFAULT_QUEUE)
-        CELERY_QUEUE_LENGTH.labels(queue_name=CELERY_DEFAULT_QUEUE).set(
-            queue_length)
+        CELERY_QUEUE_LENGTH.labels(queue_name=CELERY_DEFAULT_QUEUE).set(queue_length)
+
         registry = CollectorRegistry()
-        basedir = os.getenv('PROMETHEUS_MULTIPROC_DIR',
-                            '/tmp/prometheus_metrics')
+        basedir = os.getenv('PROMETHEUS_MULTIPROC_DIR', '/tmp/prometheus_metrics')
         multiprocess.MultiProcessCollector(registry, path=basedir)
-
-        # ToDo fix aggregation below
-
-        # iterate over subdirectories
-        for subdir in os.listdir(basedir):
-            if os.path.isdir(os.path.join(basedir, subdir)):
-                worker_path = os.path.join(basedir, subdir)
-                multiprocess.MultiProcessCollector(registry, path=worker_path)
 
         return Response(generate_latest(registry), mimetype="text/plain")
 
     except Exception as e:
-        LOGGER.error(
-            f"Failed to generate metrics: {e}. Check Sentinel connection.")
-        error_message = "Error generating metrics"
-        return Response(error_message, status=500, mimetype="text/plain")
+        LOGGER.error(f"Failed to generate metrics: {e}")
+        return Response("Error generating metrics", status=500, mimetype="text/plain")
 
 
 # health check end point
