@@ -1,0 +1,537 @@
+= WIS2 Downloader API Reference
+:toc: left
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:source-highlighter: highlight.js
+:sectnums:
+
+== Overview
+
+The WIS2 Downloader exposes a REST API for managing subscriptions and monitoring the system.
+
+* **Base URL:** `http://localhost:5002`
+* **OpenAPI Spec:** `http://localhost:5002/openapi`
+* **Swagger UI:** `http://localhost:5002/swagger`
+
+== Authentication
+
+Currently, the API does not require authentication. In production, consider placing it behind a reverse proxy with authentication.
+
+== Subscriptions API
+
+=== List Subscriptions
+
+Returns all active subscriptions.
+
+[source,http]
+----
+GET /subscriptions
+----
+
+==== Response
+
+[cols="1,3"]
+|===
+|Status |Description
+
+|200
+|Success - returns map of topic to subscription details
+
+|503
+|Redis unavailable
+|===
+
+==== Example
+
+[source,bash]
+----
+curl http://localhost:5002/subscriptions
+----
+
+[source,json]
+----
+{
+  "cache/a/wis2/+/data/core/weather/surface-based-observations/#": {
+    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+    "save_path": "surface-obs",
+    "filters": {
+      "accepted_media_types": ["application/bufr", "application/grib"]
+    }
+  }
+}
+----
+
+=== Create Subscription
+
+Creates a new subscription to a WIS2 topic.
+
+[source,http]
+----
+POST /subscriptions
+Content-Type: application/json
+----
+
+==== Request Body
+
+[cols="1,1,1,3"]
+|===
+|Field |Type |Required |Description
+
+|`topic`
+|string
+|Yes
+|WIS2 MQTT topic pattern. Supports `+` (single-level) and `#` (multi-level) wildcards.
+
+|`target`
+|string
+|No
+|Subdirectory under `/data` where files will be saved.
+
+|`filters`
+|object
+|No
+|Filter configuration.
+
+|`filters.accepted_media_types`
+|array
+|No
+|List of allowed MIME types. Supports wildcards (e.g., `application/x-grib*`).
+|===
+
+==== Response
+
+[cols="1,3"]
+|===
+|Status |Description
+
+|202
+|Accepted - subscription queued for processing
+
+|400
+|Bad request - missing or invalid topic
+
+|503
+|Service unavailable - Redis connection failed
+|===
+
+==== Response Headers
+
+[cols="1,3"]
+|===
+|Header |Description
+
+|`Location`
+|URL to retrieve subscription details
+|===
+
+==== Example
+
+[source,bash]
+----
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+    "target": "surface-obs",
+    "filters": {
+      "accepted_media_types": ["application/bufr", "application/grib"]
+    }
+  }'
+----
+
+[source,json]
+----
+{
+  "status": "accepted",
+  "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+  "target": "surface-obs"
+}
+----
+
+=== Get Subscription
+
+Returns details for a specific subscription.
+
+[source,http]
+----
+GET /subscriptions/{topic}
+----
+
+==== Path Parameters
+
+[cols="1,1,3"]
+|===
+|Parameter |Type |Description
+
+|`topic`
+|string
+|WIS2 topic (only `#` requires encoding as `%23`)
+|===
+
+==== URL Encoding
+
+Only the `#` character requires URL encoding:
+
+[cols="1,1,2"]
+|===
+|Character |Encoded |Reason
+
+|`#`
+|`%23`
+|Otherwise interpreted as URL fragment
+|===
+
+NOTE: Slashes (`/`) and `+` do not require encoding in the path.
+
+==== Response
+
+[cols="1,3"]
+|===
+|Status |Description
+
+|200
+|Success
+
+|400
+|Invalid topic
+
+|404
+|Subscription not found
+
+|503
+|Redis unavailable
+|===
+
+==== Example
+
+[source,bash]
+----
+curl "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"
+----
+
+[source,json]
+----
+{
+  "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+  "save_path": "surface-obs",
+  "filters": {
+    "accepted_media_types": ["application/bufr", "application/grib"]
+  }
+}
+----
+
+=== Delete Subscription
+
+Removes a subscription.
+
+[source,http]
+----
+DELETE /subscriptions/{topic}
+----
+
+==== Path Parameters
+
+[cols="1,1,3"]
+|===
+|Parameter |Type |Description
+
+|`topic`
+|string
+|URL-encoded WIS2 topic
+|===
+
+==== Response
+
+[cols="1,3"]
+|===
+|Status |Description
+
+|200
+|Successfully deleted
+
+|400
+|Invalid topic
+
+|503
+|Redis unavailable
+|===
+
+==== Example
+
+[source,bash]
+----
+curl -X DELETE "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"
+----
+
+[source,json]
+----
+{
+  "status": "deleted",
+  "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#"
+}
+----
+
+== Monitoring API
+
+=== Health Check
+
+Returns service health status.
+
+[source,http]
+----
+GET /health
+----
+
+==== Response
+
+Always returns 200. Check the `status` field for actual health.
+
+[cols="1,3"]
+|===
+|Field |Values
+
+|`status`
+|`healthy` or `unhealthy`
+|===
+
+==== Example
+
+[source,bash]
+----
+curl http://localhost:5002/health
+----
+
+[source,json]
+----
+{"status": "healthy"}
+----
+
+=== Prometheus Metrics
+
+Returns metrics in Prometheus text format.
+
+[source,http]
+----
+GET /metrics
+----
+
+==== Response
+
+[cols="1,3"]
+|===
+|Status |Description
+
+|200
+|Prometheus text format metrics
+
+|500
+|Error generating metrics
+|===
+
+==== Available Metrics
+
+[cols="2,1,2,3"]
+|===
+|Metric |Type |Labels |Description
+
+|`wis2_notifications_received`
+|Counter
+|broker, cache, centre_id, topic
+|Total notifications received
+
+|`wis2_notifications_skipped`
+|Counter
+|broker, cache, centre_id, topic, reason
+|Notifications skipped
+
+|`wis2_downloads_failed`
+|Counter
+|cache, centre_id, topic, reason, media_type
+|Failed download attempts
+
+|`wis2_downloads_total`
+|Counter
+|broker, cache, centre_id, topic, media_type
+|Successfully downloaded files
+
+|`wis2_downloads_bytes_total`
+|Counter
+|broker, cache, centre_id, topic, media_type
+|Total bytes downloaded
+
+|`wis2_celery_queue_length`
+|Gauge
+|queue_name
+|Current tasks in Celery queue
+|===
+
+==== Example
+
+[source,bash]
+----
+curl http://localhost:5002/metrics
+----
+
+[source,prometheus]
+----
+# HELP wis2_downloads_total Total number of files downloaded.
+# TYPE wis2_downloads_total counter
+wis2_downloads_total{broker="globalbroker.meteo.fr",cache="example.cache.com",centre_id="fra",topic="weather",media_type="application/bufr"} 42.0
+wis2_downloads_total{broker="globalbroker.meteo.fr",cache="total",centre_id="total",topic="total",media_type="application/bufr"} 42.0
+----
+
+=== OpenAPI Specification
+
+Returns the OpenAPI 3.0 specification as JSON.
+
+[source,http]
+----
+GET /openapi
+----
+
+=== Swagger UI
+
+Interactive API documentation.
+
+[source,http]
+----
+GET /
+GET /swagger
+----
+
+== Error Responses
+
+All error responses follow this format:
+
+[source,json]
+----
+{
+  "error": "Error message describing the problem"
+}
+----
+
+=== Common Error Messages
+
+[cols="1,1,2"]
+|===
+|Status |Error |Cause
+
+|400
+|"No topic provided"
+|POST /subscriptions without topic field
+
+|400
+|"No topic passed"
+|GET/DELETE with empty topic
+
+|404
+|"Subscription for topic X not found"
+|Topic not subscribed
+
+|503
+|"Failed to connect to Redis: ..."
+|Redis unavailable
+
+|503
+|"Failed to queue subscription command..."
+|Redis pub/sub failed
+
+|503
+|"Failed to persist subscription..."
+|Redis write failed
+|===
+
+== Data Schemas
+
+=== Subscription
+
+[source,json]
+----
+{
+  "topic": "string (required) - WIS2 MQTT topic pattern",
+  "save_path": "string | null - Subdirectory for downloads",
+  "filters": {
+    "accepted_media_types": ["array of MIME type strings"]
+  }
+}
+----
+
+=== Filters
+
+[source,json]
+----
+{
+  "accepted_media_types": [
+    "application/bufr",
+    "application/grib",
+    "application/x-netcdf*"
+  ]
+}
+----
+
+==== Default Accepted Media Types
+
+When no filter is specified, these types are accepted:
+
+[source,json]
+----
+[
+  "image/gif", "image/jpeg", "image/png", "image/tiff",
+  "application/pdf", "application/postscript",
+  "application/bufr", "application/grib",
+  "application/x-hdf", "application/x-hdf5",
+  "application/x-netcdf", "application/x-netcdf4",
+  "text/plain", "text/html", "text/xml", "text/csv",
+  "text/tab-separated-values"
+]
+----
+
+== Topic Pattern Reference
+
+=== WIS2 Topic Structure
+
+[source]
+----
+{origin|cache}/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
+----
+
+* `origin` - Original data from the data provider
+* `cache` - Cached copy from a Global Cache (recommended for reliability)
+* `{centre-id}` - Country/organization code, prepended with ISO2C country code (e.g., `de-dwd`)
+* `{data-policy}` - WMO Unified Data Policy: `core` or `recommended`
+* `{earth-system-domain}` - Earth system domain from the WMO Unified Data Policy
+
+=== Wildcards
+
+[cols="1,1,3"]
+|===
+|Pattern |Symbol |Description
+
+|Single-level
+|`+`
+|Matches exactly one level
+
+|Multi-level
+|`#`
+|Matches zero or more levels (must be at end)
+|===
+
+=== Examples
+
+[cols="2,3"]
+|===
+|Pattern |Matches
+
+|`cache/a/wis2/de-dwd/data/#`
+|All data from Deutscher Wetterdienst
+
+|`cache/a/wis2/+/data/core/weather/surface-based-observations/#`
+|Surface observations from all centres
+
+|`cache/a/wis2/+/data/core/#`
+|All core data from any centre
+
+|`cache/a/wis2/+/data/+/weather/#`
+|All weather data (any policy) from any centre
+|===

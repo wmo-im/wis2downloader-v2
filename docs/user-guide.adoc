@@ -1,0 +1,395 @@
+= WIS2 Downloader User Guide
+:toc: left
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:source-highlighter: highlight.js
+:sectnums:
+
+== Introduction
+
+WIS2 Downloader automatically downloads data from WIS2 (WMO Information System 2.0) Global Caches based on your
+subscriptions. You create subscriptions to specify which data topics you're interested in, and the system handles
+downloading and organizing the files.
+
+== Understanding WIS2 Topics
+
+WIS2 uses MQTT topic hierarchies to organize data. Topics follow this pattern:
+
+[source]
+----
+origin/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
+cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
+----
+
+* `origin` - Original data from the data provider
+* `cache` - Cached copy from a Global Cache (recommended for reliability)
+* `{centre-id}` - Country/organization code, prepended with ISO2C country code
+* `{data-policy}` - WMO Unified Data Policy applicable to data (core or recommended)
+* `{earth-system-domain}` - Earth system domain or discipline from the WMO Unified Data Policy
+
+=== Topic Examples
+
+[cols="1,2"]
+|===
+|Topic |Description
+
+|`cache/a/wis2/de-dwd/data/#`
+|All data from Deutscher Wetterdienst
+
+|`cache/a/wis2/+/data/core/weather/surface-based-observations/#`
+|Surface observations from all countries
+
+|===
+
+=== Wildcards
+
+[cols="1,3"]
+|===
+|Wildcard |Meaning
+
+|`+`
+|Matches exactly one level (e.g., any country code)
+
+|`#`
+|Matches zero or more levels (must be at end of topic)
+|===
+
+== Managing Subscriptions
+
+=== Creating a Subscription
+
+Use the REST API to create subscriptions:
+
+[source,bash]
+----
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+    "target": "surface-obs"
+  }'
+----
+
+Response:
+[source,json]
+----
+{
+  "status": "accepted",
+  "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+  "target": "surface-obs"
+}
+----
+
+TIP: Use the Swagger UI at `http://localhost:5002/swagger` for interactive API exploration.
+
+=== Subscription Parameters
+
+[cols="1,1,3"]
+|===
+|Parameter |Required |Description
+
+|`topic`
+|Yes
+|WIS2 MQTT topic pattern with wildcards
+
+|`target`
+|No
+|Subdirectory for downloaded files (under `/data`)
+
+|`filters`
+|No
+|Filter configuration (see <<Filtering>>)
+|===
+
+=== Listing Subscriptions
+
+[source,bash]
+----
+curl http://localhost:5002/subscriptions
+----
+
+Response:
+[source,json]
+----
+{
+  "cache/a/wis2/+/data/core/weather/surface-based-observations/#": {
+    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+    "save_path": "surface-obs",
+    "filters": {}
+  }
+}
+----
+
+=== Getting Subscription Details
+
+[source,bash]
+----
+curl "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"
+----
+
+NOTE: The `#` character must be URL-encoded as `%23` (otherwise interpreted as a URL fragment). Slashes and `+` do not require encoding.
+
+=== Deleting a Subscription
+
+[source,bash]
+----
+curl -X DELETE "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"
+----
+
+== Filtering
+
+=== Media Type Filtering
+
+You can filter downloads by file type using the `accepted_media_types` filter:
+
+[source,bash]
+----
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/de-dwd/data/#",
+    "target": "dwd-bufr",
+    "filters": {
+      "accepted_media_types": ["application/bufr"]
+    }
+  }'
+----
+
+This subscription only downloads BUFR files, skipping all other formats.
+
+=== Supported Media Types
+
+Default accepted types (if no filter specified):
+
+[cols="1,2"]
+|===
+|Category |Types
+
+|Images
+|`image/gif`, `image/jpeg`, `image/png`, `image/tiff`
+
+|Documents
+|`application/pdf`, `application/postscript`
+
+|WMO Formats
+|`application/bufr`, `application/grib`
+
+|Scientific
+|`application/x-hdf`, `application/x-hdf5`, `application/x-netcdf`, `application/x-netcdf4`
+
+|Text
+|`text/plain`, `text/html`, `text/xml`, `text/csv`, `text/tab-separated-values`
+|===
+
+=== Wildcard Matching
+
+Use wildcards in media type filters:
+
+[source,json]
+----
+{
+  "filters": {
+    "accepted_media_types": [
+      "application/bufr",
+      "application/grib",
+      "application/x-netcdf*"
+    ]
+  }
+}
+----
+
+The `*` matches any suffix, so `application/x-netcdf*` matches both `application/x-netcdf` and `application/x-netcdf4`.
+
+== Downloaded Files
+
+=== File Organization
+
+Files are organized by date under your target directory:
+
+[source]
+----
+/data/
+└── surface-obs/           # Your target directory
+    └── 2026/
+        └── 01/
+            └── 28/
+                ├── SYNOP_20260128T120000.bufr
+                ├── SYNOP_20260128T121500.bufr
+                └── ...
+----
+
+=== File Naming
+
+Files retain their original names from the download URL. If a file with the same name already exists and is not an update, the download is skipped.
+
+=== Viewing Downloads
+
+[source,bash]
+----
+# List recent downloads
+ls -la downloads/surface-obs/$(date +%Y/%m/%d)/
+
+# Count files by type
+find downloads/ -name "*.bufr" | wc -l
+
+# Total size
+du -sh downloads/
+----
+
+== Monitoring
+
+=== Health Check
+
+[source,bash]
+----
+curl http://localhost:5002/health
+----
+
+Response:
+[source,json]
+----
+{"status": "healthy"}
+----
+
+=== Metrics
+
+View download statistics:
+
+[source,bash]
+----
+# Total downloads
+curl -s http://localhost:5002/metrics | grep wis2_downloads_total
+
+# Failed downloads
+curl -s http://localhost:5002/metrics | grep wis2_downloads_failed
+
+# Queue depth
+curl -s http://localhost:5002/metrics | grep wis2_celery_queue_length
+----
+
+=== Grafana Dashboard
+
+Access Grafana at `http://localhost:3000` (default credentials: admin/admin) for visual monitoring.
+
+== Common Use Cases
+
+=== Subscribe to All Surface Observations
+
+[source,bash]
+----
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+    "target": "synop"
+  }'
+----
+
+=== Subscribe to Specific Country
+
+[source,bash]
+----
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/de-dwd/data/#",
+    "target": "dwd"
+  }'
+----
+
+=== Download Only BUFR and GRIB Files
+
+[source,bash]
+----
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/#",
+    "target": "wmo-formats",
+    "filters": {
+      "accepted_media_types": ["application/bufr", "application/grib"]
+    }
+  }'
+----
+
+=== Multiple Subscriptions
+
+Create separate subscriptions for different data types:
+
+[source,bash]
+----
+# Surface observations
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{"topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#", "target": "surface"}'
+
+# Upper air
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{"topic": "cache/a/wis2/+/data/core/weather/upper-air-observations/#", "target": "upper-air"}'
+
+# Forecasts
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{"topic": "cache/a/wis2/+/data/core/weather/prediction/#", "target": "forecasts"}'
+----
+
+== Troubleshooting
+
+=== No Files Downloaded
+
+1. Check subscription exists:
++
+[source,bash]
+----
+curl http://localhost:5002/subscriptions
+----
+
+2. Check system health:
++
+[source,bash]
+----
+curl http://localhost:5002/health
+----
+
+3. Check for skipped downloads (metrics):
++
+[source,bash]
+----
+curl -s http://localhost:5002/metrics | grep skipped
+----
+
+=== Files Being Skipped
+
+Check the skip reason in metrics:
+
+[source,bash]
+----
+curl -s http://localhost:5002/metrics | grep wis2_notifications_skipped
+----
+
+Common reasons:
+
+* `PreviouslyProcessed` - File already downloaded (deduplication)
+* `MediaTypeNotAllowed` - File type not in accepted list
+* `GlobalCacheBlacklisted` - Cache excluded via `GC_EXCLUDE`
+
+=== Wrong File Types Downloaded
+
+Update your subscription with a media type filter:
+
+[source,bash]
+----
+# Delete old subscription
+curl -X DELETE http://localhost:5002/subscriptions/your-topic
+
+# Create new subscription with filter
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "your-topic",
+    "target": "your-target",
+    "filters": {"accepted_media_types": ["application/bufr"]}
+  }'
+----

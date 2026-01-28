@@ -75,31 +75,65 @@ def _reconnect(self):
 
 ---
 
-## Pending Work (from tasks.md)
+## 2026-01-28
 
-### Phase 3: Configuration Improvements
-- [ ] Fix subscription storage (Redis only)
-- [ ] Make cache blacklist configurable
-- [ ] Improve Celery worker configuration
-- [ ] Fix invalid JSON in transport options default
+### Phase 3: Configuration Improvements - COMPLETE
 
-### Phase 4: Download Task Improvements
-- [x] Improve file type detection
-- [ ] Add STATUS_QUEUED constant
-- [ ] Add centre_id to result dict
-- [ ] Add dataset field to result
-- [ ] Add media-type safe list validation
+**Fixed:**
+- Subscription storage uses Redis only (removed SQLite)
+- Cache blacklist made configurable via CACHE_BLACKLIST env var
+- Celery worker configuration improved with proper JSON parsing
+- Fixed broker/backend transport options JSON defaults
 
-### Phase 5: Metrics Improvements
-- [ ] Add wis2_ prefix to Prometheus metrics
-- [ ] Simplify metrics labels
-- [ ] Initialize Prometheus multiprocess mode properly
+### Phase 4: Download Task Improvements - COMPLETE
 
-### Phase 6: Code Quality
-- [ ] Remove commented/dead code
-- [ ] Standardize logging
-- [ ] Add type hints
+**Fixed:**
+- Improved file type detection
+- Added STATUS_QUEUED constant
+- Added centre_id extraction to result dict
+- Added dataset field to result
+- Added media-type filtering via subscription filters
+
+**Media-type Filtering:**
+- Subscriptions can now include `filters.media_types` (list of allowed types)
+- Filter is applied early in workflow, before download
+- Uses fnmatch for wildcard support (e.g., `application/x-grib*`)
+
+### Phase 5: Metrics Improvements - COMPLETE
+
+**Fixed:**
+- All metrics renamed with `wis2_` prefix for consistency:
+  - `wis2_notifications_received`
+  - `wis2_notifications_skipped`
+  - `wis2_downloads_failed`
+  - `wis2_downloads_total`
+  - `wis2_downloads_bytes_total`
+  - `wis2_celery_queue_length`
+- Fixed Prometheus multiprocess mode initialization
+- Added `multiprocess_mode='livesum'` to Gauge metrics
+- Fixed shared volume between celery and subscription-manager containers
+- Added Grafana service with auto-provisioned Prometheus/Loki datasources
+
+**Multiprocess Mode Fix:**
+- subscription-manager clears `/tmp/prometheus_metrics/` on startup
+- celery depends_on subscription-manager for proper startup order
+- Both containers share prometheus-metrics-data volume
+
+### Phase 6: Code Quality - COMPLETE
+
+**Fixed:**
+- Created centralized logging in `modules/shared/shared/logging.py`
+- All modules updated to use `setup_logging()` from shared
+- Removed unused imports across all modules
+- Removed commented/dead code
+- Fixed credential logging security issue (was logging passwords)
+- Changed verbose log messages from WARNING to DEBUG
+
+---
+
+## Pending Work
 
 ### Phase 7: Environment & Docker
-- [ ] Update default.env
-- [ ] Clean up git status
+- [ ] Clean up unused config files (e.g., `config/redis-sentinel/sentinel.conf`)
+- [ ] Fix sentinel.conf file permissions
+- [ ] Update/create main project README

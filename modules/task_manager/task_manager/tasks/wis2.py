@@ -1,6 +1,7 @@
 import base64
 from celery.utils.log import get_task_logger
 import datetime as dt
+from fnmatch import fnmatch
 from functools import wraps
 import importlib
 import json
@@ -138,7 +139,7 @@ def guess_file_type(data):
 def _is_allowed_media_type(media_type, filters):
     allowed_types = filters.get('accepted_media_types', DEFAULT_ACCEPTED_MEDIA_TYPES)
     base_type = media_type.split(';')[0].strip().lower()
-    return base_type in [t.lower() for t in allowed_types]
+    return any(fnmatch(base_type, t.lower()) for t in allowed_types)
 
 
 def _select_download_link(links):

@@ -1,0 +1,524 @@
+= WIS2 Downloader Administration Guide
+:toc: left
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:source-highlighter: highlight.js
+:sectnums:
+
+== Deployment
+
+=== Prerequisites
+
+* Docker 20.10+
+* Docker Compose 2.0+
+* 4GB RAM minimum (8GB recommended for production)
+* Network access to WIS2 Global Broker (port 443)
+
+=== Installation
+
+[source,bash]
+----
+git clone <repository-url>
+cd wis2downloader-refactor
+cp default.env .env
+----
+
+Edit `.env` to configure your deployment, then start:
+
+[source,bash]
+----
+docker-compose up -d
+----
+
+=== Verifying Deployment
+
+[source,bash]
+----
+# Check all services are running
+docker-compose ps
+
+# Check health endpoint
+curl http://localhost:5002/health
+
+# View logs
+docker-compose logs -f subscriber
+----
+
+== Configuration
+
+=== Environment Variables
+
+==== Application Settings
+
+[cols="2,1,1,4"]
+|===
+|Variable |Type |Default |Description
+
+|`LOG_LEVEL`
+|string
+|`DEBUG`
+|Logging level: DEBUG, INFO, WARNING, ERROR
+
+|`DATA_PATH`
+|path
+|`/data`
+|Base directory for downloaded files
+
+|`FLASK_SECRET_KEY`
+|string
+|`dev`
+|Flask session secret (change in production!)
+
+|`FLASK_HOST`
+|string
+|`0.0.0.0`
+|API bind address
+
+|`FLASK_PORT`
+|integer
+|`5001`
+|API bind port (internal)
+|===
+
+==== MQTT Broker Settings
+
+[cols="2,1,1,4"]
+|===
+|Variable |Type |Default |Description
+
+|`GLOBAL_BROKER_HOST`
+|string
+|_required_
+|WIS2 Global Broker hostname (e.g., `globalbroker.meteo.fr`)
+
+|`GLOBAL_BROKER_PORT`
+|integer
+|`443`
+|Broker port
+
+|`GLOBAL_BROKER_USERNAME`
+|string
+|`everyone`
+|MQTT username
+
+|`GLOBAL_BROKER_PASSWORD`
+|string
+|`everyone`
+|MQTT password
+
+|`MQTT_PROTOCOL`
+|string
+|`websockets`
+|Transport protocol: `websockets` or `tcp`
+
+|`MQTT_SESSION_ID`
+|string
+|_auto-generated_
+|Persistent session ID for resuming after restart
+|===
+
+==== Redis Settings
+
+[cols="2,1,1,4"]
+|===
+|Variable |Type |Default |Description
+
+|`REDIS_SENTINEL_HOSTS`
+|string
+|_see default.env_
+|Comma-separated list of sentinel hosts (host:port)
+
+|`REDIS_PRIMARY_NAME`
+|string
+|`redis-primary`
+|Sentinel master name
+
+|`REDIS_DATABASE`
+|integer
+|`0`
+|Redis database number
+
+|`REDIS_TTL_SECONDS`
+|integer
+|`3600`
+|TTL for deduplication keys
+
+|`REDIS_MESSAGE_LOCK`
+|integer
+|`300`
+|Lock expiration for concurrent download prevention
+|===
+
+==== Celery Settings
+
+[cols="2,1,1,4"]
+|===
+|Variable |Type |Default |Description
+
+|`CELERY_BROKER_URL`
+|string
+|_sentinel URL_
+|Celery broker connection string
+
+|`CELERY_BROKER_TRANSPORT_OPTIONS`
+|JSON
+|`{"master_name": "redis-primary"}`
+|Broker transport options
+
+|`CELERY_RESULT_BACKEND`
+|string
+|_sentinel URL_
+|Result backend connection string
+
+|`CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS`
+|JSON
+|`{"master_name": "redis-primary"}`
+|Result backend transport options
+|===
+
+==== Download Filtering
+
+[cols="2,1,1,4"]
+|===
+|Variable |Type |Default |Description
+
+|`GC_EXCLUDE`
+|string
+|_empty_
+|Comma-separated list of global cache hostnames to exclude
+|===
+
+=== File Structure
+
+[source]
+----
+wis2downloader-refactor/
+├── config/
+│   ├── grafana/provisioning/    # Grafana datasource config
+│   ├── loki/                    # Loki configuration
+│   └── prometheus/              # Prometheus scrape config
+├── containers/                  # Dockerfiles
+├── downloads/                   # Downloaded data (mounted volume)
+├── modules/                     # Python modules
+│   ├── shared/                  # Shared utilities
+│   ├── subscriber/              # MQTT subscriber
+│   ├── subscription_manager/    # REST API
+│   └── task_manager/            # Celery tasks
+├── docker-compose.yaml
+├── default.env
+└── README.adoc
+----
+
+== High Availability
+
+=== Redis Sentinel
+
+The system uses Redis Sentinel for automatic failover:
+
+* 1 Primary + 2 Replicas
+* 3 Sentinel instances (quorum = 2)
+* Static IPs on dedicated Docker network (172.28.0.0/16)
+
+==== Failover Behavior
+
+* Sentinel detects primary failure after 5 seconds (`down-after-milliseconds`)
+* Failover completes within 60 seconds (`failover-timeout`)
+* Applications auto-reconnect via Sentinel-aware clients
+
+==== Manual Failover
+
+[source,bash]
+----
+# Trigger manual failover
+docker exec redis-sentinel-1 redis-cli -p 26379 SENTINEL FAILOVER redis-primary
+
+# Check current master
+docker exec redis-sentinel-1 redis-cli -p 26379 SENTINEL GET-MASTER-ADDR-BY-NAME redis-primary
+----
+
+=== Scaling Workers
+
+Increase Celery worker concurrency for higher throughput:
+
+[source,yaml]
+----
+# docker-compose.yaml
+celery:
+  command: ["... --concurrency=16 ..."]
+----
+
+Or run multiple worker containers:
+
+[source,bash]
+----
+docker-compose up -d --scale celery=3
+----
+
+=== Adding Global Brokers
+
+Each subscriber service connects to a single WIS2 Global Broker. To receive data from multiple brokers, add additional subscriber services to `docker-compose.yaml`:
+
+[source,yaml]
+----
+  subscriber-france:
+    container_name: subscriber-france
+    restart: always
+    build:
+      context: .
+      dockerfile: ./containers/subscriber/Dockerfile
+    env_file: *default-env
+    environment:
+      GLOBAL_BROKER_HOST: globalbroker.meteo.fr
+      GLOBAL_BROKER_PORT: 443
+      GLOBAL_BROKER_USERNAME: everyone
+      GLOBAL_BROKER_PASSWORD: everyone
+      MQTT_PROTOCOL: websockets
+    depends_on:
+      - redis-sentinel-1
+      - redis-sentinel-2
+      - redis-sentinel-3
+    networks:
+      - redis-net
+    logging: *default-logging
+
+  subscriber-china:
+    container_name: subscriber-china
+    restart: always
+    build:
+      context: .
+      dockerfile: ./containers/subscriber/Dockerfile
+    env_file: *default-env
+    environment:
+      GLOBAL_BROKER_HOST: gb.wis.cma.cn
+      GLOBAL_BROKER_PORT: 443
+      GLOBAL_BROKER_USERNAME: everyone
+      GLOBAL_BROKER_PASSWORD: everyone
+      MQTT_PROTOCOL: websockets
+    depends_on:
+      - redis-sentinel-1
+      - redis-sentinel-2
+      - redis-sentinel-3
+    networks:
+      - redis-net
+    logging: *default-logging
+----
+
+IMPORTANT: Each subscriber must have a unique `container_name`.
+
+All subscribers share the same Redis backend, so subscriptions created via the API are received by all subscriber instances. Downloads are deduplicated, so the same file won't be downloaded twice even if notifications arrive from multiple brokers.
+
+== Monitoring
+
+=== Prometheus Metrics
+
+Metrics endpoint: `http://localhost:5002/metrics`
+
+==== Available Metrics
+
+[cols="2,1,3"]
+|===
+|Metric |Type |Description
+
+|`wis2_notifications_received`
+|Counter
+|Total notifications received (labels: broker, cache, centre_id, topic)
+
+|`wis2_notifications_skipped`
+|Counter
+|Notifications skipped due to deduplication or filtering (labels: +reason)
+
+|`wis2_downloads_failed`
+|Counter
+|Failed download attempts (labels: cache, centre_id, topic, reason, media_type)
+
+|`wis2_downloads_total`
+|Counter
+|Successfully downloaded files (labels: broker, cache, centre_id, topic, media_type)
+
+|`wis2_downloads_bytes_total`
+|Counter
+|Total bytes downloaded
+
+|`wis2_celery_queue_length`
+|Gauge
+|Current number of tasks in the Celery queue
+|===
+
+==== Example Queries
+
+[source,promql]
+----
+# Download rate per minute
+rate(wis2_downloads_total[1m])
+
+# Failed downloads by reason
+sum by (reason) (wis2_downloads_failed)
+
+# Bytes downloaded in last hour
+increase(wis2_downloads_bytes_total[1h])
+
+# Queue depth
+wis2_celery_queue_length
+----
+
+=== Grafana
+
+Access Grafana at `http://localhost:3000` (default: admin/admin)
+
+Pre-configured datasources:
+
+* Prometheus - `http://prometheus:9090`
+* Loki - `http://loki:3100`
+
+=== Logging
+
+All services log to stdout with UTC timestamps:
+
+[source]
+----
+2026-01-28T10:15:30.123Z subscriber INFO Connected successfully
+----
+
+View logs via Docker:
+
+[source,bash]
+----
+# All services
+docker-compose logs -f
+
+# Specific service
+docker-compose logs -f celery
+
+# With timestamps
+docker-compose logs -f -t subscriber
+----
+
+Logs are also collected by Loki and queryable in Grafana.
+
+== Maintenance
+
+=== Backup
+
+==== Redis Data
+
+[source,bash]
+----
+# Trigger RDB snapshot
+docker exec redis-primary redis-cli BGSAVE
+
+# Copy snapshot
+docker cp redis-primary:/data/dump.rdb ./backup/
+----
+
+==== Downloaded Files
+
+[source,bash]
+----
+# Backup downloads directory
+tar -czf wis2-downloads-$(date +%Y%m%d).tar.gz downloads/
+----
+
+=== Clearing Data
+
+WARNING: These operations are destructive.
+
+[source,bash]
+----
+# Clear all subscriptions
+docker exec redis-primary redis-cli DEL global:all_subscriptions
+
+# Clear deduplication cache (allows re-download of all data)
+docker exec redis-primary redis-cli KEYS "wis2:notifications:*" | xargs -r docker exec -i redis-primary redis-cli DEL
+
+# Clear downloaded files
+rm -rf downloads/*
+----
+
+=== Restarting Services
+
+[source,bash]
+----
+# Restart single service
+docker-compose restart subscriber
+
+# Restart all services
+docker-compose restart
+
+# Full rebuild (after code changes)
+docker-compose build && docker-compose up -d
+----
+
+== Troubleshooting
+
+=== Service Won't Start
+
+[source,bash]
+----
+# Check logs
+docker-compose logs <service-name>
+
+# Check container status
+docker-compose ps
+
+# Verify environment
+docker-compose config
+----
+
+=== No Downloads
+
+1. Check subscriber is connected:
++
+[source,bash]
+----
+docker-compose logs subscriber | grep -i connect
+----
+
+2. Verify subscription exists:
++
+[source,bash]
+----
+curl http://localhost:5002/subscriptions
+----
+
+3. Check Celery worker is processing:
++
+[source,bash]
+----
+docker-compose logs celery | tail -50
+----
+
+4. Check queue depth:
++
+[source,bash]
+----
+curl -s http://localhost:5002/metrics | grep queue_length
+----
+
+=== Redis Connection Errors
+
+1. Check Sentinel status:
++
+[source,bash]
+----
+docker exec redis-sentinel-1 redis-cli -p 26379 SENTINEL MASTER redis-primary
+----
+
+2. Verify network connectivity:
++
+[source,bash]
+----
+docker network inspect wis2downloader-refactor_redis-net
+----
+
+=== High Memory Usage
+
+* Increase `max-tasks-per-child` to recycle workers more frequently
+* Reduce worker concurrency
+* Check for large files overwhelming workers
+
+=== Metrics Not Updating
+
+* Prometheus scrape interval is 15 seconds by default
+* Check Prometheus targets: `http://localhost:9090/targets`
+* Verify metrics endpoint: `curl http://localhost:5002/metrics`
