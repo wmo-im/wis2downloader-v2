@@ -1,38 +1,18 @@
 import json
-import logging
 import os
 from pathlib import Path
 from urllib.parse import unquote
 import yaml
-import time
 from flask import Flask, request, jsonify, url_for, Response, render_template
 from prometheus_client import generate_latest, CollectorRegistry, multiprocess
-from prometheus_client import Counter, Gauge
-import sys
+from prometheus_client import Gauge
 from redis.exceptions import ConnectionError
 
-# Import shared Redis client
-from shared import get_redis_client
+from shared import get_redis_client, setup_logging
 
-# set up logging
-log_formatter = logging.Formatter(
-    fmt='%(asctime)s.%(msecs)03dZ, %(name)s, %(levelname)s, %(message)s',
-    datefmt='%Y-%m-%dT%H:%M:%S'
-)
-log_formatter.converter = time.gmtime
-
-stream_handler = logging.StreamHandler(sys.stdout)
-stream_handler.setFormatter(log_formatter)
-
-root_logger = logging.getLogger()
-root_logger.setLevel(os.getenv("LOG_LEVEL", "DEBUG").upper())
-
-# Clear existing handlers and add our stream handler
-if root_logger.hasHandlers():
-    root_logger.handlers.clear()
-root_logger.addHandler(stream_handler)
-
-LOGGER = logging.getLogger(__name__)
+# Set up logging
+setup_logging()  # Configure root logger
+LOGGER = setup_logging(__name__)
 
 DATA_DIRECTORY = Path(
     os.getenv("DATA_BASEPATH", "/data/wis2-downloads")).resolve()

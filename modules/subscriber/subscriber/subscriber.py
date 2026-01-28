@@ -2,18 +2,14 @@ import time
 from datetime import datetime
 from fnmatch import fnmatch
 import json
-import logging
-import magic
-import os
 import ssl
 
 import paho.mqtt.client as mqtt
 
 from task_manager.workflows import wis2_download
+from shared import setup_logging
 
-LOGGER = logging.getLogger(__name__)
-LOG_LEVEL = os.getenv("LOG_LEVEL","DEBUG").upper()
-LOGGER.setLevel(LOG_LEVEL)
+LOGGER = setup_logging(__name__)
 
 class Subscriber():
     def __init__(self, host: str = "globalbroker.meteo.fr",

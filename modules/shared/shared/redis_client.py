@@ -1,35 +1,46 @@
+"""Redis client with Sentinel support for high availability."""
 from functools import lru_cache
-import logging
 import os
+from typing import List, Optional, Tuple
+
 import redis
 from redis.sentinel import Sentinel
 
-LOGGER = logging.getLogger(__name__)
-LOG_LEVEL = os.getenv("LOG_LEVEL","DEBUG").upper()
-LOGGER.setLevel(LOG_LEVEL)
+from .logging import setup_logging
 
-SENTINEL_HOSTS_STR = os.getenv('REDIS_SENTINEL_HOSTS')
-MASTER_NAME = os.getenv('REDIS_PRIMARY_NAME', 'redis-primary')
-REDIS_DB = int(os.getenv('REDIS_DATABASE', 0))
+LOGGER = setup_logging(__name__)
 
-# fallback to direct connection if no sentinel hosts are provided
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+SENTINEL_HOSTS_STR: Optional[str] = os.getenv('REDIS_SENTINEL_HOSTS')
+MASTER_NAME: str = os.getenv('REDIS_PRIMARY_NAME', 'redis-primary')
+REDIS_DB: int = int(os.getenv('REDIS_DATABASE', 0))
 
-SENTINEL_HOSTS = []
+# Fallback to direct connection if no sentinel hosts are provided
+REDIS_HOST: str = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT: int = int(os.getenv("REDIS_PORT", 6379))
+
+SENTINEL_HOSTS: List[Tuple[str, int]] = []
 if SENTINEL_HOSTS_STR:
     for pair in SENTINEL_HOSTS_STR.split(','):
         host, port = pair.split(':')
         SENTINEL_HOSTS.append((host, int(port)))
 
-_sentinel = None
-_redis_client = None
+_sentinel: Optional[Sentinel] = None
+_redis_client: Optional[redis.Redis] = None
+
 
 @lru_cache(maxsize=1)
-def get_redis_client():
+def get_redis_client() -> redis.Redis:
     """
-    Initializes and returns the Redis master client via Sentinel.
+    Initialize and return the Redis master client via Sentinel.
+
     Uses lru_cache to ensure the connection is only established once.
+    Falls back to direct Redis connection if no Sentinel hosts configured.
+
+    Returns:
+        Redis client instance.
+
+    Raises:
+        ConnectionError: If unable to connect to Redis.
     """
     global _sentinel, _redis_client
     if _redis_client is None:

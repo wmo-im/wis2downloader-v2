@@ -1,16 +1,11 @@
 import threading
 import json
 import time
-import logging
-import os
 
 import redis
-from shared import get_redis_client
+from shared import get_redis_client, setup_logging
 
-
-LOGGER = logging.getLogger(__name__)
-LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG").upper()
-LOGGER.setLevel(LOG_LEVEL)
+LOGGER = setup_logging(__name__)
 
 
 class CommandListener(threading.Thread):

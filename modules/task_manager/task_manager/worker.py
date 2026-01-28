@@ -1,25 +1,13 @@
-import logging
+from celery import Celery
+import json
 import os
 import sys
-import time
-import json # New import required for parsing transport options
-from celery import Celery
 
-# set up logging
-log_formatter = logging.Formatter(
-    fmt='%(asctime)s.%(msecs)03dZ, %(name)s, %(levelname)s, %(message)s',
-    datefmt='%Y-%m-%dT%H:%M:%S'
-)
-log_formatter.converter = time.gmtime
+from shared import setup_logging
 
-stream_handler = logging.StreamHandler(sys.stdout)
-stream_handler.setFormatter(log_formatter)
-
-root_logger = logging.getLogger()
-# Use LOG_LEVEL from environment for root logger
-root_logger.setLevel(os.getenv("LOG_LEVEL", "DEBUG").upper())
-root_logger.addHandler(stream_handler)
-LOGGER = logging.getLogger(__name__)
+# Set up logging
+setup_logging()  # Configure root logger
+LOGGER = setup_logging(__name__)
 
 
 # 1. Load Celery Broker URL (Sentinel list)

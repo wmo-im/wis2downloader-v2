@@ -1,4 +1,3 @@
-import logging
 import os
 import threading
 import time
@@ -6,10 +5,9 @@ from uuid import uuid4
 
 from .command_listener import CommandListener
 from .subscriber import Subscriber
+from shared import setup_logging
 
-LOGGER = logging.getLogger(__name__)
-LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG").upper()
-LOGGER.setLevel(LOG_LEVEL)
+LOGGER = setup_logging(__name__)
 
 COMMAND_CHANNEL = "subscription_commands"
 
