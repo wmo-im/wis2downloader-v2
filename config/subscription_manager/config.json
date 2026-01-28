@@ -1,13 +1,5 @@
 {
     "brokers": {
-        "France": {
-            "session": "7a5c0732-9475-4f9e-a6d5-a4d87eefa5c6",
-            "host": "globalbroker.meteo.fr",
-            "port": 443,
-            "username": "everyone",
-            "password": "everyone",
-            "protocol": "websockets"
-        }
     },
     "topics": {},
     "flask_host": "0.0.0.0",

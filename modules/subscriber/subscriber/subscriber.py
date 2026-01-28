@@ -2,18 +2,14 @@ import time
 from datetime import datetime
 from fnmatch import fnmatch
 import json
-import logging
-import os
 import ssl
 
 import paho.mqtt.client as mqtt
 
 from task_manager.workflows import wis2_download
+from shared import setup_logging
 
-LOGGER = logging.getLogger(__name__)
-
-LOG_LEVEL = os.getenv("LOG_LEVEL","DEBUG").upper()
-LOGGER.setLevel(LOG_LEVEL)
+LOGGER = setup_logging(__name__)
 
 class Subscriber():
     def __init__(self, host: str = "globalbroker.meteo.fr",
@@ -50,6 +46,7 @@ class Subscriber():
         LOGGER.info(f"Connecting (Host: {host}, port: {port}, session: {session}) ...")
 
         try:
+            LOGGER.warning(f"Connecting to {host}:{port}")
             self.client.connect(host, port)
         except Exception as e:
             LOGGER.error(f"Failed to connect to {host}: {e}")
@@ -81,11 +78,13 @@ class Subscriber():
     def _on_message(self, client, userdata, msg):
         LOGGER.debug(f"Message received on topic {msg.topic}")
         target = self.active_subscriptions.get(msg.topic,{}).get('target')
+        filters = self.active_subscriptions.get(msg.topic,{}).get('filters', {})
 
         if target is None:
             for key, value in self.active_subscriptions.items():
                 if fnmatch(msg.topic, value['pattern']):
-                    target = value['target']
+                    target = value.get('target')
+                    filters = value.get('filters', {})
                     break
 
         if target is None:
@@ -97,6 +96,7 @@ class Subscriber():
         job = {
             "topic": msg.topic,
             "target": target,
+            "filters": filters,
             "_broker": self.host,
             "_received": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
             '_queued': datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
@@ -111,11 +111,12 @@ class Subscriber():
         workflow = wis2_download(job)
         workflow.apply_async()
 
-    def subscribe(self, topic, target):
+    def subscribe(self, topic, target, filters):
         self.client.subscribe(topic, qos=0)
         self.active_subscriptions[topic] = {
             'target': target,
-            'pattern': topic.replace("+", "*").replace("#", "*")
+            'pattern': topic.replace("+", "*").replace("#", "*"),
+            'filters': filters
         }
         LOGGER.info(f"Subscribed to {topic} on {self.host}")
         return self.active_subscriptions

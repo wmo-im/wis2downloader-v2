@@ -28,6 +28,8 @@ services:
     volumes:
       - loki-data:/loki
       - ./config/loki/loki-config.yml:/etc/loki/loki-config.yml
+    networks:
+      - redis-net
     <<: *loki-logging
 
 
@@ -42,16 +44,130 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.retention.time=10d'
       - '--log.level=warn'
+    networks:
+      - redis-net
 
-  # Databases / message queues
-  redis:
-    container_name: redis
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
     restart: always
-    build:
-      context: ./containers/redis
-      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - redis-net
     logging: *default-logging
 
+  # Databases / message queues
+
+  redis-primary:
+    container_name: redis-primary
+    build:
+      context: ./containers/redis/
+      dockerfile: Dockerfile
+    restart: always
+    command: ["redis-server", "--appendonly", "yes", "--protected-mode", "no"]
+    volumes:
+      - redis-primary-data:/data
+    networks:
+      redis-net:
+        ipv4_address: 172.28.0.10
+    logging: *default-logging
+
+  redis-replica-1:
+    container_name: redis-replica-1
+    build:
+      context: ./containers/redis/
+      dockerfile: Dockerfile
+    restart: always
+    command: ["redis-server", "--replicaof", "172.28.0.10", "6379", "--protected-mode", "no"]
+    depends_on:
+      - redis-primary
+    volumes:
+      - redis-replica-1-data:/data
+    networks:
+      redis-net:
+        ipv4_address: 172.28.0.11
+    logging: *default-logging
+
+  redis-replica-2:
+    container_name: redis-replica-2
+    build:
+      context: ./containers/redis/
+      dockerfile: Dockerfile
+    restart: always
+    command: ["redis-server", "--replicaof", "172.28.0.10", "6379", "--protected-mode", "no"]
+    depends_on:
+      - redis-primary
+    volumes:
+      - redis-replica-2-data:/data
+    networks:
+      redis-net:
+        ipv4_address: 172.28.0.12
+    logging: *default-logging
+
+  redis-sentinel-1:
+    container_name: redis-sentinel-1
+    build:
+      context: ./containers/redis-sentinel/
+      dockerfile: Dockerfile
+    restart: always
+    command: ["redis-sentinel","/usr/local/etc/redis/sentinel.conf"]
+    ports:
+      - "26379:26379"
+    depends_on:
+      - redis-primary
+      - redis-replica-1
+      - redis-replica-2
+    networks:
+      redis-net:
+        ipv4_address: 172.28.0.20
+    logging: *default-logging
+
+  redis-sentinel-2:
+    container_name: redis-sentinel-2
+    build:
+      context: ./containers/redis-sentinel/
+      dockerfile: Dockerfile
+    restart: always
+    command: ["redis-sentinel","/usr/local/etc/redis/sentinel.conf"]
+    ports:
+      - "26380:26379"
+    depends_on:
+      - redis-primary
+      - redis-replica-1
+      - redis-replica-2
+    networks:
+      redis-net:
+        ipv4_address: 172.28.0.21
+    logging: *default-logging
+
+  redis-sentinel-3:
+    container_name: redis-sentinel-3
+    build:
+      context: ./containers/redis-sentinel/
+      dockerfile: Dockerfile
+    restart: always
+    command: ["redis-sentinel","/usr/local/etc/redis/sentinel.conf"]
+    ports:
+      - "26381:26379"
+    depends_on:
+      - redis-primary
+      - redis-replica-1
+      - redis-replica-2
+    networks:
+      redis-net:
+        ipv4_address: 172.28.0.22
+    logging: *default-logging
 
   # Task handling
   celery:
@@ -68,11 +184,13 @@ services:
       - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus_metrics
     tty: true
     depends_on:
-      - redis
-    deploy:
-      replicas: 1
+      - redis-sentinel-1
+      - redis-sentinel-2
+      - redis-sentinel-3
+      - subscription-manager
+    networks:
+      - redis-net
     logging: *default-logging
-
 
   # Main application
   subscription-manager:
@@ -91,9 +209,15 @@ services:
     env_file: *default-env
     environment:
       - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus_metrics
+      - FLASK_HOST=0.0.0.0
+      - FLASK_PORT=5001
     tty: true
     depends_on:
-      - redis
+      - redis-sentinel-1
+      - redis-sentinel-2
+      - redis-sentinel-3
+    networks:
+      - redis-net
     logging: *default-logging
 
   wis2downloader-ui:
@@ -107,7 +231,40 @@ services:
         - PGID=0 # change this to your group id
         - STORAGE_SECRET="change-this-to-yor-own-private-secret"
 
+  subscriber-france:
+    container_name: subscriber
+    restart: always
+    build:
+      context: .
+      dockerfile: ./containers/subscriber/Dockerfile
+    env_file: *default-env
+    environment:
+      GLOBAL_BROKER_HOST: globalbroker.meteo.fr
+      GLOBAL_BROKER_PORT: 443
+      GLOBAL_BROKER_USERNAME: everyone
+      GLOBAL_BROKER_PASSWORD: everyone
+      MQTT_PROTOCOL: websockets
+    depends_on:
+      - redis-sentinel-1
+      - redis-sentinel-2
+      - redis-sentinel-3
+    networks:
+      - redis-net
+    logging: *default-logging
+
+
 volumes:
   loki-data:
   prometheus-data:
   prometheus-metrics-data:
+  grafana-data:
+  redis-primary-data:
+  redis-replica-1-data:
+  redis-replica-2-data:
+
+networks:
+  redis-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

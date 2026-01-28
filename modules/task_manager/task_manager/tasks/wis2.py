@@ -1,74 +1,84 @@
 import base64
-from celery import Task, current_task
 from celery.utils.log import get_task_logger
 import datetime as dt
-from dateutil.relativedelta import relativedelta
+from fnmatch import fnmatch
 from functools import wraps
 import importlib
 import json
+import magic
+import mimetypes
 import os
 from pathlib import Path
 from prometheus_client import Counter, Gauge
-import redis
 import time
 import urllib3
 from urllib.parse import urlsplit
 
 from task_manager.worker import app as app
 
+# Import shared Redis client
+from shared import get_redis_client
+
+LOGGER = get_task_logger(__name__)
+
+DATA_BASEPATH = os.getenv("DATA","/data") # this needs checking
+
 STATUS_SUCCESS = "SUCCESS"
 STATUS_FAILED = "FAILED"
 STATUS_SKIPPED = "SKIPPED"
-STATUS_VALID_CONDITIONS = [STATUS_SUCCESS, STATUS_FAILED, STATUS_SKIPPED]
+STATUS_PENDING = "PENDING"
+STATUS_VALID_CONDITIONS = [STATUS_SUCCESS, STATUS_FAILED, STATUS_SKIPPED, STATUS_PENDING]
 REDIS_TTL_SECONDS = int(os.getenv("REDIS_TTL_SECONDS", 3600))
 LOCK_EXPIRE = int(os.getenv("REDIS_MESSAGE_LOCK", 300))
+CACHE_EXCLUDE_LIST = os.getenv("GC_EXCLUDE","").split(",")
 
 _pool = urllib3.PoolManager()
 hash_module = importlib.import_module("hashlib")
 
-# environment variables
-DATA_BASEPATH = os.getenv("DATA","/data") # this needs checking
-REDIS_HOST = os.getenv("REDIS_HOST","redis")
-REDIS_PORT = os.getenv("REDIS_PORT","6379")
-
-LOGGER = get_task_logger(__name__)
-
-redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 
 TRACKER = "wis2:notifications:data:tracker"
 
+mimetypes.add_type('application/bufr', '.bufr')
+mimetypes.add_type('application/grib', '.grib')
+
+DEFAULT_ACCEPTED_MEDIA_TYPES = [
+                        'image/gif', 'image/jpeg', 'image/png', 'image/tiff',  # image formats
+                        'application/pdf', 'application/postscript',  # postscript and PDF
+                        'application/bufr', 'application/grib',  # WMO formats
+                        'application/x-hdf', 'application/x-hdf5', 'application/x-netcdf', 'application/x-netcdf4',  # scientific formats
+                        'text/plain', 'text/html', 'text/xml', 'text/csv', 'text/tab-separated-values',  # text based formats
+                        ]
 
 # define some metrics for prometheus
 
 NOTIFICATIONS_RECEIVED = Counter(
-    'notifications_received',
+    'wis2_notifications_received',
     'Total number of notifications received.',
     ['broker', 'cache', 'centre_id', 'topic']
 )
 
 NOTIFICATIONS_SKIPPED = Counter(
-    'notifications_skipped',
+    'wis2_notifications_skipped',
     'Total number of notifications skipped.',
     ['broker', 'cache', 'centre_id', 'topic', 'reason']
 )
 
 DOWNLOADS_FAILED = Counter(
-    'failed_downloads',
+    'wis2_downloads_failed',
     'Total number of failed downloads.',
-    ['cache', 'centre_id', 'topic', 'reason', 'file_type']
+    ['cache', 'centre_id', 'topic', 'reason', 'media_type']
 )
 
-
 DOWNLOADS_TOTAL_FILES = Counter(
-    'downloads_total_files',
+    'wis2_downloads_total',
     'Total number of files downloaded.',
-    ['broker', 'cache', 'centre_id', 'topic', 'file_type']
+    ['broker', 'cache', 'centre_id', 'topic', 'media_type']
 )
 
 DOWNLOADS_TOTAL_BYTES = Counter(
-    'downloads_total_bytes',
+    'wis2_downloads_bytes_total',
     'Total number of bytes downloaded.',
-    ['broker', 'cache', 'centre_id', 'topic', 'file_type']
+    ['broker', 'cache', 'centre_id', 'topic', 'media_type']
 )
 
 
@@ -79,9 +89,16 @@ def set_status(key, type, status):
     if type not in ('by-msg-id', 'by-hash', 'by-data-id'):
         LOGGER.error(f"Invalid type {type}")
         return
+    if status not in STATUS_VALID_CONDITIONS:
+        LOGGER.error(f"Invalid status '{status}' for {key} ({type})")
     tracker_id = f"{TRACKER}:{type}:{key}"
-    redis_client.hset(tracker_id, 'status', status)
-    redis_client.expire(tracker_id, REDIS_TTL_SECONDS)  # Set expiration
+
+    try:
+        redis_client = get_redis_client()
+        redis_client.hset(tracker_id, 'status', status)
+        redis_client.expire(tracker_id, REDIS_TTL_SECONDS)  # Set expiration
+    except Exception as e:
+        LOGGER.error(f"Redis error in set_status: {e}")
 
 
 def get_status(key, type):
@@ -94,13 +111,35 @@ def get_status(key, type):
         return status
 
     tracker_id = f"{TRACKER}:{type}:{key}"
-    if redis_client.hexists(tracker_id,'status'):
-        status = redis_client.hget(tracker_id,'status')
-        status = status.decode('utf-8')
-        if status not in STATUS_VALID_CONDITIONS:
-            LOGGER.warning(f"Invalid status '{status}' for {key}")
+
+    try:
+        redis_client = get_redis_client()
+        if redis_client.hexists(tracker_id, 'status'):
+            status = redis_client.hget(tracker_id, 'status')
+            status = status.decode('utf-8')
+            if status not in STATUS_VALID_CONDITIONS:
+                LOGGER.warning(f"Invalid status '{status}' for {key}")
+    except Exception as e:
+        LOGGER.error(f"Redis error in get_status: {e}")
 
     return status
+
+def guess_file_type(data):
+    mime = magic.from_buffer(data, mime=True)
+    if mime == 'application/octet-stream':  # we need to manually guess for BUFR, GRIB, etc
+        if len(data) >= 4:
+            header = data[0:4].decode('utf-8', errors='ignore')
+            if header == 'BUFR':
+                mime = 'application/bufr'
+            elif header == 'GRIB':
+                mime = 'application/grib'
+    ext = mimetypes.guess_extension(mime)
+    return mime, ext
+
+def _is_allowed_media_type(media_type, filters):
+    allowed_types = filters.get('accepted_media_types', DEFAULT_ACCEPTED_MEDIA_TYPES)
+    base_type = media_type.split(';')[0].strip().lower()
+    return any(fnmatch(base_type, t.lower()) for t in allowed_types)
 
 
 def _select_download_link(links):
@@ -151,7 +190,7 @@ def metrics_collector(func):
         error_class = result.get('error_class','')
         centre_id = result.get('centre_id','')
         file_size = result.get('actual_filesize',0)
-        file_type = result.get('file_type','')
+        media_type = result.get('media_type','')
 
         try:
 
@@ -177,7 +216,7 @@ def metrics_collector(func):
                     cache=global_cache,
                     centre_id=centre_id,
                     topic=topic,
-                    file_type=file_type,
+                    media_type=media_type,
                     reason=error_class
                 ).inc()
 
@@ -187,7 +226,7 @@ def metrics_collector(func):
                     cache=global_cache,
                     centre_id=centre_id,
                     topic=topic,
-                    file_type = file_type
+                    media_type = media_type
                 ).inc()
 
                 DOWNLOADS_TOTAL_FILES.labels(
@@ -195,7 +234,7 @@ def metrics_collector(func):
                     cache=global_cache,
                     centre_id='total',
                     topic='total',
-                    file_type = file_type
+                    media_type = media_type
                 ).inc()
 
                 DOWNLOADS_TOTAL_BYTES.labels(
@@ -203,7 +242,7 @@ def metrics_collector(func):
                     cache=global_cache,
                     centre_id='total',
                     topic=topic,
-                    file_type=file_type
+                    media_type=media_type
                 ).inc(file_size)
 
 
@@ -212,7 +251,7 @@ def metrics_collector(func):
                     cache=global_cache,
                     centre_id='total',
                     topic='total',
-                    file_type=file_type
+                    media_type=media_type
                 ).inc(file_size)
         except Exception as e:
             LOGGER.error(f"Error collecting metrics: {e}", exc_info=True)
@@ -231,6 +270,7 @@ def download_from_wis2(self, job):
         'topic': None,
         'broker': None,
         'global_cache': None,
+        'centre_id': None,
         'metadata_id': None,
         'received': None,
         'queued': None,
@@ -242,7 +282,7 @@ def download_from_wis2(self, job):
         'reason': None,
         'error_class': None,
         'filepath': None,
-        'file_type': None,
+        'media_type': None,
         'save': False,
         'expected_hash': None,
         'actual_hash': None,
@@ -270,8 +310,8 @@ def download_from_wis2(self, job):
     centre_id = topic_parts[3] if len(topic_parts) > 3 and topic_parts[2] == 'wis2' else 'unknown'
     result['centre_id'] = centre_id
 
-    file_type = 'unknown'
-    result['file_type'] = file_type
+    media_type = 'unknown'
+    result['media_type'] = media_type
 
     # get identifiers (incl. file hash if present)
     message_id = job.get('payload',{}).get('id')
@@ -305,6 +345,7 @@ def download_from_wis2(self, job):
     # acquire lock on ID to make sure we only process once.
     lock_key_identifier = filehash or data_id or message_id
     lock_key = f"wis2:notification:data:lock:{lock_key_identifier}"
+    redis_client = get_redis_client()
     lock_acquired = redis_client.set(lock_key, 1, nx=True, ex=LOCK_EXPIRE)
     if not lock_acquired:  # lock acquired by another worker
         LOGGER.warning(f"Could not acquire lock for {lock_key_identifier}, retrying in 10 seconds")
@@ -317,14 +358,6 @@ def download_from_wis2(self, job):
         # Now parse download URL from payload link
         download_url, expected_length, overwrite = _select_download_link(job['payload']['links'])
         result['download_url'] = download_url
-
-        # get file_type from filename extension, this doesn't always work
-        # hence later we also check the file header for GRIB or BUFR.
-        if download_url:
-            filename = os.path.basename(urlsplit(download_url).path)
-            if '.' in filename:
-                file_type = filename.split('.')[-1]
-                result['file_type'] = file_type
 
         # check we have a download URL
         if not download_url:
@@ -344,7 +377,8 @@ def download_from_wis2(self, job):
         # extract cache
         result['global_cache'] = urlsplit(download_url).hostname
 
-        if result['global_cache'] in ("wis2.ncm.gov.sa"):
+        # ToDo, remove hard coding and move to config.
+        if result['global_cache'] in CACHE_EXCLUDE_LIST:
             result['status'] = STATUS_SKIPPED
             result['reason'] = "Global cache black listed, skipped"
             result['error_class'] = "GlobalCacheBlacklisted"
@@ -361,6 +395,7 @@ def download_from_wis2(self, job):
 
         # ToDo - investigate whether we want to replace the following with aria2
         # download the data
+        result['status'] = STATUS_PENDING
         result['download_start'] = _now_utc_str()
         try:
             response = _pool.request('GET', download_url,
@@ -381,24 +416,34 @@ def download_from_wis2(self, job):
             result['status'] = STATUS_FAILED
             result['reason'] = f"Error {e} while downloading from {result['global_cache']}"
             result['error_class'] = str(e.__class__.__name__)
+
+        if result['status'] == STATUS_FAILED:
+            final_status = result.get('status', STATUS_FAILED)
+            LOGGER.error(f"Download failed for {download_url}, reason: {result['reason']}")
+            if lock_acquired:
+                redis_client.delete(lock_key)
+            set_status(message_id, 'by-msg-id', final_status)
+            set_status(data_id, 'by-data-id', final_status)
+            set_status(filehash, 'by-hash', final_status)
+            return result
+
         result['download_end'] = _now_utc_str()
 
         # verify and save the file
         data = response.data
         result['actual_filesize'] = len(data)
 
-        # update filetype
-        if len(data) >= 4:
-            header = data[0:4].decode('utf-8', errors='ignore')
-            if header == 'BUFR':
-                file_type = 'bufr'
-            elif header == 'GRIB': # GRIB is often represented by 'GRIB' or 'GRB'
-                file_type = 'grib'
 
-        if file_type == 'bufr4':  # chnage to bufr cor consistency
-            file_type = 'bufr'
-
-        result['file_type'] = file_type
+        file_type, _ = guess_file_type(data)
+        result['media_type'] = file_type
+        # check if media_type is allowed
+        filters = job.get('filters', {})
+        if not _is_allowed_media_type(file_type, filters):
+            result['status'] = STATUS_SKIPPED
+            result['reason'] = f"Media type '{file_type}' not allowed by filter"
+            result['error_class'] = "MediaTypeNotAllowed"
+            LOGGER.warning(f"File {output_path} skipped, media type '{file_type}' not allowed by filter")
+            return result
 
         # hash verification
         hash_props = job['payload']['properties'].get('integrity',{})
@@ -430,9 +475,7 @@ def download_from_wis2(self, job):
         result['save'] = True
         result['status'] = STATUS_SUCCESS
 
-        # update metrics
-
-        LOGGER.warning(result)
+        LOGGER.debug(result)
         return result
 
     except Exception as e:

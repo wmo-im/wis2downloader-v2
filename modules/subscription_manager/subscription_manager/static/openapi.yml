@@ -1,140 +1,349 @@
-openapi: 3.0.0
+openapi: 3.0.3
 x-api-id: wis2-downloader-api
 info:
-  title: WIS2 downloader API
-  version: 0.1.dev2
-  description: API definition
+  title: WIS2 Downloader API
+  version: 1.0.0
+  description: |
+    REST API for managing WIS2 data subscriptions.
+
+    This API allows you to subscribe to WIS2 MQTT topics and configure
+    where downloaded data should be stored and what file types to accept.
+  contact:
+    name: WIS2 Downloader
 servers:
-  - url: http://127.0.0.1:5002
+  - url: http://localhost:5002
     description: Local development server
+
+tags:
+  - name: Subscriptions
+    description: Manage WIS2 topic subscriptions
+  - name: Monitoring
+    description: Health checks and metrics
+
 paths:
   /subscriptions:
     get:
-      summary: Returns list of subscribed topics
-      description: Returns list of subscribed topics
+      tags:
+        - Subscriptions
+      summary: List all subscriptions
+      description: Returns all active WIS2 topic subscriptions
+      operationId: listSubscriptions
       responses:
         "200":
-          description: A JSON object containing the subscribed topics
+          description: Map of topic to subscription details
           content:
             application/json:
               schema:
                 type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/Subscription'
+              example:
+                "cache/a/wis2/+/data/core/weather/surface-based-observations/#":
+                  topic: "cache/a/wis2/+/data/core/weather/surface-based-observations/#"
+                  save_path: "surface-obs"
+                  filters:
+                    accepted_media_types:
+                      - "application/bufr"
+                      - "application/grib"
+        "503":
+          $ref: '#/components/responses/ServiceUnavailable'
+
     post:
-      summary: Subscribe to specified topic
-      description: Subscribe to specified topic
+      tags:
+        - Subscriptions
+      summary: Create subscription
+      description: |
+        Subscribe to a WIS2 MQTT topic. The subscription is processed asynchronously.
+
+        **Topic Wildcards:**
+        - `+` matches exactly one level (e.g., country code)
+        - `#` matches zero or more levels (must be at end of topic)
+      operationId: createSubscription
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                topic:
-                  type: string
-                  description: The WIS2 topic to subscribe to
-                  example: cache/a/wis2/+/data/core/weather/surface-based-observations/#
-                target:
-                  type: string
-                  description: Sub directory to save data to
-                  example: surface-obs
-              required:
-                - topic
+              $ref: '#/components/schemas/SubscriptionRequest'
+            examples:
+              basic:
+                summary: Basic subscription
+                value:
+                  topic: "cache/a/wis2/+/data/core/weather/surface-based-observations/#"
+                  target: "surface-obs"
+              with_filters:
+                summary: Subscription with media type filter
+                value:
+                  topic: "cache/a/wis2/de-dwd/data/#"
+                  target: "dwd-data"
+                  filters:
+                    accepted_media_types:
+                      - "application/bufr"
+                      - "application/grib"
+                      - "application/x-netcdf*"
       responses:
-        "201":
-          description: A JSON object containing the subscribed topic after specified topic subscribed to
+        "202":
+          description: Subscription accepted for processing
+          headers:
+            Location:
+              description: URL to retrieve subscription details
+              schema:
+                type: string
+                example: /subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  target:
-                    type: string
-                    description: Sub directory to save data downloaded data to
-                  pattern:
-                    type: string
-                    description: Pattern used to match topic
-                required:
-                  - target
-                  - pattern
+                $ref: '#/components/schemas/SubscriptionResponse'
         "400":
-          description: Invalid input
-        "500":
-          description: Internal server error
+          $ref: '#/components/responses/BadRequest'
+        "503":
+          $ref: '#/components/responses/ServiceUnavailable'
 
   /subscriptions/{topic}:
-    delete:
-      summary: Unsubscribe from specified topic
-      description: Unsubscribe from specified topic
-      security:
-        - wis2boxAuth: [ ]
-      parameters:
-        - in: path
-          name: topic
-          description: WIS2 topic to unsubscribe from
-          schema:
-            type: string
-          required: true
-      responses:
-        "200":
-          description: Subscription successfully removed.
-        "400":
-          description: Invalid topic specified
-        "404":
-          description: Subscription not found.
+    parameters:
+      - name: topic
+        in: path
+        required: true
+        description: URL-encoded WIS2 topic
+        schema:
+          type: string
+        example: "cache/a/wis2/+/data/core/weather/surface-based-observations/#"
+
     get:
-      summary: Get information on specified subscription
-      description: Get information on specified subscription
-      security:
-        - wis2boxAuth: [ ]
-      parameters:
-        - in: path
-          name: topic
-          description: WIS2 topic to unsubscribe from
-          schema:
-            type: string
-          required: true
+      tags:
+        - Subscriptions
+      summary: Get subscription details
+      description: Returns details for a specific subscription
+      operationId: getSubscription
       responses:
         "200":
-          description: A JSON object containing information on the subscribed topic.
+          description: Subscription details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "503":
+          $ref: '#/components/responses/ServiceUnavailable'
+
+    delete:
+      tags:
+        - Subscriptions
+      summary: Delete subscription
+      description: Removes a subscription and stops receiving data for the topic
+      operationId: deleteSubscription
+      responses:
+        "200":
+          description: Subscription deleted
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  target:
+                  status:
                     type: string
-                    description: Sub directory to save data downloaded data to.
-                  pattern:
+                    example: deleted
+                  topic:
                     type: string
-                    description: Pattern used to match topic.
-                required:
-                  - target
-                  - pattern
+                    example: "cache/a/wis2/+/data/core/weather/surface-based-observations/#"
         "400":
-          description: Invalid topic.
-        "404":
-          description: Subscription not found.
+          $ref: '#/components/responses/BadRequest'
+        "503":
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /health:
+    get:
+      tags:
+        - Monitoring
+      summary: Health check
+      description: Returns service health status including Redis connectivity
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Health status (always returns 200, check status field)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
 
   /metrics:
     get:
-      summary: Get of list of published metrics
-      description: Get list of published metrics
+      tags:
+        - Monitoring
+      summary: Prometheus metrics
+      description: |
+        Returns metrics in Prometheus text format.
+
+        **Available Metrics:**
+        - `wis2_notifications_received` - Total notifications received
+        - `wis2_notifications_skipped` - Notifications skipped (deduplicated/filtered)
+        - `wis2_downloads_failed` - Failed download attempts
+        - `wis2_downloads_total` - Successfully downloaded files
+        - `wis2_downloads_bytes_total` - Total bytes downloaded
+        - `wis2_celery_queue_length` - Current tasks in queue
+      operationId: getMetrics
       responses:
         "200":
-          description: List of published metrics suitable for integration with Prometheus
+          description: Prometheus metrics
           content:
             text/plain:
               schema:
                 type: string
-                description: List of metrics
-  /health:
+              example: |
+                # HELP wis2_downloads_total Total number of files downloaded.
+                # TYPE wis2_downloads_total counter
+                wis2_downloads_total{broker="globalbroker.meteo.fr",cache="example.cache.com",centre_id="fra",topic="weather",media_type="application/bufr"} 42.0
+        "500":
+          description: Error generating metrics
+
+  /openapi:
     get:
-      summary: End point for health check
-      description: End point for health check
+      tags:
+        - Monitoring
+      summary: OpenAPI specification
+      description: Returns this OpenAPI specification as JSON
+      operationId: getOpenAPI
       responses:
         "200":
-          description: Health check successful
+          description: OpenAPI 3.0 specification
           content:
             application/json:
               schema:
                 type: object
+
+components:
+  schemas:
+    Subscription:
+      type: object
+      required:
+        - topic
+      properties:
+        topic:
+          type: string
+          description: WIS2 MQTT topic pattern
+          example: "cache/a/wis2/+/data/core/weather/surface-based-observations/#"
+        save_path:
+          type: string
+          nullable: true
+          description: Subdirectory under data root where files are saved
+          example: "surface-obs"
+        filters:
+          $ref: '#/components/schemas/Filters'
+
+    SubscriptionRequest:
+      type: object
+      required:
+        - topic
+      properties:
+        topic:
+          type: string
+          description: |
+            WIS2 MQTT topic pattern to subscribe to.
+            Use `+` for single-level wildcard, `#` for multi-level wildcard.
+          example: "cache/a/wis2/+/data/core/weather/surface-based-observations/#"
+        target:
+          type: string
+          description: |
+            Subdirectory under the data root where downloaded files will be saved.
+            Path traversal attempts are rejected.
+          example: "surface-obs"
+        filters:
+          $ref: '#/components/schemas/Filters'
+
+    SubscriptionResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [accepted]
+          example: accepted
+        topic:
+          type: string
+          example: "cache/a/wis2/+/data/core/weather/surface-based-observations/#"
+        target:
+          type: string
+          nullable: true
+          example: "surface-obs"
+
+    Filters:
+      type: object
+      description: Optional filters to apply to downloaded data
+      properties:
+        accepted_media_types:
+          type: array
+          description: |
+            List of allowed MIME types. Files with other types are skipped.
+            Supports wildcards via fnmatch (e.g., `application/x-grib*`).
+            If omitted, uses default list.
+          items:
+            type: string
+          example:
+            - "application/bufr"
+            - "application/grib"
+            - "application/x-netcdf*"
+          default:
+            - "image/gif"
+            - "image/jpeg"
+            - "image/png"
+            - "image/tiff"
+            - "application/pdf"
+            - "application/postscript"
+            - "application/bufr"
+            - "application/grib"
+            - "application/x-hdf"
+            - "application/x-hdf5"
+            - "application/x-netcdf"
+            - "application/x-netcdf4"
+            - "text/plain"
+            - "text/html"
+            - "text/xml"
+            - "text/csv"
+            - "text/tab-separated-values"
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+          description: Service health status
+          example: healthy
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "No topic provided"
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "No topic provided"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Subscription for topic xyz not found"
+
+    ServiceUnavailable:
+      description: Service unavailable (Redis connection failed)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Failed to connect to Redis: Connection refused"

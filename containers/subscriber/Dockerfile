@@ -27,10 +27,8 @@ COPY --chown=wis2:wis2 ./modules/ ./app
 
 RUN cd ./app && \
     source /home/wis2/.venv/bin/activate && \
-    pip install gunicorn gevent && \
     pip install -e shared && \
     pip install -e task_manager && \
-    pip install -e subscription_manager
+    pip install -e subscriber
 
-# now the default command
-CMD ["/bin/bash", "-c", "source .venv/bin/activate && task_manager_start worker --concurrency=8 --max-tasks-per-child 100"]
+CMD ["/bin/bash", "-c", "source .venv/bin/activate && subscriber_start"]
