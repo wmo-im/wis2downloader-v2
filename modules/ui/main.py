@@ -16,6 +16,15 @@ ui.add_head_html('<link rel="stylesheet" type="text/css" href="/assets/base.css"
 setup_logging()  # Configure root logger
 LOGGER = setup_logging(__name__)
 
+DEFAULT_ACCEPTED_MEDIA_TYPES = [
+                        'image/gif', 'image/jpeg', 'image/png', 'image/tiff',  # image formats
+                        'application/pdf', 'application/postscript',  # postscript and PDF
+                        'application/bufr', 'application/grib',  # WMO formats
+                        'application/x-hdf', 'application/x-hdf5', 'application/x-netcdf', 'application/x-netcdf4',  # scientific formats
+                        'text/plain', 'text/html', 'text/xml', 'text/csv', 'text/tab-separated-values',  # text based formats
+                        'application/octet-stream',
+                        ]
+
 json_scrapes = {
     "CMA": {},
     "DWD": {},
@@ -104,7 +113,7 @@ def home_page(client: Client):
     # MenuBar
     page.home = ui.left_drawer().props("mini mini-width=80").classes("menu-bar-gradient p-4 items-center justify-start gap-4")
     with page.home:
-        ui.button(icon='subscribe', text="GDC Subscription").props("no-caps").classes("menu-bar-btn").on('click', lambda: ui.navigate.to('/'))
+        ui.button(icon='subscriptions', text="GDC Subscription").props("no-caps").classes("menu-bar-btn").on('click', lambda: ui.navigate.to('/'))
         ui.button(icon='unsubscribe', text="Remove Subscription").props("no-caps").classes("menu-bar-btn").on('click', lambda: ui.navigate.to('/unsubscribe'))
 
 
@@ -372,7 +381,9 @@ def home_page(client: Client):
                 for topic in topics:
                     ui.label(topic).classes("selected-topic-chip").style("display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 7px; background: linear-gradient(90deg, #77AEE4 60%, #2563eb 100%); color: #fff; font-weight: 500; font-size: 0.85rem; margin: 2px 4px 2px 0; box-shadow: 0 1px 4px 0 rgba(31,38,135,0.10);")
             directory = ui.textarea("Directory to save datasets(default: data):").style('margin-top: 10px; width: 100%;')
-            submit = ui.button("Submit").style('margin-top: 10px;').on('click', lambda: subscribe_to_topics(topics, directory.value))
+            filters = {}
+            filters_button = ui.button("Select Filters").style('margin-top: 10px;').on('click', lambda: show_filters_dialog(topics, filters))
+            submit = ui.button("Submit").style('margin-top: 10px;').on('click', lambda: subscribe_to_topics(topics, directory.value, filters))
         with page.dataset_sidebar:
             page.dataset_sidebar.clear()
             ui.label("Datasets:").style('font-weight: bold; font-size: 16px;').style('color:' + "#4A72C3" + ';')
@@ -381,7 +392,7 @@ def home_page(client: Client):
             with ui.scroll_area().style('height: 75vh;'):
                 for topic in topics:
                     for (key,features) in tree.features.items():
-                        if topic[0:-2] in key:
+                        if topic.replace("/#", "") in key:
                             for dataset in features:
                                 if dataset['id'] not in added_datasets:
                                     added_datasets.append(dataset['id'])
@@ -392,12 +403,87 @@ def home_page(client: Client):
                                     select_btn = ui.button(f"Select")\
                                         .style('font-size:12px;width:170px;max-width:200px;min-width:80px;text-overflow:ellipsis;')\
                                         .on('click', lambda e, topic=topic, dataset_id=dataset['id']: select_dataset(e, topic, dataset_id))
-                                    if is_page_selection:
+                                    if is_page_selection and topic == e.value[0]:
                                         select_btn.run_method("click")
+                                    if dataset['id'] in tree.selected_datasets.get(topic, []):
+                                        select_btn.text = "Unselect"
+                                        select_btn.set_background_color("#77AEE4")
                                     ui.button(f"Show Metadata")\
                                         .style('font-size:12px;width:170px;max-width:200px;min-width:80px;text-overflow:ellipsis;')\
                                         .on('click', lambda e, dataset_id=dataset['id']: show_metadata(dataset_id))
     
+    async def show_filters_dialog(topics, filters):
+        with ui.dialog() as dialog, ui.card():
+            with ui.scroll_area().style('width: 400px;'):
+                with ui.row():
+                    north = ui.number(label='North',max=90, min=-90).style('width: 15vh;')
+                    west = ui.number(label='West',max=180, min=-180).style('width: 15vh;')
+                    east = ui.number(label='East',max=180, min=-180).style('width: 15vh;')
+                    south = ui.number(label='South',max=90, min=-90).style('width: 15vh;')
+                start_date = ui.date_input(label='Start date (YYYY-MM-DD)').style('width: 20vh;')
+                end_date = ui.date_input(label='End date (YYYY-MM-DD)').style('width: 20vh;')
+                start_time = ui.time_input(label='Start time (HH:MM)').style('width: 20vh;')
+                end_time = ui.time_input(label='End time (HH:MM)').style('width: 20vh;')
+                media_type = ui.select(options=DEFAULT_ACCEPTED_MEDIA_TYPES, label='Media Type',multiple=True).style('width: 20vh;')
+                with ui.column() as custom_filters_column:
+                    custom_filters = {}
+                    if len(topics) == 1 and len(tree.selected_datasets.get(topics[0], [])) == 1:
+                        dataset = tree.selected_datasets[topics[0]][0]
+                        for (key,features) in tree.features.items():
+                            for data in features:
+                                if data['id'] == dataset:
+                                    dataset = data
+                                    break
+                        if 'links' in dataset:
+                            for link in dataset['links']:
+                                if 'filters' in link:
+                                    for (name, filter) in link['filters'].items():
+                                        if name not in custom_filters:
+                                            custom_filters[name] = []
+                                        else:
+                                            continue
+                                        if filter['type'] == 'string':
+                                            ui.button(f"{name}",icon="add").on('click', lambda e, name=name, type=filter['type']: add_custom_filter(e, name, custom_filters_column, type))
+                                        if filter['type'] == 'datetime':
+                                            ui.button(f"{name}",icon="add").on('click', lambda e, name=name, type=filter['type']: add_custom_filter(e, name, custom_filters_column, type))
+                                        if filter['type'] == 'number':
+                                            ui.button(f"{name}",icon="add").on('click', lambda e, name=name, type=filter['type']: add_custom_filter(e, name, custom_filters_column, type))
+            with ui.row():
+                ui.button("Close").on('click', lambda: dialog.close())
+                ui.button("Apply").on('click', lambda: apply_filters(filters, topics, north.value, west.value, east.value, south.value, start_date.value, end_date.value, start_time.value, end_time.value, media_type.value, custom_filters, custom_filters_column))
+        dialog.open()
+
+    async def apply_filters(filters, topics, north, west, east, south, start_date, end_date, start_time, end_time, media_type, custom_filters, custom_filters_column):
+        filters.clear()
+        if all([north, west, east, south]):
+            filters['bbox'] = [north, west, east, south]
+        if start_date and end_date:
+            filters['date_range'] = [start_date, end_date]
+        if start_time and end_time:
+            filters['time_range'] = [start_time, end_time]
+        if media_type:
+            filters['media_type'] = media_type
+        for child in custom_filters_column.descendants():
+            if isinstance(child, ui.input):
+                if child.label in custom_filters:
+                    custom_filters[child.label].append(child.value)
+                else:
+                    custom_filters[child.label] = [child.value]
+        filters['custom_filters'] = custom_filters
+        ui.notify("Filters applied. Please click on Submit to save the subscription with the applied filters.", type="positive")
+        
+
+    async def add_custom_filter(e, name, column, type):
+        with column:
+                if type == 'string':
+                     ui.input(label=f"{name}").style('width: 20vh;')
+                if type == 'datetime':
+                    ui.date_input(label=f"{name}").style('width: 20vh;')
+                if type == 'number':
+                    ui.number(label=f"{name}").style('width: 20vh;')
+
+                    
+
     async def select_all_datasets(e):
                 if e.sender.text == "Select All":
                     for child in page.dataset_sidebar.descendants():
@@ -421,16 +507,19 @@ def home_page(client: Client):
             tree.selected_datasets[topic].remove(dataset_id)
             if len(tree.selected_datasets[topic]) == 0:
                 del tree.selected_datasets[topic]
-        #print(tree.selected_datasets)
     
-    async def subscribe_to_topics(topics, directory):
+    async def subscribe_to_topics(topics, directory, filters=None):
         async with httpx.AsyncClient() as client:
             if directory.strip() == '':
                 directory = 'data'
             for topic in topics:
+                if topic not in tree.selected_datasets:
+                    continue
                 payload = {
                     "topic": topic,
-                    "target": directory
+                    "target": directory,
+                    "datasets": tree.selected_datasets.get(topic, []),
+                    "filters": filters
                 }
                 response = await client.post(f'{SUBSCRIPTION_MANAGER}/subscriptions', json=payload)
 
@@ -472,21 +561,28 @@ def unsuscribe_page():
 
     ui.query(".nicegui-content").style("padding: 0; overflow: hidden;")
 
-    with ui.element("div").classes("flex w-full h-screen absolute"):
-            # MenuBar
-        page.home = ui.element("div").classes("flex flex-col w-xs bg-base-400 p-4 items-center justify-start gap-4")
-        with page.home:
-                ui.button(icon="home", text="GDC Subscription", color="base-100").props("flat round").on('click', lambda: ui.navigate.to('/'))
-                ui.button(icon="logout", text="Unsubscribe", color="base-100").props("flat round").on('click', lambda: ui.navigate.to('/unsuscribe'))
-
-            # Content
-        page.content = ui.element("div").classes("grow bg-base-100 p-4")
-        with page.content:
+    with ui.element("div").classes("flex flex-row h-full w-full relative").style("margin-top: -7vh;"):
+        # Main content area
+        with ui.element("div").classes("flex-grow min-w-0 bg-base-100 h-full") as content:
+            page.content = content
             reload = ui.button("Reload Subscriptions").style('margin-left: 10px; font-weight: bold;').on('click', lambda: load_subscriptions())
-            # Right Sidebar
-        page.right_sidebar = ui.element("div").classes("w-[20%] max-w-xs bg-base-200 p-4")
-        with page.right_sidebar:
-            pass
+
+    with ui.header(elevated=True).classes("header-bg bg-white text-slate-900 p-0 flex").style("margin:0 !important; padding:0 !important; border:0 !important; line-height:0 !important;"):
+        ui.image('assets/wmo-banner.png').props("fit=cover").classes("header-img").style("width: 100vw; height: 120px; object-fit: cover; display: block; margin: 0 !important; padding: 0 !important; border: 0 !important;")
+        ui.image('assets/wmo-foot.png').style("width: 100vw; height: 11px; display: block; margin: 0 !important; padding: 0 !important; border: 0 !important; margin-top: -17px !important;")
+        ui.image('assets/logo.png').style("position: absolute !important; left: 20% !important; top: 20px !important; width: 80px !important; height: 80px !important; line-height:0 !important;")
+    
+    # MenuBar
+    page.home = ui.left_drawer().props("mini mini-width=80").classes("menu-bar-gradient p-4 items-center justify-start gap-4")
+    with page.home:
+        ui.button(icon='subscriptions', text="GDC Subscription").props("no-caps").classes("menu-bar-btn").on('click', lambda: ui.navigate.to('/'))
+        ui.button(icon='unsubscribe', text="Remove Subscription").props("no-caps").classes("menu-bar-btn").on('click', lambda: ui.navigate.to('/unsubscribe'))
+
+    #Footer
+    with ui.footer().classes("bg-base-400").style("height: 30px;"):
+        ui.image('assets/wmo-foot.png').style("margin-top: -10px; height: 11px;")
+        ui.label("© 2026 World Meteorological Organization").style("color: white; margin-left: 10px; font-size: 12px; margin-top: -18px;")
+
 
     async def load_subscriptions():
         async with httpx.AsyncClient() as client:
@@ -496,13 +592,14 @@ def unsuscribe_page():
                 if element is not reload and element is not page.content:
                     element.delete()
             with page.content:
-                scroll_area = ui.scroll_area().style('height: 90vh;') 
+                scroll_area = ui.scroll_area().style('height: 80vh;') 
             with scroll_area:
                 for (sub) in page.subscriptions:
-                    with ui.row():
-                        ui.label(f"Topic: {sub}").style('margin-left: 10px; font-weight: bold;').style('color: black;')
-                        ui.label(f"Folder: {page.subscriptions[sub]['save_path']}").style('margin-left: 10px; font-weight: bold;').style('color: black;')
-                        ui.button("Unsubscribe").style('margin-left: 10px;').on('click', lambda e: unsubscribe(e.sender.parent_slot.children[0].text.replace('Topic: ', '')))
+                    with ui.card().tight():
+                        with ui.row():
+                            ui.label(f"Topic: {sub}").style('margin-left: 10px; font-weight: bold;').style('color: black;')
+                            ui.label(f"Folder: {page.subscriptions[sub]['save_path']}").style('margin-left: 10px; font-weight: bold;').style('color: black;')
+                            ui.button("Unsubscribe").style('margin-left: 10px;').on('click', lambda e: unsubscribe(e.sender.parent_slot.children[0].text.replace('Topic: ', '')))
     
     async def unsubscribe(sub_id):
         async with httpx.AsyncClient() as client:
