@@ -49,7 +49,8 @@ def scrape_all():
 
 scrape_all_task = ui.run(scrape_all())
 
-SUBSCRIPTION_MANAGER = "http://subscription-manager:5001"
+SUBSCRIPTION_MANAGER = str(os.getenv("WIS2_SUBSCRIPTION_MANAGER_URL", "http://subscription-manager:5001"))
+
 app.colors(base_100="#FFFFFF",
            base_200="#5D8FCF",
            base_300="#77AEE4",
