@@ -33,10 +33,7 @@ def main_page(client: Client):
 
     class AppState:
         def __init__(self):
-            self.features = {}
             self.selected_topics = []
-            self.selected_datasets = {}
-            self.tree_widget = None
 
     state = AppState()
 
@@ -44,8 +41,6 @@ def main_page(client: Client):
         layout.content.clear()
         layout.right_sidebar.set_visibility(False)
         layout.right_sidebar.clear()
-        layout.dataset_sidebar.clear()
-        layout.dataset_sidebar.set_visibility(name in ('catalogue', 'tree'))
         with layout.content:
             if name == 'dashboard':
                 dashboard.render(layout.content)

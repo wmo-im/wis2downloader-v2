@@ -10,7 +10,6 @@ class PageLayout:
         self.footer = None
         self.nav_drawer = None
         self.content = None
-        self.dataset_sidebar = None
         self.right_sidebar = None
 
 

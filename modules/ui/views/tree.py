@@ -1,36 +1,30 @@
 from nicegui import ui
 
-from data import gdc_records, merged_records
+from data import gdc_records, topic_hierarchy
 from views.shared import on_topics_picked, clean_page
 
 
 # ---------------------------------------------------------------------------
-# Pure tree-builder helper
+# Topic hierarchy → ui.tree conversion
 # ---------------------------------------------------------------------------
 
-def put_in_dicc(dicc, key, identifier):
-    values = key.split('/')
-    if len(values) == 1:
-        if identifier == "cache":
-            dicc["id"] = "cache/#"
-        elif values[0] not in dicc:
-            dicc["id"] = identifier
-            dicc["label"] = values[0]
-    else:
-        dicc["id"] = identifier.split("/" + values[0] + "/")[0] + "/" + values[0] + "/#"
-        dicc["label"] = values[0]
-        if dicc["label"] == 'cache':
-            dicc['id'] = 'cache/#'
-        if "children" not in dicc:
-            dicc["children"] = []
-        for child in dicc["children"]:
-            if child["id"].split('/')[-2] == values[1]:
-                put_in_dicc(child, '/'.join(values[1:]), identifier)
-                return dicc
-        new_dicc = {}
-        dicc["children"].append(new_dicc)
-        put_in_dicc(new_dicc, '/'.join(values[1:]), identifier)
-    return dicc
+def _to_tree_nodes(topic_dict: dict, path: str = '') -> list[dict]:
+    """Convert the topic hierarchy dict into the node list format expected by ui.tree."""
+    nodes = []
+    for label, value in sorted(topic_dict.items()):
+        node_path = f"{path}/{label}" if path else label
+        if "children" in value:
+            nodes.append({
+                "id": node_path + "/#",
+                "label": label,
+                "children": _to_tree_nodes(value["children"], node_path),
+            })
+        else:
+            nodes.append({
+                "id": node_path,
+                "label": label,
+            })
+    return nodes
 
 
 # ---------------------------------------------------------------------------
@@ -39,23 +33,14 @@ def put_in_dicc(dicc, key, identifier):
 
 async def scrape_topics_tree(state, layout, tree_area):
     clean_page(state, layout)
-    dicc = {}
-    for merged in merged_records():
-        for channel in merged.record.mqtt_channels:
-            if channel.startswith('cache/'):
-                state.features.setdefault(channel, []).append(merged.record)
-                dicc = put_in_dicc(dicc, channel, channel)
-                break
-
     tree_area.clear()
     with tree_area:
         filter_input = ui.input(label='Filter topics')
         tree_widget = ui.tree(
-            [dicc], label_key='label', tick_strategy='strict',
-            on_tick=lambda e: on_topics_picked(e, state, layout),
+            _to_tree_nodes(topic_hierarchy()), label_key='label',
+            on_select=lambda e: on_topics_picked(e, state, layout),
         )
         filter_input.bind_value_to(tree_widget, 'filter')
-        state.tree_widget = tree_widget
 
 
 # ---------------------------------------------------------------------------

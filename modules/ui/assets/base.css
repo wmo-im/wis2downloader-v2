@@ -7,7 +7,6 @@
     overflow: hidden !important;
 }
 
-.dataset-sidebar,
 .right-sidebar {
     flex-shrink: 0;
     height: 100%;
@@ -15,10 +14,6 @@
     box-sizing: border-box;
     background-color: #f5f6fa;
     box-shadow: -2px 0 8px rgba(31,38,135,0.06);
-}
-
-.dataset-sidebar {
-    width: 260px;
 }
 
 .right-sidebar {
@@ -171,33 +166,37 @@
     width: 100%;
 }
 
+.sidebar-section-title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 4px;
+}
+
+.filter-expansion {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    margin-top: 6px;
+}
+
+.bbox-grid {
+    width: 100%;
+    gap: 4px !important;
+}
+
 .sidebar-btn {
     margin-top: 10px;
 }
 
-/* -- Dataset sidebar ------------------------------------------- */
-
-.dataset-scroll {
-    height: 75vh;
+.subscribe-btn {
+    width: 100%;
+    margin-top: 4px;
+    margin-bottom: 16px;
 }
 
-.dataset-card {
-    width: 170px;
-    max-width: 170px;
-}
-
-.dataset-id-label {
-    font-weight: bold;
-    font-size: 14px;
-    background-color: #f0f0f0;
-}
-
-.dataset-btn {
-    font-size: 12px;
-    width: 170px;
-    min-width: 80px;
-    text-overflow: ellipsis;
-}
 
 /* -- Settings page --------------------------------------------- */
 
@@ -412,7 +411,13 @@ label, .q-label {
 /* -- Dialogs --------------------------------------------------- */
 
 .dialog-scroll {
-    width: 400px;
+    min-width: min(70vw, 900px); !important;
+    height: 75vh;
+}
+
+.dialog-confirm {
+    min-width: min(70vw, 900px); !important;
+    max-height: 75vh;
 }
 
 .dialog-input {

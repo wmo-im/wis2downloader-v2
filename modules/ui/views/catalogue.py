@@ -79,10 +79,9 @@ def filter_by_bbox(record: WCMP2Record, bbox) -> bool | None:
 # ---------------------------------------------------------------------------
 
 async def select_in_search_results(e, page_selector, query, records,
-                                   state, layout, sender=None):
-    on_topics_picked(e, state, layout, is_page_selection=True, sender=sender)
-    if sender.text == "Unselect" and e.value[0] in state.selected_datasets:
-        state.selected_datasets.pop(e.value[0])
+                                   state, layout, sender=None, dataset_id=None):
+    on_topics_picked(e, state, layout, is_page_selection=True, sender=sender,
+                     dataset_id=dataset_id)
     sender.text = "Unselect" if sender.text == "Select" else "Select"
 
 
@@ -127,7 +126,7 @@ async def update_search_results(page_selector, query, records: list[MergedRecord
                         with ui.row().classes("result-actions"):
                             ui.button("Show Metadata", icon='info').on(
                                 'click',
-                                lambda ev, did=rec.id: show_metadata(did, state),
+                                lambda ev, did=rec.id: show_metadata(did),
                             )
                             for lnk in rec.links:
                                 if lnk.channel and lnk.channel.startswith('cache/'):
@@ -136,9 +135,9 @@ async def update_search_results(page_selector, query, records: list[MergedRecord
                                     ev_ref = event_list[i - 1]
                                     selector = ui.button("Select", icon='add').on(
                                         'click',
-                                        lambda ev, er=ev_ref: select_in_search_results(
+                                        lambda ev, er=ev_ref, did=rec.id: select_in_search_results(
                                             er, page_selector, query, records,
-                                            state, layout, sender=ev.sender,
+                                            state, layout, sender=ev.sender, dataset_id=did,
                                         ),
                                     )
                                     if lnk.channel in state.selected_topics:
@@ -171,12 +170,6 @@ async def perform_search(query, data_policy, keywords, bbox, state, layout,
         with results_container:
             ui.label("No results found.").classes("no-results-label")
         return
-
-    for merged in records:
-        for channel in merged.record.mqtt_channels:
-            if channel.startswith('cache/'):
-                state.features.setdefault(channel, []).append(merged.record)
-                break
 
     num_pages = (len(records) // 10) + (1 if len(records) % 10 > 0 else 0)
 
@@ -230,7 +223,7 @@ def render(container, state, layout):
                     search_bbox_east  = ui.number(label='East',  max=180, min=-180).classes("bbox-input")
                     search_bbox_south = ui.number(label='South', max=90,  min=-90).classes("bbox-input")
                 with ui.row().classes("justify-end"):
-                    search_btn = ui.button('Search', icon='search')
+                    search_btn = ui.button('Filter', icon='search')
 
         results_col = ui.column().classes("results-column")
 
