@@ -14,27 +14,28 @@ def render(container):
             subscriptions_col.clear()
             async with httpx.AsyncClient() as client:
                 response = await client.get(f'{SUBSCRIPTION_MANAGER}/subscriptions')
-                subscriptions = response.json()
+                # response shape: {topic: {sub_id: {save_path, filter}}}
+                by_topic = response.json()
             with subscriptions_col:
                 scroll_area = ui.scroll_area().classes("subscriptions-scroll")
             with scroll_area:
-                for sub in subscriptions:
-                    with ui.card():
-                        with ui.card_section():
-                            ui.label(sub).classes('text-subtitle2')
-                            ui.label(
-                                f"Folder: {subscriptions[sub]['save_path']}"
-                            ).classes('text-body2 text-grey-7')
-                            ui.button("Unsubscribe", icon='remove_circle_outline').classes("subscription-action-btn").on(
-                                'click',
-                                lambda ev: unsubscribe(
-                                    ev.sender.parent_slot.children[0].text.replace('Topic: ', '')
-                                ),
-                            )
+                for topic, subs in by_topic.items():
+                    for sub_id, sub_data in subs.items():
+                        with ui.card():
+                            with ui.card_section():
+                                ui.label(topic).classes('text-subtitle2')
+                                ui.label(
+                                    f"Folder: {sub_data.get('save_path') or '/'}"
+                                ).classes('text-body2 text-grey-7')
+                                ui.button(
+                                    "Unsubscribe", icon='remove_circle_outline'
+                                ).classes("subscription-action-btn").on(
+                                    'click',
+                                    lambda _, sid=sub_id: unsubscribe(sid),
+                                )
 
-        async def unsubscribe(sub_id):
+        async def unsubscribe(sub_id: str):
             async with httpx.AsyncClient() as client:
-                sub_id = sub_id.replace('#', '%23').replace('+', '%2B')
                 await client.delete(f'{SUBSCRIPTION_MANAGER}/subscriptions/{sub_id}')
             await load_subscriptions()
 

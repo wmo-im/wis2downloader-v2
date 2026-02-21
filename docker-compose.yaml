@@ -103,10 +103,7 @@ services:
     volumes:
       - "./downloads/:/data"
       - "./:/local"
-      - "prometheus-metrics-data:/tmp/prometheus_metrics"
     env_file: *default-env
-    environment:
-      - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus_metrics
     tty: true
     depends_on:
       - redis
@@ -133,10 +130,8 @@ services:
       - "./downloads/:/data"
       - "./:/local/app"
       - "./config/subscription_manager/:/app/config/"
-      - "prometheus-metrics-data:/tmp/prometheus_metrics"
     env_file: *default-env
     environment:
-      - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus_metrics
       - FLASK_HOST=0.0.0.0
       - FLASK_PORT=5001
     tty: true
@@ -216,7 +211,6 @@ services:
 volumes:
   loki-data:
   prometheus-data:
-  prometheus-metrics-data:
   grafana-data:
   redis-data:
 

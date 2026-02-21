@@ -362,7 +362,7 @@
     transition: border 0.2s, box-shadow 0.2s;
     padding: 0 12px !important;
 }
-.q-field__control:focus-withinn, .q-input:focus-within, .q-select:focus-within, .q-number:focus-within {
+.q-field__control:focus-within, .q-input:focus-within, .q-select:focus-within, .q-number:focus-within {
     border: 1.5px solid #2563eb !important;
     box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.12) !important;
 }
@@ -411,12 +411,12 @@ label, .q-label {
 /* -- Dialogs --------------------------------------------------- */
 
 .dialog-scroll {
-    min-width: min(70vw, 900px); !important;
+    min-width: min(70vw, 900px) !important;
     height: 75vh;
 }
 
 .dialog-confirm {
-    min-width: min(70vw, 900px); !important;
+    min-width: min(70vw, 900px) !important;
     max-height: 75vh;
 }
 

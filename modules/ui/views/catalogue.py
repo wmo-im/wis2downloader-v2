@@ -55,7 +55,7 @@ def filter_by_keywords(record: WCMP2Record, keywords: str) -> bool:
 
 
 def filter_by_bbox(record: WCMP2Record, bbox) -> bool | None:
-    if not all(bbox):
+    if not all(v is not None for v in bbox):
         return True
     if record.geometry is not None:
         coordinates = record.geometry.coordinates
@@ -91,12 +91,14 @@ async def update_search_results(page_selector, query, records: list[MergedRecord
     parent = page_selector.parent_slot.parent
     parent.clear()
     with parent:
+        async def on_page_change_inner(e):
+            await update_search_results(page_selector, query, records, state, layout)
+
         page_selector = ui.select(
             options=[str(i + 1) for i in range(num_pages)],
             label='Page', value=str(page_number), with_input=True,
         ).classes("page-selector").on(
-            'update:model-value',
-            lambda e: update_search_results(page_selector, query, records, state, layout),
+            'update:model-value', on_page_change_inner,
         )
         offset = (page_number - 1) * 10
         event_list = []
@@ -174,12 +176,14 @@ async def perform_search(query, data_policy, keywords, bbox, state, layout,
     num_pages = (len(records) // 10) + (1 if len(records) % 10 > 0 else 0)
 
     with results_container:
+        async def on_page_change(e):
+            await update_search_results(page_selector, query, records, state, layout)
+
         page_selector = ui.select(
             options=[str(i + 1) for i in range(num_pages)],
             label='Page', value='1', with_input=True,
         ).classes("page-selector").on(
-            'update:model-value',
-            lambda e: update_search_results(page_selector, query, records, state, layout),
+            'update:model-value', on_page_change,
         )
         await update_search_results(page_selector, query, records, state, layout)
 

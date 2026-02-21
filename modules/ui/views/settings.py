@@ -22,6 +22,7 @@ def render(container):
                         colour = _GDC_CHIP_COLOURS.get(name, 'grey') if count else 'grey'
                         label = f"{name}: {count} records" if count else f"{name}: not loaded"
                         ui.chip(label, color=colour)
-                ui.button("Refresh GDC data", icon="refresh").on(
-                    'click', lambda: scrape_all(force=True)
-                )
+                async def on_refresh():
+                    await scrape_all(force=True)
+
+                ui.button("Refresh GDC data", icon="refresh").on('click', on_refresh)

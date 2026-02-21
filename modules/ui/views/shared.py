@@ -194,7 +194,7 @@ def on_topics_picked(e, state, layout, is_page_selection=False, sender=None, dat
 def confirm_subscribe(topics, directory, filters):
     target = directory.strip() or './'
     payloads = [
-        {"topic": topic, "target": target, "filters": filters}
+        {"topic": topic, "target": target, "filter": filters}
         for topic in topics
     ]
     pretty = json.dumps(payloads if len(payloads) > 1 else payloads[0], indent=2)
@@ -205,10 +205,12 @@ def confirm_subscribe(topics, directory, filters):
             ui.code(pretty, language='json').classes("w-full")
         with ui.row().classes("justify-end gap-2"):
             ui.button("Cancel", icon="close").props("flat").on('click', dialog.close)
-            ui.button("Confirm", icon="check_circle").props("color=primary").on(
-                'click',
-                lambda: (dialog.close(), subscribe_to_topics(topics, target, filters)),
-            )
+
+            async def on_confirm():
+                dialog.close()
+                await subscribe_to_topics(topics, target, filters)
+
+            ui.button("Confirm", icon="check_circle").props("color=primary").on('click', on_confirm)
     dialog.open()
 
 
@@ -218,7 +220,7 @@ async def subscribe_to_topics(topics, directory, filters):
             payload = {
                 "topic": topic,
                 "target": directory,
-                "filters": filters,
+                "filter": filters,
             }
             await client.post(f'{SUBSCRIPTION_MANAGER}/subscriptions', json=payload)
 
