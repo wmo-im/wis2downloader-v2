@@ -155,8 +155,8 @@ def metrics_collector(func):
 
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender: Celery, **kwargs):
-    # Calls clean_directory(DATA_BASEPATH) every 1 minute.
-    sender.add_periodic_task(60.0, clean_directory.s(DATA_BASEPATH), name='clean downloads every 1 minute')
+    # Calls clean_directory(DATA_BASEPATH) every 10 minute.
+    sender.add_periodic_task(600.0, clean_directory.s(DATA_BASEPATH), name='clean downloads every 10 minutes')
 
 @app.task
 def clean_directory(directory):
