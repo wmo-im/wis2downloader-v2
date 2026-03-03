@@ -92,6 +92,14 @@ modules/
     ├── assets/
     │   └── base.css        # All custom CSS
     ├── components/         # Reusable layout components
+    ├── i18n/               # Internationalisation
+    │   ├── __init__.py     # t(), current_lang(), is_rtl(), LANGUAGES
+    │   ├── en.py           # English strings (source of truth)
+    │   ├── fr.py           # French
+    │   ├── es.py           # Spanish
+    │   ├── ar.py           # Arabic (RTL)
+    │   ├── zh.py           # Chinese
+    │   └── ru.py           # Russian
     ├── models/
     │   └── wcmp2.py        # WCMP2Record dataclass
     └── views/              # Page views (catalogue, tree, subscriptions, etc.)
@@ -365,10 +373,18 @@ modules/ui/
 ├── assets/
 │   └── base.css             # All custom CSS (inside @layer components)
 ├── components/
-│   ├── header.py            # WMO banner + toolbar
+│   ├── header.py            # WMO banner + toolbar + language selector
 │   ├── footer.py            # Footer bar
 │   ├── navigation_drawer.py # Left nav drawer with view links
 │   └── page_body.py         # Main content area + right sidebar
+├── i18n/                    # Internationalisation
+│   ├── __init__.py          # t(), current_lang(), is_rtl(), LANGUAGES
+│   ├── en.py                # English strings (source of truth)
+│   ├── fr.py                # French
+│   ├── es.py                # Spanish
+│   ├── ar.py                # Arabic (RTL)
+│   ├── zh.py                # Chinese
+│   └── ru.py                # Russian
 ├── models/
 │   └── wcmp2.py             # WCMP2Record dataclass (GeoJSON Feature)
 └── views/
@@ -499,9 +515,10 @@ Each browser session has its own `AppState` instance (defined in `main.py`):
 class AppState:
     def __init__(self):
         self.selected_topics: list[str] = []
+        self.current_view: str = 'dashboard'
 ----
 
-`selected_topics` holds the MQTT topics currently selected in the UI and drives the right sidebar.
+`selected_topics` holds the MQTT topics currently selected in the UI and drives the right sidebar.  `current_view` tracks the active view name and is persisted to `app.storage.user['current_view']` before any page reload (e.g. on language change) so the user is returned to the same view.
 
 === Views
 
@@ -548,10 +565,245 @@ Result cards are rendered by `update_search_results()`, which is also responsibl
 
 === Adding a New View
 
-1. Create `modules/ui/views/myview.py` with a `render(container)` function
-2. Add a navigation entry in `components/navigation_drawer.py`
+1. Create `modules/ui/views/myview.py` with a `render(container)` function, using `t()` for all user-visible strings
+2. Add a navigation entry in `components/navigation_drawer.py` — the `NAV_ITEMS` list takes a `(view_id, label_key, icon)` tuple where `label_key` is a `nav.*` i18n key
 3. Add a branch in the `show_view()` dispatcher in `main.py`
 4. Add any new CSS classes to `assets/base.css` inside the `@layer components { ... }` block
+5. Add all new string keys to `i18n/en.py` and to each other language file — see <<internationalisation>>
+
+[[internationalisation]]
+=== Internationalisation (i18n)
+
+The UI supports multiple interface languages via a lightweight dictionary-based i18n system in `modules/ui/i18n/`.
+
+==== Supported Languages
+
+[cols="1,2,1"]
+|===
+|Code |Language |Direction
+
+|`en`
+|English
+|LTR
+
+|`fr`
+|Français
+|LTR
+
+|`es`
+|Español
+|LTR
+
+|`ar`
+|العربية
+|RTL
+
+|`zh`
+|中文
+|LTR
+
+|`ru`
+|Русский
+|LTR
+|===
+
+The active language is stored per browser session in `app.storage.user['lang']` and defaults to English.  Users change language via the selector in the header toolbar; the page reloads to apply the change.
+
+==== How `t()` Works
+
+[source,python]
+----
+from i18n import t
+
+# Simple lookup
+label = t('nav.dashboard')                      # → 'Dashboard'
+
+# With interpolation (uses str.format)
+label = t('subscriptions.folder', path='./')    # → 'Folder: ./'
+----
+
+The lookup chain is:
+
+. Chosen language file
+. English (`en.py`) — fallback if key is missing in the chosen language
+. The key string itself — fallback if missing from English too (visible in development)
+
+WARNING: `t()` reads `app.storage.user['lang']` from the current NiceGUI request session.  Always call it at render time (inside a `@ui.page` handler or a NiceGUI event callback), never at module import time.
+
+NOTE: Strings that contain literal `{` or `}` characters (for example, JSON examples in hint text) must use single braces as-is.  Do *not* use `{{` / `}}` escaping — `t()` only calls `.format(**kwargs)` when keyword arguments are passed, so `{{` would be displayed literally.
+
+==== Key Naming Conventions
+
+Keys use dot-separated namespaces:
+
+[cols="1,2,2"]
+|===
+|Prefix |Scope |Example
+
+|`nav.*`
+|Navigation drawer labels
+|`nav.dashboard`
+
+|`btn.*`
+|Button labels
+|`btn.subscribe`
+
+|`sidebar.*`
+|Subscription sidebar
+|`sidebar.save_directory`
+
+|`catalogue.*`
+|Catalogue view
+|`catalogue.search_label`
+
+|`tree.*`
+|Tree view
+|`tree.filter_label`
+
+|`subscriptions.*`
+|Manage Subscriptions view
+|`subscriptions.folder`
+
+|`settings.*`
+|Settings view
+|`settings.title`
+
+|`manual.*`
+|Manual Subscribe view
+|`manual.topic_label`
+
+|`manual.val.*`
+|Manual Subscribe validation messages
+|`manual.val.topic_required`
+
+|`dialog.*`
+|Dialog titles
+|`dialog.confirm_title`
+
+|`metadata.*`
+|Metadata dialog
+|`metadata.title`
+
+|`validation.*`
+|Shared validation messages
+|`validation.date_format`
+
+|`footer.*`
+|Footer
+|`footer.copyright`
+
+|`aria.*`
+|ARIA accessibility labels
+|`aria.toggle_nav`
+|===
+
+==== RTL Support
+
+Arabic (`ar`) is right-to-left.  When Arabic is selected, `is_rtl()` returns `True` and `main.py`'s `on_connect()` handler injects `dir="rtl"` on the `<html>` element via JavaScript, activating Quasar's RTL layout mode.  Custom CSS overrides in `assets/base.css` (under the `RTL overrides` comment block) correct Quasar's physical padding on `.q-page-container` and reposition the subscription sidebar.
+
+To add another RTL language, add its code to `RTL_LANGUAGES` in `__init__.py` — no other changes are needed.
+
+==== Adding a New Language
+
+.Step 1 — Create the language file
+Copy `modules/ui/i18n/en.py` to `modules/ui/i18n/{code}.py` and translate all values.  Keep every key; do not remove any.  Preserve `{placeholder}` names exactly as they appear in the English source:
+
+[source,python]
+----
+# modules/ui/i18n/de.py
+"""German strings."""
+
+STRINGS: dict[str, str] = {
+    'nav.dashboard':        'Dashboard',
+    'nav.catalogue':        'Katalogsuche',
+    'nav.tree':             'Baumsuche',
+    'nav.manual':           'Manuell abonnieren',
+    'nav.manage':           'Abonnements verwalten',
+    'nav.settings':         'Einstellungen',
+    # ... all remaining keys ...
+    'subscriptions.folder': 'Ordner: {path}',   # {path} must be preserved
+    'settings.records':     '{name}: {count} Einträge',
+}
+----
+
+.Step 2 — Register the language in `__init__.py`
+[source,python]
+----
+from . import ar, de, en, es, fr, ru, zh        # <1>
+
+LANGUAGES: dict[str, str] = {
+    'en': 'English',
+    'fr': 'Français',
+    'es': 'Español',
+    'ar': 'العربية',
+    'zh': '中文',
+    'ru': 'Русский',
+    'de': 'Deutsch',                             # <2>
+}
+
+_STRINGS: dict[str, dict[str, str]] = {
+    'en': en.STRINGS,
+    'fr': fr.STRINGS,
+    'es': es.STRINGS,
+    'ar': ar.STRINGS,
+    'zh': zh.STRINGS,
+    'ru': ru.STRINGS,
+    'de': de.STRINGS,                            # <3>
+}
+----
+<1> Add the import
+<2> Add the display name (in the native script)
+<3> Add the strings mapping
+
+.Step 3 — Mark as RTL if required
+If the language is right-to-left (e.g. Hebrew `he`, Persian `fa`):
+[source,python]
+----
+RTL_LANGUAGES: frozenset[str] = frozenset({'ar', 'he'})
+----
+
+.Step 4 — Restart the UI
+[source,bash]
+----
+docker-compose restart wis2downloader-ui
+----
+
+The new language will appear immediately in the header language selector.
+
+IMPORTANT: The existing non-English translations are machine-generated and provided as a starting point only.  All strings should be reviewed by a native speaker before production deployment, with particular attention to WMO/meteorological domain terms (WIS2, BUFR, GRIB, Global Cache, etc.) which have established translations in WMO official documents.
+
+==== Adding New Translatable Strings
+
+When adding UI text to any view or component:
+
+.Step 1 — Add to `en.py` (source of truth)
+[source,python]
+----
+# modules/ui/i18n/en.py
+'myview.title':       'My New View',
+'myview.description': 'Showing results for {topic}.',
+----
+
+.Step 2 — Add to all other language files
+Copy the English value as a placeholder if a translation is not yet available.  `t()` falls back to English automatically, but having the key present avoids gaps in tooling:
+
+[source,python]
+----
+# fr.py / es.py / ar.py / zh.py / ru.py
+'myview.title':       'My New View',         # TODO: translate
+'myview.description': 'Showing results for {topic}.',
+----
+
+.Step 3 — Use `t()` in the view
+[source,python]
+----
+from i18n import t
+
+def render(container):
+    with container:
+        ui.label(t('myview.title')).classes('page-title')
+        ui.label(t('myview.description', topic=selected_topic))
+----
 
 == Inter-Service Communication
 

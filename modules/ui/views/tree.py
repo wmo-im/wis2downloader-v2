@@ -1,6 +1,7 @@
 from nicegui import ui
 
 from data import gdc_records, topic_hierarchy
+from i18n import t
 from views.shared import on_topics_picked, clean_page
 
 
@@ -35,7 +36,7 @@ async def scrape_topics_tree(state, layout, tree_area):
     clean_page(state, layout)
     tree_area.clear()
     with tree_area:
-        filter_input = ui.input(label='Filter topics')
+        filter_input = ui.input(label=t('tree.filter_label'))
         tree_widget = ui.tree(
             _to_tree_nodes(topic_hierarchy()), label_key='label',
             on_select=lambda e: on_topics_picked(e, state, layout),
@@ -50,19 +51,16 @@ async def scrape_topics_tree(state, layout, tree_area):
 def render(container, state, layout):
     clean_page(state, layout)
     with container:
-        ui.label("Tree View").classes("page-title")
+        ui.label(t('tree.title')).classes("page-title")
 
         if not any(gdc_records.values()):
             with ui.card().classes("info-card"):
                 ui.icon('info').classes("info-card-icon")
-                ui.label("Catalogue data not loaded").classes("text-h6")
-                ui.label(
-                    "GDC data is still being fetched. Try again in a moment, "
-                    "or visit Settings to trigger a manual refresh."
-                ).classes("text-body2 text-grey-7")
+                ui.label(t('catalogue.not_loaded')).classes("text-h6")
+                ui.label(t('catalogue.not_loaded_msg')).classes("text-body2 text-grey-7")
             return
 
         with ui.scroll_area().classes("tree-scroll") as tree_area:
-            ui.label("Loading…").classes("text-body2 text-grey-7")
+            ui.label(t('tree.loading')).classes("text-body2 text-grey-7")
 
         ui.timer(0.1, lambda: scrape_topics_tree(state, layout, tree_area), once=True)

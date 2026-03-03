@@ -14,10 +14,10 @@ class PageLayout:
         self.right_sidebar = None
 
 
-def build_layout(on_navigate):
+def build_layout(on_navigate, on_language_change):
     layout = PageLayout()
     toggle_mini = build_nav_drawer(layout, on_navigate)
-    build_header(layout, toggle_mini)
+    build_header(layout, toggle_mini, on_language_change)
     build_page_body(layout)
     build_right_sidebar(layout)
     build_footer(layout)

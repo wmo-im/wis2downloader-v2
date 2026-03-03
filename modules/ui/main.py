@@ -7,6 +7,7 @@ from layout import build_layout
 from data import scrape_all
 from views import dashboard, catalogue, tree, subscriptions, settings, manual_subscription
 from components.navigation_drawer import NAV_ITEMS
+from i18n import current_lang, is_rtl
 
 setup_logging()
 
@@ -36,10 +37,12 @@ def main_page(client: Client):
     class AppState:
         def __init__(self):
             self.selected_topics = []
+            self.current_view = 'dashboard'
 
     state = AppState()
 
     def show_view(name):
+        state.current_view = name
         layout.content.clear()
         layout.right_sidebar.value = False
         layout.right_sidebar.clear()
@@ -57,6 +60,21 @@ def main_page(client: Client):
             elif name == 'settings':
                 settings.render(layout.content)
 
+    def on_language_change(lang: str):
+        app.storage.user['lang'] = lang
+        app.storage.user['current_view'] = state.current_view
+        ui.navigate.reload()
+
+    async def on_connect():
+        lang = current_lang()
+        direction = 'rtl' if is_rtl() else 'ltr'
+        await ui.run_javascript(
+            f"document.documentElement.lang = '{lang}';"
+            f"document.documentElement.dir = '{direction}';"
+        )
+
+    client.on_connect(on_connect)
+
     _view_ids = [view_id for view_id, _, _ in NAV_ITEMS]
 
     def handle_key(e: KeyEventArguments):
@@ -71,8 +89,8 @@ def main_page(client: Client):
 
     ui.keyboard(on_key=handle_key)
 
-    layout = build_layout(show_view)
-    show_view('dashboard')
+    layout = build_layout(show_view, on_language_change)
+    show_view(app.storage.user.get('current_view', 'dashboard'))
 
 
 ui.run(storage_secret=os.getenv('STORAGE_SECRET', 'wis2downloader-secret'))

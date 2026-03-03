@@ -1,13 +1,15 @@
 from nicegui import app, ui
 
+from i18n import t
+
 
 NAV_ITEMS = [
-    ('dashboard', 'Dashboard',            'dashboard'),
-    ('catalogue', 'Catalogue Search',     'search'),
-    ('tree',      'Tree Search',          'account_tree'),
-    ('manual',    'Manual Subscribe',     'edit_note'),
-    ('manage',    'Manage Subscriptions', 'manage_history'),
-    ('settings',  'Settings',             'settings'),
+    ('dashboard', 'nav.dashboard', 'dashboard'),
+    ('catalogue', 'nav.catalogue', 'search'),
+    ('tree',      'nav.tree',      'account_tree'),
+    ('manual',    'nav.manual',    'edit_note'),
+    ('manage',    'nav.manage',    'manage_history'),
+    ('settings',  'nav.settings',  'settings'),
 ]
 
 
@@ -18,9 +20,10 @@ def build_nav_drawer(layout, on_navigate):
     with ui.left_drawer(value=True).props(props) as drawer:
         layout.nav_drawer = drawer
         with ui.list().props('dense padding'):
-            for view_id, label, icon in NAV_ITEMS:
+            for view_id, label_key, icon in NAV_ITEMS:
+                label = t(label_key)
                 with ui.item(on_click=lambda v=view_id: on_navigate(v)) \
-                        .props('clickable v-ripple rounded') \
+                        .props(f'clickable v-ripple rounded aria-label="{label}"') \
                         .classes('menu-nav-item'):
                     with ui.item_section().props('avatar'):
                         ui.icon(icon)

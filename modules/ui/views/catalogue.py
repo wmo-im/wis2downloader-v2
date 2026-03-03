@@ -5,6 +5,7 @@ from shapely.geometry import Point, Polygon, MultiPolygon, MultiPoint
 
 from data import gdc_records, MergedRecord, merged_records
 from models.wcmp2 import WCMP2Record
+from i18n import t
 
 _GDC_CHIP_COLOURS = {'CMA': 'blue', 'DWD': 'teal', 'ECCC': 'orange'}
 from views.shared import on_topics_picked, show_metadata, clean_page
@@ -82,7 +83,7 @@ async def select_in_search_results(e, page_selector, query, records,
                                    state, layout, sender=None, dataset_id=None):
     on_topics_picked(e, state, layout, is_page_selection=True, sender=sender,
                      dataset_id=dataset_id)
-    sender.text = "Unselect" if sender.text == "Select" else "Select"
+    sender.text = t('btn.unselect') if e.value[0] in state.selected_topics else t('btn.select')
 
 
 async def update_search_results(page_selector, query, records: list[MergedRecord], state, layout):
@@ -96,7 +97,7 @@ async def update_search_results(page_selector, query, records: list[MergedRecord
 
         page_selector = ui.select(
             options=[str(i + 1) for i in range(num_pages)],
-            label='Page', value=str(page_number), with_input=True,
+            label=t('catalogue.page'), value=str(page_number), with_input=True,
         ).classes("page-selector").on(
             'update:model-value', on_page_change_inner,
         )
@@ -117,16 +118,16 @@ async def update_search_results(page_selector, query, records: list[MergedRecord
                     for gdc in merged.source_gdcs:
                         ui.chip(gdc, color=_GDC_CHIP_COLOURS.get(gdc, 'grey'))
                     if merged.has_discrepancy:
-                        ui.icon('warning', color='orange').tooltip(
-                            'Record content differs between catalogues'
-                        )
+                        ui.icon('warning', color='orange').props(
+                            f'aria-label="{t("aria.discrepancy")}" role="img"'
+                        ).tooltip(t('catalogue.discrepancy'))
 
                 ui.label(rec.id).classes("result-subtitle")
                 with ui.row(wrap=False).classes("result-row"):
                     with ui.column().classes("result-details"):
                         ui.label(rec.description or 'N/A').classes("result-description")
                         with ui.row().classes("result-actions"):
-                            ui.button("Show Metadata", icon='info').on(
+                            ui.button(t('btn.show_metadata'), icon='info').on(
                                 'click',
                                 lambda ev, did=rec.id: show_metadata(did),
                             )
@@ -135,15 +136,14 @@ async def update_search_results(page_selector, query, records: list[MergedRecord
                                     event_list.append(_Event([lnk.channel]))
                                     i += 1
                                     ev_ref = event_list[i - 1]
-                                    selector = ui.button("Select", icon='add').on(
+                                    btn_text = t('btn.unselect') if lnk.channel in state.selected_topics else t('btn.select')
+                                    selector = ui.button(btn_text, icon='add').on(
                                         'click',
                                         lambda ev, er=ev_ref, did=rec.id: select_in_search_results(
                                             er, page_selector, query, records,
                                             state, layout, sender=ev.sender, dataset_id=did,
                                         ),
                                     )
-                                    if lnk.channel in state.selected_topics:
-                                        selector.text = "Unselect"
                                     break
                     if rec.geometry is not None:
                         coordinates = copy.deepcopy(rec.geometry.coordinates)
@@ -170,7 +170,7 @@ async def perform_search(query, data_policy, keywords, bbox, state, layout,
 
     if not records:
         with results_container:
-            ui.label("No results found.").classes("no-results-label")
+            ui.label(t('catalogue.no_results')).classes("no-results-label")
         return
 
     num_pages = (len(records) // 10) + (1 if len(records) % 10 > 0 else 0)
@@ -181,7 +181,7 @@ async def perform_search(query, data_policy, keywords, bbox, state, layout,
 
         page_selector = ui.select(
             options=[str(i + 1) for i in range(num_pages)],
-            label='Page', value='1', with_input=True,
+            label=t('catalogue.page'), value='1', with_input=True,
         ).classes("page-selector").on(
             'update:model-value', on_page_change,
         )
@@ -195,39 +195,37 @@ async def perform_search(query, data_policy, keywords, bbox, state, layout,
 def render(container, state, layout):
     clean_page(state, layout)
     with container:
-        ui.label("Catalogue View").classes("page-title")
+        ui.label(t('catalogue.title')).classes("page-title")
 
         if not any(gdc_records.values()):
             with ui.card().classes("info-card"):
                 ui.icon('info').classes("info-card-icon")
-                ui.label("Catalogue data not loaded").classes("text-h6")
-                ui.label(
-                    "GDC data is still being fetched. Try again in a moment, "
-                    "or visit Settings to trigger a manual refresh."
-                ).classes("text-body2 text-grey-7")
+                ui.label(t('catalogue.not_loaded')).classes("text-h6")
+                ui.label(t('catalogue.not_loaded_msg')).classes("text-body2 text-grey-7")
             return
 
         with ui.card().classes("search-form-card"):
             with ui.card_section():
                 search_input = ui.input(
-                    label='Search topics', placeholder='e.g. surface observations'
+                    label=t('catalogue.search_label'),
+                    placeholder=t('catalogue.search_hint'),
                 ).classes("search-input")
                 with ui.row().classes("filter-row"):
                     search_data_type = ui.select(
                         options=['all', 'core', 'recommended'],
-                        label='Data Policy', value='all',
+                        label=t('catalogue.data_policy'), value='all',
                     ).classes("filter-select")
                     search_keyword = ui.input(
-                        label='Keywords (comma-separated)'
+                        label=t('catalogue.keywords_label')
                     ).classes("filter-input")
                 with ui.row().classes("filter-row"):
-                    ui.label("Bounding box:").classes("bbox-label")
-                    search_bbox_north = ui.number(label='North', max=90,  min=-90).classes("bbox-input")
-                    search_bbox_west  = ui.number(label='West',  max=180, min=-180).classes("bbox-input")
-                    search_bbox_east  = ui.number(label='East',  max=180, min=-180).classes("bbox-input")
-                    search_bbox_south = ui.number(label='South', max=90,  min=-90).classes("bbox-input")
+                    ui.label(t('catalogue.bbox_label')).classes("bbox-label")
+                    search_bbox_north = ui.number(label=t('sidebar.north'), max=90,  min=-90).classes("bbox-input")
+                    search_bbox_west  = ui.number(label=t('sidebar.west'),  max=180, min=-180).classes("bbox-input")
+                    search_bbox_east  = ui.number(label=t('sidebar.east'),  max=180, min=-180).classes("bbox-input")
+                    search_bbox_south = ui.number(label=t('sidebar.south'), max=90,  min=-90).classes("bbox-input")
                 with ui.row().classes("justify-end"):
-                    search_btn = ui.button('Filter', icon='search')
+                    search_btn = ui.button(t('btn.filter'), icon='search')
 
         results_col = ui.column().classes("results-column")
 

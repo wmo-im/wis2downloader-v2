@@ -2,11 +2,12 @@ import httpx
 from nicegui import ui
 
 from config import SUBSCRIPTION_MANAGER
+from i18n import t
 
 
 def render(container):
     with container:
-        reload_btn = ui.button("Reload Subscriptions").classes("reload-btn")
+        reload_btn = ui.button(t('btn.reload')).classes("reload-btn")
         with ui.column() as subscriptions_col:
             pass
 
@@ -25,10 +26,10 @@ def render(container):
                             with ui.card_section():
                                 ui.label(topic).classes('text-subtitle2')
                                 ui.label(
-                                    f"Folder: {sub_data.get('save_path') or '/'}"
+                                    t('subscriptions.folder', path=sub_data.get('save_path') or '/')
                                 ).classes('text-body2 text-grey-7')
                                 ui.button(
-                                    "Unsubscribe", icon='remove_circle_outline'
+                                    t('btn.unsubscribe'), icon='remove_circle_outline'
                                 ).classes("subscription-action-btn").on(
                                     'click',
                                     lambda _, sid=sub_id: unsubscribe(sid),

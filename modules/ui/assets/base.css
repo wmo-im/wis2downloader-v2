@@ -3,7 +3,6 @@
 /* -- Layout ---------------------------------------------------- */
 
 #app {
-    max-width: 1600px !important;
     margin: 0 auto;
     transform: translateZ(0);
 }
@@ -465,5 +464,46 @@ label, .q-label {
     background: rgba(255,255,255,0.95) !important;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18) !important;
 }
+
+/* -- Focus indicators (WCAG 2.1 AA) -------------------------------- */
+
+:focus-visible {
+    outline: 2px solid #2563eb !important;
+    outline-offset: 2px !important;
+}
+
+.q-btn:focus-visible {
+    outline: 2px solid #2563eb !important;
+    outline-offset: 2px !important;
+}
+
+/* -- Language selector in header ----------------------------------- */
+
+.lang-select {
+    min-width: 100px;
+    color: #fff !important;
+}
+
+.lang-select .q-field__native,
+.lang-select .q-field__label {
+    color: #fff !important;
+}
+
+/* -- RTL overrides ------------------------------------------------- */
+[dir="rtl"]:has(.q-drawer--left.q-drawer--mini) .q-page-container {
+    padding-left: 0 !important;
+    padding-right: calc(32px + 2rem) !important;
+}
+
+[dir="rtl"]:has(.q-drawer--left:not(.q-drawer--mini)) .q-page-container {
+    padding-left: 0 !important;
+    padding-right: 250px !important;
+}
+
+[dir="rtl"] .page-body-row {
+    padding-left: 0 !important;
+    padding-right: 1rem !important;
+}
+
 
 }
