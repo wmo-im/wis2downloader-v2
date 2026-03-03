@@ -55,6 +55,22 @@ METRICS: dict[str, tuple[str, str]] = {
         'gauge',
         'Current number of tasks in the Celery default queue.',
     ),
+    'disk_total_bytes': (
+        'gauge',
+        'Total disk space in bytes.',
+    ),
+    'disk_used_bytes': (
+        'gauge',
+        'Used disk space in bytes.',
+    ),
+    'disk_free_bytes': (
+        'gauge',
+        'Free disk space in bytes.',
+    ),
+    'disk_downloads_bytes': (
+        'gauge',
+        'Current size of the downloads directory in bytes.',
+    ),
 }
 
 

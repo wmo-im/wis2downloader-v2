@@ -92,7 +92,8 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'task_manager_start=task_manager.worker:main'
+            'task_manager_start=task_manager.worker:main',
+            'scheduler_start=task_manager.scheduler:main'
         ]
     },
     classifiers=[

@@ -32,5 +32,4 @@ RUN cd ./app && \
     pip install -e task_manager && \
     pip install -e subscription_manager
 
-# now the default command
-CMD ["/bin/bash", "-c", "source .venv/bin/activate && task_manager_start worker --concurrency=32 --loglevel=${LOG_LEVEL:-info}"]
+

@@ -251,6 +251,7 @@ def metrics_collector(func):
             if status_code == STATUS_SUCCESS:
                 incr_counter('downloads_total', {'cache': global_cache, 'media_type': media_type})
                 incr_counter('downloads_bytes_total', {'cache': global_cache, 'media_type': media_type}, file_size)
+                incr_counter('disk_downloads_bytes', {}, file_size)
 
         except Exception as e:
             LOGGER.error(f"Error collecting metrics: {e}", exc_info=True)
