@@ -5,6 +5,7 @@ NAV_ITEMS = [
     ('dashboard', 'Dashboard',            'dashboard'),
     ('catalogue', 'Catalogue Search',     'search'),
     ('tree',      'Tree Search',          'account_tree'),
+    ('manual',    'Manual Subscribe',     'edit_note'),
     ('manage',    'Manage Subscriptions', 'manage_history'),
     ('settings',  'Settings',             'settings'),
 ]

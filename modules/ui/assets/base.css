@@ -212,7 +212,6 @@
 
 .settings-card {
     width: 100%;
-    max-width: 600px;
     margin-bottom: 16px !important;
 }
 
@@ -438,6 +437,27 @@ label, .q-label {
 
 .keyword-btn {
     font-size: 12px;
+}
+
+/* -- Manual subscription view ---------------------------------- */
+
+.manual-sub-card {
+    width: 100%;
+    margin-bottom: 16px !important;
+}
+
+.manual-sub-card .q-card__section {
+    width: 100%;
+}
+
+.filter-textarea {
+    width: 100% !important;
+}
+
+.filter-textarea textarea {
+    font-family: monospace !important;
+    font-size: 0.85rem !important;
+    min-height: 200px;
 }
 
 .q-dialog {

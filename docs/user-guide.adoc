@@ -20,24 +20,33 @@ The web interface is available at `http://localhost:8080`. It provides a visual 
 
 === Navigation
 
-The navigation drawer on the left gives access to five views:
+The navigation drawer on the left gives access to six views. Each can also be reached with a keyboard shortcut:
 
-[cols="1,3"]
+[cols="1,1,3"]
 |===
-|View |Description
+|Shortcut |View |Description
 
+|kbd:[Alt+1]
 |*Dashboard*
 |Embedded Grafana panels showing download rates, queue depth, and byte totals in real time
 
+|kbd:[Alt+2]
 |*Catalogue Search*
 |Full-text search across all three Global Discovery Catalogues (GDC) with filtering by data policy, keywords, and bounding box
 
+|kbd:[Alt+3]
 |*Tree Search*
 |Browse the complete WIS2 topic hierarchy as a navigable tree and select a topic to open the subscription sidebar
 
-|*Subscriptions*
+|kbd:[Alt+4]
+|*Manual Subscribe*
+|Enter a topic, save directory, and filter directly without browsing the catalogue
+
+|kbd:[Alt+5]
+|*Manage Subscriptions*
 |List all active subscriptions and unsubscribe from topics
 
+|kbd:[Alt+6]
 |*Settings*
 |View GDC record counts per catalogue and trigger a manual data refresh
 |===
@@ -209,7 +218,7 @@ Response:
 |No
 |Subdirectory for downloaded files (under `/data`)
 
-|`filters`
+|`filter`
 |No
 |Filter configuration (see <<Filtering>>)
 |===
@@ -226,9 +235,10 @@ Response:
 ----
 {
   "cache/a/wis2/+/data/core/weather/surface-based-observations/#": {
-    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-    "save_path": "surface-obs",
-    "filters": {}
+    "a1b2c3d4-...": {
+      "save_path": "surface-obs",
+      "filter": {}
+    }
   }
 }
 ----
@@ -249,40 +259,251 @@ NOTE: The `#` character must be URL-encoded as `%23` (otherwise interpreted as a
 curl -X DELETE "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"
 ----
 
+[[Filtering]]
 == Filtering
 
-=== Media Type Filtering
+Subscriptions accept an optional `filter` object that controls which notifications are downloaded.
+Filters use ordered rules — the first rule that matches determines the outcome.
 
-You can filter downloads by file type using the `accepted_media_types` filter:
+=== Filter Structure
 
-[source,bash]
+[source,json]
 ----
-curl -X POST http://localhost:5002/subscriptions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "topic": "cache/a/wis2/de-dwd/data/#",
-    "target": "dwd-bufr",
-    "filters": {
-      "accepted_media_types": ["application/bufr"]
-    }
-  }'
+{
+  "filter": {
+    "name": "my-filter",
+    "rules": [
+      {
+        "id": "rule-1",
+        "order": 1,
+        "match": { ... },
+        "action": "accept"
+      },
+      {
+        "id": "default",
+        "order": 999,
+        "match": { "always": true },
+        "action": "reject"
+      }
+    ]
+  }
+}
 ----
 
-This subscription only downloads BUFR files, skipping all other formats.
+Each rule requires:
+
+[cols="1,1,3"]
+|===
+|Field |Required |Description
+
+|`id`
+|Yes
+|Short label shown in logs when the rule fires
+
+|`order`
+|Yes
+|Rules are evaluated in ascending order — lower numbers first
+
+|`match`
+|Yes
+|Condition that must be true for the rule to apply (see <<match-conditions>>)
+
+|`action`
+|Yes
+|`accept`, `reject`, or `continue` (continue to next rule)
+
+|`reason`
+|No
+|Human-readable explanation shown in logs and metrics
+|===
+
+If no rule matches, the default outcome is **accept**.
+
+=== Default Behaviour (No Filter)
+
+When no `filter` is provided, a built-in default filter runs that rejects any media type not in a standard allowed list (BUFR, GRIB, NetCDF, HDF5, common images and text formats). To accept everything, use an explicit accept-all filter:
+
+[source,json]
+----
+{
+  "filter": {
+    "name": "accept-all",
+    "rules": [
+      {"id": "accept-all", "order": 1, "match": {"always": true}, "action": "accept"}
+    ]
+  }
+}
+----
+
+[[match-conditions]]
+=== Match Conditions
+
+==== Always / Never
+
+[source,json]
+----
+{"always": true}   <1>
+{"always": false}  <2>
+----
+<1> Matches unconditionally — useful as a default rule at the end of a list
+<2> Never matches
+
+==== Simple Fields
+
+Match against metadata available in the WIS2 notification:
+
+[source,json]
+----
+{"centre_id":   {"equals": "de-dwd"}}
+{"topic":       {"pattern": "cache/a/wis2/+/data/core/weather/#"}}
+{"href":        {"regex": "\\.bufr4?$"}}
+{"data_id":     {"not_equals": "some-id"}}
+----
+
+Available fields:
+
+[cols="1,3"]
+|===
+|Field |Description
+
+|`centre_id`
+|Centre identifier from position 3 of the topic (e.g. `de-dwd`, `ca-eccc-msc`)
+
+|`topic`
+|Full MQTT topic string
+
+|`href`
+|Download URL from the notification
+
+|`data_id`
+|`properties.data_id` from the WIS2 notification
+
+|`metadata_id`
+|`properties.metadata_id` from the WIS2 notification
+
+|`media_type`
+|Detected MIME type of the downloaded file — **post-download only** (see <<two-pass>>)
+|===
+
+Available operators: `equals`, `not_equals`, `in`, `not_in`, `pattern` (glob), `regex`, `exists`
+
+==== Size
+
+Match on file size in bytes. The `size` field uses its own byte-unit operators:
+
+[source,json]
+----
+{"size": {"gt_bytes":  104857600}}             <1>
+{"size": {"lte_bytes": 1048576}}               <2>
+{"size": {"between_bytes": [1024, 5242880]}}   <3>
+----
+<1> Greater than 100 MB
+<2> 1 MB or less
+<3> Between 1 KB and 5 MB
+
+Operators: `gt_bytes`, `gte_bytes`, `lt_bytes`, `lte_bytes`, `between_bytes`, `exists`
+
+NOTE: `size` is the actual downloaded byte count and is only known **after** the file is fetched — see <<two-pass>>.
+
+==== Geographic Bounding Box
+
+Matches if the notification's geometry falls within the box. Notifications with no geometry are passed through.
+
+[source,json]
+----
+{"bbox": {"north": 55.0, "south": 47.0, "east": 15.0, "west": 6.0}}
+----
+
+All four coordinates are required and are in decimal degrees.
+
+==== Dynamic Notification Properties
+
+Match against any field inside the WIS2 notification's `properties` object using the `property` key:
+
+[source,json]
+----
+{"property": "model_run",     "type": "string",   "equals": "00"}
+{"property": "forecast_hour", "type": "integer",  "lte": 48}
+{"property": "datetime",      "type": "datetime", "gte": "2024-01-01T00:00:00Z"}
+----
+
+Supported types: `string`, `integer`, `number`, `boolean`, `datetime`
+
+=== Combinators
+
+Conditions can be nested using logical combinators:
+
+[source,json]
+----
+{"all": [condition1, condition2]}   <1>
+{"any": [condition1, condition2]}   <2>
+{"not": condition}                  <3>
+----
+<1> AND — all sub-conditions must match
+<2> OR — any sub-condition must match
+<3> NOT — sub-condition must not match
+
+Example — accept only 00Z and 12Z runs with short-range forecasts from a specific centre:
+
+[source,json]
+----
+{
+  "all": [
+    {"centre_id": {"equals": "ca-eccc-msc"}},
+    {"any": [
+      {"property": "model_run", "type": "string", "equals": "00"},
+      {"property": "model_run", "type": "string", "equals": "12"}
+    ]},
+    {"property": "forecast_hour", "type": "integer", "lte": 48}
+  ]
+}
+----
+
+[[two-pass]]
+=== Pre-download and Post-download Evaluation
+
+WARNING: `media_type` and `size` are only known *after* the file has been downloaded. Filters are evaluated *twice*: once before downloading (pre-download) and once after (post-download). Rules that depend on `media_type` or `size` are silently skipped in the pre-download pass.
+
+This means the following filter **rejects everything** — the `media_type` rule never fires pre-download, and the `reject-all` rule fires instead:
+
+[source,json]
+----
+{
+  "rules": [
+    {"id": "accept-bufr", "order": 1,
+     "match": {"media_type": {"in": ["application/bufr"]}}, "action": "accept"},
+    {"id": "reject-all",  "order": 99,
+     "match": {"always": true}, "action": "reject"}
+  ]
+}
+----
+
+The correct pattern is to guard the reject rule with `media_type.exists`, so it only fires post-download when the type is actually known:
+
+[source,json]
+----
+{
+  "rules": [
+    {"id": "accept-bufr", "order": 1,
+     "match": {"media_type": {"in": ["application/bufr", "application/octet-stream"]}},
+     "action": "accept"},
+    {"id": "reject-wrong-type", "order": 2,
+     "match": {"media_type": {"exists": true}},
+     "action": "reject", "reason": "Media type not allowed"}
+  ]
+}
+----
+
+Pre-download: neither rule fires (both require a known `media_type`) → download proceeds. +
+Post-download: rule 1 accepts BUFR/octet-stream; rule 2 rejects everything else.
 
 === Supported Media Types
 
-Default accepted types (if no filter specified):
+Default accepted types when no filter is specified:
 
 [cols="1,2"]
 |===
 |Category |Types
-
-|Images
-|`image/gif`, `image/jpeg`, `image/png`, `image/tiff`
-
-|Documents
-|`application/pdf`, `application/postscript`
 
 |WMO Formats
 |`application/bufr`, `application/grib`
@@ -290,28 +511,129 @@ Default accepted types (if no filter specified):
 |Scientific
 |`application/x-hdf`, `application/x-hdf5`, `application/x-netcdf`, `application/x-netcdf4`
 
+|Images
+|`image/gif`, `image/jpeg`, `image/png`, `image/tiff`
+
+|Documents
+|`application/pdf`, `application/postscript`
+
 |Text
 |`text/plain`, `text/html`, `text/xml`, `text/csv`, `text/tab-separated-values`
+
+|Binary
+|`application/octet-stream`
 |===
 
-=== Wildcard Matching
+=== Filter Examples
 
-Use wildcards in media type filters:
+==== Accept only BUFR and GRIB
 
 [source,json]
 ----
 {
-  "filters": {
-    "accepted_media_types": [
-      "application/bufr",
-      "application/grib",
-      "application/x-netcdf*"
+  "filter": {
+    "name": "wmo-formats-only",
+    "rules": [
+      {
+        "id": "accept-wmo",
+        "order": 1,
+        "match": {"media_type": {"in": ["application/bufr", "application/grib"]}},
+        "action": "accept"
+      },
+      {
+        "id": "reject-other",
+        "order": 2,
+        "match": {"media_type": {"exists": true}},
+        "action": "reject",
+        "reason": "Not a WMO format"
+      }
     ]
   }
 }
 ----
 
-The `*` matches any suffix, so `application/x-netcdf*` matches both `application/x-netcdf` and `application/x-netcdf4`.
+==== Reject files over 100 MB
+
+[source,json]
+----
+{
+  "filter": {
+    "name": "size-limit",
+    "rules": [
+      {
+        "id": "reject-large",
+        "order": 1,
+        "match": {"size": {"gt_bytes": 104857600}},
+        "action": "reject",
+        "reason": "Exceeds 100 MB"
+      }
+    ]
+  }
+}
+----
+
+==== Data from a specific centre, short-range only
+
+[source,json]
+----
+{
+  "filter": {
+    "name": "eccc-short-range",
+    "rules": [
+      {
+        "id": "reject-large",
+        "order": 1,
+        "match": {"size": {"gt_bytes": 104857600}},
+        "action": "reject",
+        "reason": "Exceeds 100 MB"
+      },
+      {
+        "id": "accept-short-range",
+        "order": 2,
+        "match": {
+          "all": [
+            {"property": "model_run",     "type": "string",  "in": ["00", "12"]},
+            {"property": "forecast_hour", "type": "integer", "lte": 48}
+          ]
+        },
+        "action": "accept"
+      },
+      {
+        "id": "default",
+        "order": 999,
+        "match": {"always": true},
+        "action": "reject"
+      }
+    ]
+  }
+}
+----
+
+==== Geographic area filter
+
+[source,json]
+----
+{
+  "filter": {
+    "name": "europe-only",
+    "rules": [
+      {
+        "id": "accept-europe",
+        "order": 1,
+        "match": {"bbox": {"north": 71.0, "south": 34.0, "east": 40.0, "west": -25.0}},
+        "action": "accept"
+      },
+      {
+        "id": "default",
+        "order": 999,
+        "match": {"always": true},
+        "action": "reject",
+        "reason": "Outside European bounding box"
+      }
+    ]
+  }
+}
+----
 
 == Downloaded Files
 
@@ -421,8 +743,23 @@ curl -X POST http://localhost:5002/subscriptions \
   -d '{
     "topic": "cache/a/wis2/+/data/#",
     "target": "wmo-formats",
-    "filters": {
-      "accepted_media_types": ["application/bufr", "application/grib"]
+    "filter": {
+      "name": "wmo-formats-only",
+      "rules": [
+        {
+          "id": "accept-wmo",
+          "order": 1,
+          "match": {"media_type": {"in": ["application/bufr", "application/grib"]}},
+          "action": "accept"
+        },
+        {
+          "id": "reject-other",
+          "order": 2,
+          "match": {"media_type": {"exists": true}},
+          "action": "reject",
+          "reason": "Not a WMO format"
+        }
+      ]
     }
   }'
 ----
@@ -486,17 +823,17 @@ curl -s http://localhost:5002/metrics | grep wis2downloader_skipped_total
 Common reasons:
 
 * `PreviouslyProcessed` - File already downloaded (deduplication)
-* `MediaTypeNotAllowed` - File type not in accepted list
+* `FilterRejected` - Rejected by a filter rule
 * `GlobalCacheBlacklisted` - Cache excluded via `GC_EXCLUDE`
 
 === Wrong File Types Downloaded
 
-Update your subscription with a media type filter:
+Delete the existing subscription and recreate it with a `media_type` filter. Use `media_type.exists` as the reject guard — not `always: true` — so the reject rule only fires after the file type is known (see <<two-pass>>):
 
 [source,bash]
 ----
-# Delete old subscription
-curl -X DELETE http://localhost:5002/subscriptions/your-topic
+# Delete old subscription (use the subscription ID from GET /subscriptions)
+curl -X DELETE http://localhost:5002/subscriptions/<id>
 
 # Create new subscription with filter
 curl -X POST http://localhost:5002/subscriptions \
@@ -504,6 +841,29 @@ curl -X POST http://localhost:5002/subscriptions \
   -d '{
     "topic": "your-topic",
     "target": "your-target",
-    "filters": {"accepted_media_types": ["application/bufr"]}
+    "filter": {
+      "name": "bufr-only",
+      "rules": [
+        {
+          "id": "accept-bufr",
+          "order": 1,
+          "match": {"media_type": {"in": ["application/bufr", "application/octet-stream"]}},
+          "action": "accept"
+        },
+        {
+          "id": "reject-other",
+          "order": 2,
+          "match": {"media_type": {"exists": true}},
+          "action": "reject",
+          "reason": "Media type not allowed"
+        }
+      ]
+    }
   }'
 ----
+
+=== Everything Being Rejected by Filter
+
+If all notifications are rejected with reason `FilterRejected`, the most common cause is an `always: true` reject rule firing pre-download before `media_type` is known.
+
+Check your filter: if you have a `media_type` accept rule followed by an `always: true` reject rule, the accept rule will never fire pre-download because `media_type` is only known after download. Replace the `always: true` reject with `media_type.exists: true` — see <<two-pass>>.
