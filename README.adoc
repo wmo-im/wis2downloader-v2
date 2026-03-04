@@ -65,12 +65,13 @@ cd wis2downloader-v2
 cp default.env .env  # Customize if needed
 
 # Set up downloads directory permissions (containers run as UID 10001)
+# Note - this is only required when run on a Linux workstation/server.
 sudo groupadd -g 988 wis2
 sudo useradd -u 10001 -g wis2 -M -s /usr/sbin/nologin wis2
 mkdir -p downloads && sudo chown wis2:wis2 downloads
 
 # Start services
-docker-compose up -d
+docker compose up -d
 
 # Create a subscription
 curl -X POST http://localhost:5002/subscriptions \
