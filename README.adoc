@@ -60,8 +60,8 @@ WIS2 Downloader subscribes to MQTT topics on WIS2 Global Brokers, receives notif
 [source,bash]
 ----
 # Clone and configure
-git clone https://github.com/wmo-im/wis2downloader-refactor.git
-cd wis2downloader-refactor
+git clone https://github.com/wmo-im/wis2downloader-v2.git
+cd wis2downloader-v2
 cp default.env .env  # Customize if needed
 
 # Set up downloads directory permissions (containers run as UID 10001)
