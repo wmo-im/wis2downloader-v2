@@ -290,7 +290,7 @@ def _collect_per_topic_filters(topics, dataset_select, media_type_select,
     for topic in topics:
         topic_dataset_ids = [
             d.id for d in get_datasets_for_channel(topic)
-            if not selected_ids or d.id in selected_ids
+            if selected_ids and d.id in selected_ids
         ]
         f = _build_filter(
             topic_dataset_ids, media_type_select,
@@ -306,15 +306,21 @@ def _collect_per_topic_filters(topics, dataset_select, media_type_select,
 
 def on_topics_picked(e, state, layout, is_page_selection=False, sender=None, dataset_id=None):
     if is_page_selection:
-        # Called from catalogue: e.value is [single_topic], toggle in/out
-        if e.value[0] not in state.selected_topics:
-            state.selected_topics.append(e.value[0])
-            if dataset_id and dataset_id not in state.selected_dataset_ids:
-                state.selected_dataset_ids.append(dataset_id)
-        else:
-            state.selected_topics.remove(e.value[0])
-            if dataset_id and dataset_id in state.selected_dataset_ids:
-                state.selected_dataset_ids.remove(dataset_id)
+        # Called from catalogue: toggle by dataset ID; derive topics from selected datasets.
+        topic = e.value[0]
+        if dataset_id and dataset_id not in state.selected_dataset_ids:
+            state.selected_dataset_ids.append(dataset_id)
+            if topic not in state.selected_topics:
+                state.selected_topics.append(topic)
+        elif dataset_id and dataset_id in state.selected_dataset_ids:
+            state.selected_dataset_ids.remove(dataset_id)
+            topic_still_needed = any(
+                topic in {lnk.channel for lnk in m.record.links if lnk.channel}
+                for m in merged_records()
+                if m.record.id in state.selected_dataset_ids
+            )
+            if not topic_still_needed and topic in state.selected_topics:
+                state.selected_topics.remove(topic)
     else:
         # Called from tree on_select: e.value is the selected node ID or None.
         state.selected_topics = [e.value] if e.value else []

@@ -113,7 +113,7 @@ async def select_in_search_results(e, page_selector, query, records,
                                    state, layout, sender=None, dataset_id=None):
     on_topics_picked(e, state, layout, is_page_selection=True, sender=sender,
                      dataset_id=dataset_id)
-    sender.text = t('btn.unselect') if e.value[0] in state.selected_topics else t('btn.select')
+    sender.text = t('btn.unselect') if dataset_id in state.selected_dataset_ids else t('btn.select')
 
 
 async def update_search_results(page_selector, query, records: list[MergedRecord], state, layout):
@@ -166,7 +166,7 @@ async def update_search_results(page_selector, query, records: list[MergedRecord
                                     event_list.append(_Event([lnk.channel]))
                                     i += 1
                                     ev_ref = event_list[i - 1]
-                                    btn_text = t('btn.unselect') if lnk.channel in state.selected_topics else t('btn.select')
+                                    btn_text = t('btn.unselect') if rec.id in state.selected_dataset_ids else t('btn.select')
 
                                     async def on_select_click(ev, er=ev_ref, did=rec.id, lnks=rec.links):
                                         is_selecting = er.value[0] not in state.selected_topics
