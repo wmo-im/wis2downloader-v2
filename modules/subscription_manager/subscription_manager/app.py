@@ -184,11 +184,14 @@ CELERY_DEFAULT_QUEUE = os.getenv("CELERY_DEFAULT_QUEUE", "celery")
 # preload openapi doc
 def load_openapi():
     p = Path(app.root_path) / 'static' / 'openapi.yml'
-    if p.exists():
-        with open(p) as fh:
-            return yaml.safe_load(fh)
-    else:
+    if not p.exists():
         return {}
+    text = p.read_text()
+    text = text.replace(
+        '${WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL}',
+        os.getenv('WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL', f'http://localhost:{FLASK_PORT}')
+    )
+    return yaml.safe_load(text)
 
 
 OPENAPI = load_openapi()
