@@ -138,6 +138,9 @@ services:
     build:
       context: .
       dockerfile: ./containers/celery/Dockerfile
+      args:
+        UID: ${UID:-10001}
+        GID: ${GID:-988}
     volumes:
       - "${HOST_DATA_PATH}:${CONTAINER_DATA_PATH}"
     env_file: *default-env
@@ -160,6 +163,9 @@ services:
     build:
       context: .
       dockerfile: ./containers/celery/Dockerfile
+      args:
+        UID: ${UID:-10001}
+        GID: ${GID:-988}
     volumes:
       - "${HOST_DATA_PATH}:${CONTAINER_DATA_PATH}"
     env_file: *default-env
