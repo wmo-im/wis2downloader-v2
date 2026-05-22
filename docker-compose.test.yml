@@ -79,19 +79,6 @@ services:
       retries: 12
       start_period: 10s
 
-  celery-workers-high-priority:
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "2"
-    healthcheck:
-      test: ["CMD-SHELL", ". .venv/bin/activate && CELERY_BROKER_URL=redis://:ci_test_password@redis:6379/0 celery inspect ping -t 5 | grep -q pong"]
-      interval: 10s
-      timeout: 15s
-      retries: 12
-      start_period: 30s
-
   celery-workers-small-files:
     logging:
       driver: json-file
@@ -105,29 +92,3 @@ services:
       retries: 12
       start_period: 30s
 
-  celery-workers-large-files:
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "2"
-    healthcheck:
-      test: ["CMD-SHELL", ". .venv/bin/activate && CELERY_BROKER_URL=redis://:ci_test_password@redis:6379/0 celery inspect ping -t 5 | grep -q pong"]
-      interval: 10s
-      timeout: 15s
-      retries: 12
-      start_period: 30s
-
-  celery-scheduler-workers:
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "2"
-
-  celery-beats:
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "2"

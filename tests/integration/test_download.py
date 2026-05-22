@@ -62,7 +62,7 @@ def _poll_tracker(redis_client, msg_id: str, timeout: int = POLL_TIMEOUT_S) -> s
         time.sleep(POLL_INTERVAL_S)
     raise TimeoutError(
         f"Tracker key '{key}' not set within {timeout}s. "
-        "Check celery-download-workers logs."
+        "Check celery-workers-small-files logs."
     )
 
 
@@ -137,7 +137,7 @@ class TestDownloadFlow:
         status = _poll_tracker(redis_client, msg_id)
         assert status == "SUCCESS", (
             f"Expected download status SUCCESS, got '{status}'. "
-            f"Check celery-download-workers logs for msg_id={msg_id}."
+            f"Check celery-workers-small-files logs for msg_id={msg_id}."
         )
 
     def test_duplicate_notification_is_skipped(self, redis_client, subscription):
