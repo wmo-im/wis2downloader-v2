@@ -525,7 +525,7 @@ def confirm_subscribe(topic_filters: dict | None, directory,
 
 
 async def subscribe_to_topics(topic_filters: dict, directory,
-                               credentials=None, queue='small_files'):
+                             credentials=None, queue='small_files'):
     async with httpx.AsyncClient() as client:
         for topic, filters in topic_filters.items():
             payload = {
