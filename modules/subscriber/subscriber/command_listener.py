@@ -4,7 +4,7 @@ import time
 from typing import TYPE_CHECKING
 
 import redis
-from shared import get_redis_client, setup_logging
+from shared import get_redis_client, setup_logging, DEFAULT_QUEUE
 
 if TYPE_CHECKING:
     from .subscriber import Subscriber
@@ -90,7 +90,7 @@ class CommandListener(threading.Thread):
                     command.get('save_path', ''),
                     command.get('filter', {}),
                     command.get('credentials'),
-                    command.get('queue', 'small_files'),
+                    command.get('queue', DEFAULT_QUEUE),
                 )
                 LOGGER.info(f'Added subscription {sub_id} to topic {topic}')
 
@@ -114,7 +114,7 @@ class CommandListener(threading.Thread):
                     command.get('save_path', ''),
                     command.get('filter', {}),
                     command.get('credentials'),
-                    command.get('queue', 'small_files'),
+                    command.get('queue', DEFAULT_QUEUE),
                 )
                 LOGGER.info(f'Updated subscription {sub_id} on topic {topic}')
 

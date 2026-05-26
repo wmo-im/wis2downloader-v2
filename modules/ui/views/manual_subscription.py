@@ -6,6 +6,7 @@ from i18n import t
 from views.shared import (
     confirm_subscribe, _collect_credentials,
     _validate_target, _validate_filter,
+    DEFAULT_QUEUE,
 )
 
 # Valid WIS2 topic: (cache|origin)/a/wis2/{centre-id or +}/data[/segments][/#]
@@ -64,7 +65,7 @@ def render(container):
                         'small_files':   t('sidebar.queue_small'),
                         'large_files':   t('sidebar.queue_large'),
                     },
-                    value='small_files',
+                    value=DEFAULT_QUEUE,
                 ).props('inline')
 
                 ui.separator()
@@ -135,7 +136,7 @@ def render(container):
                         {topic: filters},
                         target_input.value,
                         credentials,
-                        queue=queue_radio.value or 'small_files',
+                        queue=queue_radio.value or DEFAULT_QUEUE,
                     )
 
                 ui.button(t('btn.subscribe'), icon="check_circle").classes("subscribe-btn").on(

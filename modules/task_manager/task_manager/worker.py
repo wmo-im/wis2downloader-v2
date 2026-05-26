@@ -4,6 +4,7 @@ import sys
 
 from shared.logging import setup_logging
 from shared.redis_client import (REDIS_HOST, REDIS_PORT, REDIS_PASSWORD)
+from shared.queues import DEFAULT_QUEUE
 
 # Set up logging
 setup_logging()  # Configure root logger
@@ -29,7 +30,7 @@ app.conf.update(
     task_serializer='json',
     accept_content=['json'],
     result_serializer='json',
-    task_default_queue='small_files',
+    task_default_queue=DEFAULT_QUEUE,
 )
 
 # Import your tasks

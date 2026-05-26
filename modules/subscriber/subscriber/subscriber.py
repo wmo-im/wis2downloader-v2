@@ -6,7 +6,7 @@ import paho.mqtt.client as mqtt
 import ssl
 import time
 
-from shared import setup_logging, incr_counter
+from shared import setup_logging, incr_counter, DEFAULT_QUEUE
 from task_manager.workflows import wis2_download
 
 
@@ -123,7 +123,7 @@ class Subscriber():
                 "payload": payload,
             }
             try:
-                queue = sub_data.get('queue', 'small_files')
+                queue = sub_data.get('queue', DEFAULT_QUEUE)
                 wis2_download(job, queue=queue).apply_async()
                 LOGGER.info(
                     f"Job queued for topic {msg.topic} "
@@ -158,7 +158,7 @@ class Subscriber():
     def add_subscription(self, topic: str, sub_id: str,
                          save_path: str, filter_config: dict,
                          credentials: dict | None = None,
-                         queue: str = 'small_files') -> bool:
+                         queue: str = DEFAULT_QUEUE) -> bool:
         """Add or update a single subscription on an already-subscribed topic.
 
         Returns True on success, False if the topic is not currently subscribed.
