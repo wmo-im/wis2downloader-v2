@@ -202,8 +202,8 @@ curl -X POST http://localhost:5002/subscriptions \
 curl -X POST http://localhost:5002/subscriptions \
   -H "Content-Type: application/json" \
   -d '{
-    "topic": "cache/a/wis2/+/data/core/weather/gridded-forecasts/#",
-    "target": "forecasts",
+    "topic": "cache/a/wis2/fr-meteofrance/data/core/weather/space-based-observations/noaa-21/cris",
+    "target": "space-obs",
     "queue": "large_files"
   }'
 ----
