@@ -7,7 +7,11 @@ from nicegui import ui
 from config import SUBSCRIPTION_MANAGER
 from data import get_datasets_for_channel, merged_records
 from i18n import t
+import os
+
 from shared import setup_logging
+
+DEFAULT_QUEUE = os.getenv("DEFAULT_QUEUE", "small_files")
 
 _DATE_RE = re.compile(r'^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$')
 _TIME_RE = re.compile(r'^([01]\d|2[0-3]):[0-5]\d$')
@@ -467,7 +471,7 @@ def on_topics_picked(e, state, layout, is_page_selection=False, sender=None, dat
                 'small_files':   t('sidebar.queue_small'),
                 'large_files':   t('sidebar.queue_large'),
             },
-            value='small_files',
+            value=DEFAULT_QUEUE,
         ).props('inline')
 
         ui.separator()
@@ -481,7 +485,7 @@ def on_topics_picked(e, state, layout, is_page_selection=False, sender=None, dat
                     custom_inputs, custom_filter_defs,
                 ),
                 directory.value,
-                queue=queue_radio.value or 'small_files',
+                queue=queue_radio.value or DEFAULT_QUEUE,
             )
 
         ui.button(t('btn.subscribe'), icon="check_circle").classes("subscribe-btn").on(
@@ -490,7 +494,7 @@ def on_topics_picked(e, state, layout, is_page_selection=False, sender=None, dat
 
 
 def confirm_subscribe(topic_filters: dict | None, directory,
-                      credentials=None, queue='small_files'):
+                      credentials=None, queue=DEFAULT_QUEUE):
     if topic_filters is None:
         return  # validation errors already shown inline
     if credentials is False:
@@ -525,7 +529,7 @@ def confirm_subscribe(topic_filters: dict | None, directory,
 
 
 async def subscribe_to_topics(topic_filters: dict, directory,
-                              credentials=None, queue='small_files'):
+                              credentials=None, queue=DEFAULT_QUEUE):
     async with httpx.AsyncClient() as client:
         for topic, filters in topic_filters.items():
             payload = {
