@@ -14,8 +14,8 @@ info:
     name: WIS2 Downloader
 
 servers:
-  - url: /api
-    description: Default server (via Traefik)
+  - url: ${WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL}
+    description: API server
 
 tags:
   - name: Subscriptions
