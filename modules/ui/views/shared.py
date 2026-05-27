@@ -7,7 +7,11 @@ from nicegui import ui
 from config import SUBSCRIPTION_MANAGER
 from data import get_datasets_for_channel, merged_records
 from i18n import t
+import os
+
 from shared import setup_logging
+
+DEFAULT_QUEUE = os.getenv("DEFAULT_QUEUE", "small_files")
 
 _DATE_RE = re.compile(r'^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$')
 _TIME_RE = re.compile(r'^([01]\d|2[0-3]):[0-5]\d$')
@@ -290,7 +294,7 @@ def _collect_per_topic_filters(topics, dataset_select, media_type_select,
     for topic in topics:
         topic_dataset_ids = [
             d.id for d in get_datasets_for_channel(topic)
-            if not selected_ids or d.id in selected_ids
+            if selected_ids and d.id in selected_ids
         ]
         f = _build_filter(
             topic_dataset_ids, media_type_select,
@@ -306,15 +310,21 @@ def _collect_per_topic_filters(topics, dataset_select, media_type_select,
 
 def on_topics_picked(e, state, layout, is_page_selection=False, sender=None, dataset_id=None):
     if is_page_selection:
-        # Called from catalogue: e.value is [single_topic], toggle in/out
-        if e.value[0] not in state.selected_topics:
-            state.selected_topics.append(e.value[0])
-            if dataset_id and dataset_id not in state.selected_dataset_ids:
-                state.selected_dataset_ids.append(dataset_id)
-        else:
-            state.selected_topics.remove(e.value[0])
-            if dataset_id and dataset_id in state.selected_dataset_ids:
-                state.selected_dataset_ids.remove(dataset_id)
+        # Called from catalogue: toggle by dataset ID; derive topics from selected datasets.
+        topic = e.value[0]
+        if dataset_id and dataset_id not in state.selected_dataset_ids:
+            state.selected_dataset_ids.append(dataset_id)
+            if topic not in state.selected_topics:
+                state.selected_topics.append(topic)
+        elif dataset_id and dataset_id in state.selected_dataset_ids:
+            state.selected_dataset_ids.remove(dataset_id)
+            topic_still_needed = any(
+                topic in {lnk.channel for lnk in m.record.links if lnk.channel}
+                for m in merged_records()
+                if m.record.id in state.selected_dataset_ids
+            )
+            if not topic_still_needed and topic in state.selected_topics:
+                state.selected_topics.remove(topic)
     else:
         # Called from tree on_select: e.value is the selected node ID or None.
         state.selected_topics = [e.value] if e.value else []
@@ -454,6 +464,18 @@ def on_topics_picked(e, state, layout, is_page_selection=False, sender=None, dat
 
         ui.separator()
 
+        ui.label(t('sidebar.queue')).classes("sidebar-section-title")
+        queue_radio = ui.radio(
+            {
+                'high_priority': t('sidebar.queue_high'),
+                'small_files':   t('sidebar.queue_small'),
+                'large_files':   t('sidebar.queue_large'),
+            },
+            value=DEFAULT_QUEUE,
+        ).props('inline')
+
+        ui.separator()
+
         def on_subscribe_click():
             confirm_subscribe(
                 _collect_per_topic_filters(
@@ -463,6 +485,7 @@ def on_topics_picked(e, state, layout, is_page_selection=False, sender=None, dat
                     custom_inputs, custom_filter_defs,
                 ),
                 directory.value,
+                queue=queue_radio.value or DEFAULT_QUEUE,
             )
 
         ui.button(t('btn.subscribe'), icon="check_circle").classes("subscribe-btn").on(
@@ -470,7 +493,8 @@ def on_topics_picked(e, state, layout, is_page_selection=False, sender=None, dat
         )
 
 
-def confirm_subscribe(topic_filters: dict | None, directory, credentials=None):
+def confirm_subscribe(topic_filters: dict | None, directory,
+                      credentials=None, queue=DEFAULT_QUEUE):
     if topic_filters is None:
         return  # validation errors already shown inline
     if credentials is False:
@@ -482,6 +506,7 @@ def confirm_subscribe(topic_filters: dict | None, directory, credentials=None):
             "topic": topic,
             "target": target,
             "filter": f,
+            "queue": queue,
             **({"credentials": _preview_credentials(credentials)} if credentials else {}),
         }
         for topic, f in topic_filters.items()
@@ -497,19 +522,21 @@ def confirm_subscribe(topic_filters: dict | None, directory, credentials=None):
 
             async def on_confirm():
                 dialog.close()
-                await subscribe_to_topics(topic_filters, target, credentials)
+                await subscribe_to_topics(topic_filters, target, credentials, queue)
 
             ui.button(t('btn.confirm'), icon="check_circle").props("color=primary").on('click', on_confirm)
     dialog.open()
 
 
-async def subscribe_to_topics(topic_filters: dict, directory, credentials=None):
+async def subscribe_to_topics(topic_filters: dict, directory,
+                              credentials=None, queue=DEFAULT_QUEUE):
     async with httpx.AsyncClient() as client:
         for topic, filters in topic_filters.items():
             payload = {
                 "topic": topic,
                 "target": directory,
                 "filter": filters,
+                "queue": queue,
             }
             if credentials:
                 payload["credentials"] = credentials

@@ -7,7 +7,11 @@ import yaml
 from flask import Flask, request, jsonify, url_for, Response, render_template
 from redis.exceptions import ConnectionError
 
-from shared import get_redis_client, setup_logging, set_gauge, generate_prometheus_text
+from shared import (
+    get_redis_client, setup_logging,
+    set_gauge, generate_prometheus_text,
+    VALID_QUEUES, DEFAULT_QUEUE,
+)
 
 # Set up logging
 setup_logging()  # Configure root logger
@@ -226,6 +230,12 @@ def add_subscription():
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
+    queue = data.get('queue', DEFAULT_QUEUE)
+    if queue not in VALID_QUEUES:
+        return jsonify({
+            "error": f"queue must be one of: {', '.join(sorted(VALID_QUEUES))}"
+        }), 400
+
     sub_id = str(uuid4())
     sub_data = {
         'id': sub_id,
@@ -233,6 +243,7 @@ def add_subscription():
         'save_path': save_path,
         'filter': filter_config,
         'credentials': credentials,
+        'queue': queue,
     }
 
     try:
@@ -257,11 +268,12 @@ def add_subscription():
                     'save_path': save_path,
                     'filter': filter_config,
                     'credentials': credentials,
+                    'queue': queue,
                 }
             },
         }
     else:
-        # Topic already subscribed — register the new subscription with the subscriber
+        # Topic already subscribed — register the new subscription
         command = {
             "action": "add_subscription",
             "topic": topic,
@@ -269,6 +281,7 @@ def add_subscription():
             "save_path": save_path,
             "filter": filter_config,
             'credentials': credentials,
+            'queue': queue,
         }
 
     if not publish_command(command):
@@ -303,9 +316,19 @@ def update_subscription(sub_id):
         sub_data['filter'] = data['filter']
     if 'credentials' in data:
         try:
-            sub_data['credentials'] = _validate_credentials(data['credentials'])
+            sub_data['credentials'] = _validate_credentials(
+                data['credentials'])
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
+    if 'queue' in data:
+        if data['queue'] not in VALID_QUEUES:
+            return jsonify({
+                "error": (
+                    f"queue must be one of: "
+                    f"{', '.join(sorted(VALID_QUEUES))}"
+                )
+            }), 400
+        sub_data['queue'] = data['queue']
 
     if not _persist_subscription(sub_id, sub_data):
         return jsonify({"error": "Failed to persist update to Redis"}), 503
@@ -317,6 +340,7 @@ def update_subscription(sub_id):
         "save_path": sub_data['save_path'],
         "filter": sub_data['filter'],
         "credentials": sub_data.get('credentials'),
+        "queue": sub_data.get('queue', DEFAULT_QUEUE),
     }
     if not publish_command(command):
         return jsonify({"error": "Failed to queue update command"}), 503
@@ -372,8 +396,14 @@ def expose_metrics():
     """Expose Prometheus metrics to be scraped."""
     try:
         redis_client = get_redis_client()
-        queue_length = redis_client.llen(CELERY_DEFAULT_QUEUE)
-        set_gauge('celery_queue_length', {'queue_name': CELERY_DEFAULT_QUEUE}, queue_length)
+        queue_length = sum(
+            redis_client.llen(q) for q in VALID_QUEUES
+        )
+        set_gauge(
+            'celery_queue_length',
+            {'queue_name': CELERY_DEFAULT_QUEUE},
+            queue_length,
+        )
 
         text = generate_prometheus_text()
         return Response(text, mimetype="text/plain")

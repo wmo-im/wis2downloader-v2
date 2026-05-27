@@ -4,6 +4,7 @@ import sys
 
 from shared.logging import setup_logging
 from shared.redis_client import (REDIS_HOST, REDIS_PORT, REDIS_PASSWORD)
+from shared.queues import DEFAULT_QUEUE
 
 # Set up logging
 setup_logging()  # Configure root logger
@@ -28,7 +29,8 @@ app.conf.result_expires = 86400  # 1 day, or do we want 1 hour? (TBD)
 app.conf.update(
     task_serializer='json',
     accept_content=['json'],
-    result_serializer='json'
+    result_serializer='json',
+    task_default_queue=DEFAULT_QUEUE,
 )
 
 # Import your tasks

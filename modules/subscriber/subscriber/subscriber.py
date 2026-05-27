@@ -6,7 +6,7 @@ import paho.mqtt.client as mqtt
 import ssl
 import time
 
-from shared import setup_logging, incr_counter
+from shared import setup_logging, incr_counter, DEFAULT_QUEUE
 from task_manager.workflows import wis2_download
 
 
@@ -123,8 +123,12 @@ class Subscriber():
                 "payload": payload,
             }
             try:
-                wis2_download(job).apply_async()
-                LOGGER.info(f"Job queued for topic {msg.topic}")
+                queue = sub_data.get('queue', DEFAULT_QUEUE)
+                wis2_download(job, queue=queue).apply_async()
+                LOGGER.info(
+                    f"Job queued for topic {msg.topic} "
+                    f"on queue '{queue}'"
+                )
             except Exception as e:
                 LOGGER.error(
                     f"Failed to queue job for topic {msg.topic}: {e}",
@@ -153,7 +157,8 @@ class Subscriber():
 
     def add_subscription(self, topic: str, sub_id: str,
                          save_path: str, filter_config: dict,
-                         credentials: dict | None = None) -> bool:
+                         credentials: dict | None = None,
+                         queue: str = DEFAULT_QUEUE) -> bool:
         """Add or update a single subscription on an already-subscribed topic.
 
         Returns True on success, False if the topic is not currently subscribed.
@@ -167,6 +172,7 @@ class Subscriber():
             'save_path': save_path,
             'filter': filter_config,
             'credentials': credentials,
+            'queue': queue,
         }
         LOGGER.info(f"Added subscription {sub_id} to topic {topic}")
         return True
