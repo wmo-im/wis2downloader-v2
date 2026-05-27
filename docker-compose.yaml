@@ -114,8 +114,8 @@ services:
       context: .
       dockerfile: ./containers/celery/Dockerfile
       args:
-        UID: ${UID:-10001}
-        GID: ${GID:-988}
+        WIS2DOWNLOADER_UID: ${WIS2DOWNLOADER_UID:-10001}
+        WIS2DOWNLOADER_GID: ${WIS2DOWNLOADER_GID:-988}
     volumes:
       - "${HOST_DATA_PATH}:${CONTAINER_DATA_PATH}"
     env_file: *default-env
@@ -138,9 +138,6 @@ services:
     build:
       context: .
       dockerfile: ./containers/celery/Dockerfile
-      args:
-        UID: ${UID:-10001}
-        GID: ${GID:-988}
     volumes:
       - "${HOST_DATA_PATH}:${CONTAINER_DATA_PATH}"
     env_file: *default-env
@@ -163,9 +160,6 @@ services:
     build:
       context: .
       dockerfile: ./containers/celery/Dockerfile
-      args:
-        UID: ${UID:-10001}
-        GID: ${GID:-988}
     volumes:
       - "${HOST_DATA_PATH}:${CONTAINER_DATA_PATH}"
     env_file: *default-env
@@ -190,8 +184,8 @@ services:
       context: .
       dockerfile: ./containers/celery/Dockerfile
       args:
-        UID: ${UID:-10001}
-        GID: ${GID:-988}
+        WIS2DOWNLOADER_UID: ${WIS2DOWNLOADER_UID:-10001}
+        WIS2DOWNLOADER_GID: ${WIS2DOWNLOADER_GID:-988}
     volumes:
       - "${HOST_DATA_PATH}:${CONTAINER_DATA_PATH}"
     env_file: *default-env
@@ -215,8 +209,8 @@ services:
       context: .
       dockerfile: ./containers/celery/Dockerfile
       args:
-        UID: ${UID:-10001}
-        GID: ${GID:-988}
+        WIS2DOWNLOADER_UID: ${WIS2DOWNLOADER_UID:-10001}
+        WIS2DOWNLOADER_GID: ${WIS2DOWNLOADER_GID:-988}
     volumes:
       - "${HOST_DATA_PATH}:${CONTAINER_DATA_PATH}"
     env_file: *default-env
@@ -242,8 +236,8 @@ services:
       context: .
       dockerfile: ./containers/subscription_manager/Dockerfile
       args:
-        UID: ${UID:-10001}
-        GID: ${GID:-988}
+        WIS2DOWNLOADER_UID: ${WIS2DOWNLOADER_UID:-10001}
+        WIS2DOWNLOADER_GID: ${WIS2DOWNLOADER_GID:-988}
     env_file: *default-env
     ports:
       - "5002:5001"
@@ -285,8 +279,8 @@ services:
       context: .
       dockerfile: ./containers/subscriber/Dockerfile
       args:
-        UID: ${UID:-10001}
-        GID: ${GID:-988}
+        WIS2DOWNLOADER_UID: ${WIS2DOWNLOADER_UID:-10001}
+        WIS2DOWNLOADER_GID: ${WIS2DOWNLOADER_GID:-988}
     env_file: *default-env
     environment:
       GLOBAL_BROKER_HOST: globalbroker.meteo.fr
@@ -312,8 +306,8 @@ services:
       context: .
       dockerfile: ./containers/subscriber/Dockerfile
       args:
-        UID: ${UID:-10001}
-        GID: ${GID:-988}
+        WIS2DOWNLOADER_UID: ${WIS2DOWNLOADER_UID:-10001}
+        WIS2DOWNLOADER_GID: ${WIS2DOWNLOADER_GID:-988}
     env_file: *default-env
     environment:
       GLOBAL_BROKER_HOST: globalbroker.inmet.gov.br

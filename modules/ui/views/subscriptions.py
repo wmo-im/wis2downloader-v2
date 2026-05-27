@@ -8,6 +8,7 @@ from views.shared import (
     _validate_target, _validate_filter,
     _build_filter, _try_parse_filter,
     DEFAULT_ACCEPTED_MEDIA_TYPES, _DATE_RE, _TIME_RE,
+    DEFAULT_QUEUE,
 )
 
 
@@ -75,7 +76,7 @@ def render(container):
             creds = sub_full.get('credentials') or {}
             original_auth_type = creds.get('type', 'none')
             current_username = creds.get('username', '')
-            current_queue = sub_full.get('queue', 'small_files')
+            current_queue = sub_full.get('queue', DEFAULT_QUEUE)
 
             # Decide rendering mode for filters
             parsed = _try_parse_filter(filter_cfg)
@@ -287,7 +288,7 @@ def render(container):
                     payload: dict = {
                         'target': target_input.value.strip() or './',
                         'filter': filter_result,
-                        'queue': queue_radio.value or 'small_files',
+                        'queue': queue_radio.value or DEFAULT_QUEUE,
                     }
                     if include_credentials:
                         payload['credentials'] = credentials_value

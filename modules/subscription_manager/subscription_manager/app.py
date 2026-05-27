@@ -7,8 +7,11 @@ import yaml
 from flask import Flask, request, jsonify, url_for, Response, render_template
 from redis.exceptions import ConnectionError
 
-from shared import get_redis_client, setup_logging, set_gauge, generate_prometheus_text
-from shared import VALID_QUEUES, DEFAULT_QUEUE
+from shared import (
+    get_redis_client, setup_logging,
+    set_gauge, generate_prometheus_text,
+    VALID_QUEUES, DEFAULT_QUEUE,
+)
 
 # Set up logging
 setup_logging()  # Configure root logger
