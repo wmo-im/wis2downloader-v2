@@ -71,11 +71,11 @@ El cajón de navegación a la izquierda (a la derecha en modo RTL árabe) da acc
 
 |kbd:[Alt+4]
 |*Suscripción manual*
-|Introduzca un tema, directorio de guardado y filtro directamente sin explorar el catálogo
+|Introduzca un tema, directorio de guardado, filtro, cola y credenciales directamente sin explorar el catálogo
 
 |kbd:[Alt+5]
 |*Gestionar suscripciones*
-|Lista todas las suscripciones activas y permite cancelar la suscripción a temas
+|Lista todas las suscripciones activas, edita su configuración y permite cancelar la suscripción a temas
 
 |kbd:[Alt+6]
 |*Configuración*
@@ -116,7 +116,10 @@ Cada tarjeta de resultado muestra:
 * Chips de catálogo fuente (CMA = azul, DWD = verde azulado, ECCC = naranja)
 * Un icono de advertencia si el contenido del registro difiere entre catálogos
 * *Mostrar metadatos* — abre un diálogo con los detalles completos del registro y un mapa interactivo del alcance geográfico del conjunto de datos
+* *Ver licencia* — abre la URL de la licencia del conjunto de datos en una nueva pestaña (se muestra solo cuando el registro incluye un enlace de licencia)
 * *Seleccionar* / *Deseleccionar* — agrega o elimina el tema MQTT del conjunto de datos en el panel lateral de suscripción
+
+NOTE: Si un conjunto de datos tiene licencia, al hacer clic en *Seleccionar* se muestra un diálogo de confirmación de licencia. Debe ver y aceptar la licencia antes de que el tema se añada al panel lateral de suscripción.
 
 === Vista de árbol
 
@@ -152,13 +155,41 @@ Cuando se selecciona un tema (desde la vista de catálogo o la vista de árbol),
 
 |Filtros personalizados
 |Campos de filtro específicos del conjunto de datos de los metadatos de enlace del registro GDC (solo vista de catálogo)
+
+|Cola
+|Cola de prioridad para el procesamiento de descargas: `high_priority`, `small_files` (predeterminado) o `large_files`. Use `large_files` para temas masivos o de archivos grandes para evitar bloquear descargas menores.
 |===
 
 Haga clic en *Suscribirse* para abrir un diálogo de confirmación que muestra la carga útil JSON completa. Revísela y luego haga clic en *Confirmar* para crear la suscripción, o en *Cancelar* para volver.
 
+=== Credenciales (Suscripción manual)
+
+La vista *Suscripción manual* (kbd:[Alt+4]) incluye una sección de autenticación para fuentes que requieren credenciales. Seleccione el tipo de autenticación con el botón de radio:
+
+[cols="1,3"]
+|===
+|Tipo |Campos
+
+|Ninguno (predeterminado)
+|Sin autenticación — para fuentes de datos públicas
+
+|Básica
+|Nombre de usuario y contraseña
+
+|Bearer
+|Token (enviado como `Authorization: Bearer <token>`)
+|===
+
+NOTE: Las credenciales se almacenan en Redis y se envían con cada solicitud de descarga de la suscripción. La contraseña y el token se ocultan en las respuestas de la API.
+
 === Gestión de suscripciones
 
-La vista Suscripciones lista todas las suscripciones activas con sus rutas de guardado. Haga clic en *Cancelar suscripción* en cualquier entrada para eliminarla. Use *Recargar suscripciones* para actualizar la lista tras cualquier cambio realizado mediante la API.
+La vista Suscripciones lista todas las suscripciones activas con su tema, ruta de guardado y resumen del filtro. Hay dos acciones disponibles en cada entrada:
+
+* *Editar* — abre un diálogo para modificar el directorio de guardado, el filtro, la cola y las credenciales de la suscripción. El tema no puede cambiarse; para suscribirse a un tema diferente debe crear una nueva suscripción.
+* *Cancelar suscripción* — elimina la suscripción. Si era la última suscripción para ese tema, la conexión MQTT también se cierra.
+
+Use *Recargar suscripciones* para actualizar la lista tras cualquier cambio realizado mediante la API.
 
 === Configuración
 
@@ -252,6 +283,14 @@ Respuesta:
 |`filter`
 |No
 |Configuración del filtro (ver <<Filtrado>>)
+
+|`queue`
+|No
+|Cola de prioridad para el procesamiento: `high_priority`, `small_files` (predeterminado) o `large_files`
+
+|`credentials`
+|No
+|Autenticación para la fuente de datos (ver <<Credenciales-API>>)
 |===
 
 === Listar suscripciones
@@ -294,6 +333,22 @@ Respuesta:
 }
 ----
 
+=== Actualizar una suscripción
+
+Actualice el directorio de guardado, el filtro, la cola o las credenciales de una suscripción sin recrearla:
+
+[source,bash]
+----
+curl -X PUT http://localhost:5002/subscriptions/<id> \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target": "new-directory",
+    "queue": "large_files"
+  }'
+----
+
+Solo cambian los campos incluidos; los campos omitidos conservan sus valores actuales. `credentials` puede establecerse en `null` para eliminar la autenticación.
+
 === Eliminar una suscripción
 
 [source,bash]
@@ -302,6 +357,38 @@ curl -X DELETE http://localhost:5002/subscriptions/<id>
 ----
 
 NOTE: Donde `<id>` es el UUID de suscripción obtenido de `GET /subscriptions`. Si esta es la última suscripción para el tema, la conexión MQTT también se cierra.
+
+[[Credenciales-API]]
+== Credenciales
+
+Las suscripciones que descargan desde fuentes protegidas por contraseña o token aceptan un objeto `credentials` opcional.
+
+=== Autenticación básica
+
+[source,json]
+----
+{
+  "credentials": {
+    "type": "basic",
+    "username": "myuser",
+    "password": "mypassword"
+  }
+}
+----
+
+=== Token Bearer
+
+[source,json]
+----
+{
+  "credentials": {
+    "type": "bearer",
+    "token": "eyJhbGciOi..."
+  }
+}
+----
+
+NOTE: La API oculta los secretos en las respuestas — `password` se omite y `token` se reemplaza por `***`. Las credenciales completas se almacenan en Redis y se usan solo durante la descarga.
 
 [[Filtrado]]
 == Filtrado

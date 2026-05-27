@@ -98,16 +98,18 @@ Les conteneurs de l'application s'exécutent en tant qu'utilisateur non-root (`w
 |`wis2`
 
 |Identifiant utilisateur (UID)
-|`10001`
+|`10001` (par défaut — configurable via `WIS2DOWNLOADER_UID` dans `.env`)
 
 |Nom du groupe
 |`wis2`
 
 |Identifiant de groupe (GID)
-|`988`
+|`988` (par défaut — configurable via `WIS2DOWNLOADER_GID` dans `.env`)
 |===
 
-Le worker Celery écrit les fichiers dans `/data` à l'intérieur du conteneur, ce qui correspond à `./downloads/` sur l'hôte.
+Le worker Celery écrit les fichiers dans `/data` à l'intérieur du conteneur, ce qui correspond à `HOST_DATA_PATH` sur l'hôte (par défaut : `./downloads/`).
+
+IMPORTANT: Si vous modifiez `WIS2DOWNLOADER_UID` ou `WIS2DOWNLOADER_GID` dans `.env`, reconstruisez les images avec `docker compose build` avant de redémarrer, et utilisez les valeurs correspondantes dans les commandes ci-dessous.
 
 ==== Option 1 : Créer un utilisateur/groupe correspondant (Recommandé)
 
@@ -226,13 +228,8 @@ docker-compose logs -f subscriber
 
 |`LOG_LEVEL`
 |string
-|`DEBUG`
+|`INFO`
 |Niveau de journalisation : DEBUG, INFO, WARNING, ERROR
-
-|`DATA_PATH`
-|path
-|`/data`
-|Répertoire de base pour les fichiers téléchargés
 
 |`FLASK_SECRET_KEY`
 |string
@@ -252,7 +249,27 @@ docker-compose logs -f subscriber
 |`FLASK_PORT`
 |integer
 |`5001`
-|Port d'écoute de l'API (interne)
+|Port d'écoute de l'API (port interne du conteneur)
+
+|`WIS2DOWNLOADER_UID`
+|integer
+|`10001`
+|Identifiant utilisateur utilisé lors de la construction des images. Doit correspondre au propriétaire du répertoire hôte pour les écritures de volume.
+
+|`WIS2DOWNLOADER_GID`
+|integer
+|`988`
+|Identifiant de groupe utilisé lors de la construction des images. Doit correspondre au groupe du répertoire hôte pour les écritures de volume.
+
+|`HOST_DATA_PATH`
+|path
+|`./downloads`
+|Chemin hôte monté comme volume de téléchargement
+
+|`CONTAINER_DATA_PATH`
+|path
+|`/data`
+|Point de montage à l'intérieur des conteneurs
 |===
 
 ==== Paramètres du courtier MQTT
@@ -364,15 +381,20 @@ docker-compose logs -f subscriber
 |===
 |Variable |Type |Valeur par défaut |Description
 
+|`WIS2DOWNLOADER_BASE_URL`
+|string
+|`http://localhost`
+|URL publique de base du déploiement (IP ou nom d'hôte du serveur). Définissez cette valeur à l'adresse de votre serveur lors d'un déploiement distant.
+
 |`WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL`
 |string
-|`http://subscription-manager:5001`
-|URL interne utilisée par l'interface pour atteindre l'API du gestionnaire d'abonnements
+|`${WIS2DOWNLOADER_BASE_URL}:5002`
+|URL publique de l'API du gestionnaire d'abonnements (côté navigateur)
 
 |`WIS2DOWNLOADER_GRAFANA_URL`
 |string
-|`http://localhost:3000`
-|URL utilisée pour intégrer les panneaux Grafana dans la vue Tableau de bord
+|`${WIS2DOWNLOADER_BASE_URL}:3000`
+|URL publique utilisée pour intégrer les panneaux Grafana dans la vue Tableau de bord
 
 |`STORAGE_SECRET`
 |string
@@ -425,21 +447,37 @@ Le système utilise une seule instance Redis et ne fournit pas de haute disponib
 
 === Mise à l'échelle des workers
 
-Augmentez la concurrence du worker Celery pour un débit plus élevé :
+La pile exécute trois pools de workers Celery, chacun ciblant une file dédiée :
+
+[cols="2,1,1,3"]
+|===
+|Service |File |Concurrence par défaut |Rôle
+
+|`celery-workers-high-priority`
+|`high_priority`
+|8
+|Téléchargements haute priorité
+
+|`celery-workers-small-files`
+|`small_files`
+|24
+|File par défaut pour les petits fichiers
+
+|`celery-workers-large-files`
+|`large_files`
+|8
+|Téléchargements de grands fichiers
+|===
+
+Ajustez la concurrence en modifiant le flag `--concurrency` dans la commande du service concerné dans `docker-compose.yaml` :
 
 [source,yaml]
 ----
-# docker-compose.yaml
-celery:
-  command: ["... --concurrency=16 ..."]
+celery-workers-small-files:
+  command: ["/bin/bash", "-c", "source .venv/bin/activate && task_manager_start worker --pool=threads --concurrency=32 --loglevel=info -Q small_files"]
 ----
 
-Ou exécutez plusieurs conteneurs workers :
-
-[source,bash]
-----
-docker-compose up -d --scale celery=3
-----
+Lors de la création d'un abonnement via l'API, utilisez le champ `queue` pour router les téléchargements vers un pool spécifique (`high_priority`, `small_files` ou `large_files`). La valeur par défaut est `small_files`.
 
 === Ajout de courtiers globaux
 
@@ -601,7 +639,7 @@ Consultez les journaux via Docker :
 docker-compose logs -f
 
 # Service spécifique
-docker-compose logs -f celery
+docker-compose logs -f celery-workers-small-files
 
 # Avec les horodatages
 docker-compose logs -f -t subscriber
@@ -698,7 +736,7 @@ curl http://localhost:5002/subscriptions
 +
 [source,bash]
 ----
-docker-compose logs celery | tail -50
+docker-compose logs celery-workers-small-files | tail -50
 ----
 
 4. Vérifiez la profondeur de la file d'attente :
