@@ -8,6 +8,7 @@ from flask import Flask, request, jsonify, url_for, Response, render_template
 from redis.exceptions import ConnectionError
 
 from shared import get_redis_client, setup_logging, set_gauge, generate_prometheus_text
+from shared import VALID_QUEUES, DEFAULT_QUEUE
 
 # Set up logging
 setup_logging()  # Configure root logger
@@ -25,8 +26,6 @@ except Exception as e:
 
 
 VALID_CRED_TYPES = {"basic", "bearer"}
-VALID_QUEUES = {"high_priority", "small_files", "large_files"}
-DEFAULT_QUEUE = "small_files"
 
 
 def _validate_credentials(creds: dict | None) -> dict | None:
