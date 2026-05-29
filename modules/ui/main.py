@@ -52,7 +52,7 @@ def main_page(client: Client):
         def __init__(self):
             self.selected_topics = []
             self.selected_dataset_ids = []
-            self.current_view = 'help'
+            self.current_view = 'dashboard'
 
     state = AppState()
 
@@ -82,7 +82,7 @@ def main_page(client: Client):
                 subscriptions.render(layout.content)
             elif name == 'settings':
                 settings.render(layout.content)
-            elif name == 'help':
+            elif name == 'docs':
                 help.render(layout.content)
 
     async def on_language_change(lang: str):
@@ -116,7 +116,7 @@ def main_page(client: Client):
     ui.keyboard(on_key=handle_key)
 
     layout = build_layout(show_view, on_language_change)
-    show_view(app.storage.user.get('current_view', 'help'))
+    show_view(app.storage.user.get('current_view', 'dashboard'))
 
 
 ui.run(storage_secret=os.getenv('STORAGE_SECRET', 'wis2downloader-secret'),

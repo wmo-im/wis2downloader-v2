@@ -51,7 +51,7 @@ NOTE: Las traducciones de la interfaz son generadas automáticamente. Si nota un
 
 === Navegación
 
-El cajón de navegación a la izquierda (a la derecha en modo RTL árabe) da acceso a seis vistas. Cada una también es accesible mediante un atajo de teclado:
+El cajón de navegación a la izquierda (a la derecha en modo RTL árabe) da acceso a siete vistas. Cada una también es accesible mediante un atajo de teclado:
 
 [cols="1,1,3"]
 |===
@@ -80,6 +80,10 @@ El cajón de navegación a la izquierda (a la derecha en modo RTL árabe) da acc
 |kbd:[Alt+6]
 |*Configuración*
 |Ver recuentos de registros GDC por catálogo y activar una actualización manual de datos
+
+|kbd:[Alt+7]
+|*Documentación*
+|Muestra la documentación del proyecto
 |===
 
 === Vista de catálogo

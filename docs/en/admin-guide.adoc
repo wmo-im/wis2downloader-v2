@@ -156,7 +156,7 @@ Test that the container can write to the volume:
 [source,bash]
 ----
 # Start the celery container
-docker-compose up -d celery
+docker compose up -d celery
 
 # Test write access from inside the container
 docker exec celery touch /data/test-write && echo "Write OK" || echo "Write FAILED"
@@ -197,7 +197,7 @@ NOTE: The examples below use `localhost`. If the system is deployed on a remote 
 [source,bash]
 ----
 # Check all services are running
-docker-compose ps
+docker compose ps
 
 # Check health endpoint (subscription manager)
 curl http://localhost:5002/health
@@ -206,7 +206,7 @@ curl http://localhost:5002/health
 curl -o /dev/null -s -w "%{http_code}" http://localhost:8080
 
 # View logs
-docker-compose logs -f subscriber
+docker compose logs -f subscriber
 ----
 
 == Configuration
@@ -629,13 +629,13 @@ View logs via Docker:
 [source,bash]
 ----
 # All services
-docker-compose logs -f
+docker compose logs -f
 
 # Specific service (use the worker queue name)
-docker-compose logs -f celery-workers-small-files
+docker compose logs -f celery-workers-small-files
 
 # With timestamps
-docker-compose logs -f -t subscriber
+docker compose logs -f -t subscriber
 ----
 
 Logs are also collected by Loki and queryable in Grafana.
@@ -684,13 +684,13 @@ rm -rf downloads/*
 [source,bash]
 ----
 # Restart single service
-docker-compose restart subscriber
+docker compose restart subscriber
 
 # Restart all services
-docker-compose restart
+docker compose restart
 
 # Full rebuild (after code changes)
-docker-compose build && docker-compose up -d
+docker compose build && docker compose up -d
 ----
 
 == Troubleshooting
@@ -700,13 +700,13 @@ docker-compose build && docker-compose up -d
 [source,bash]
 ----
 # Check logs
-docker-compose logs <service-name>
+docker compose logs <service-name>
 
 # Check container status
-docker-compose ps
+docker compose ps
 
 # Verify environment
-docker-compose config
+docker compose config
 ----
 
 === No Downloads
@@ -715,7 +715,7 @@ docker-compose config
 +
 [source,bash]
 ----
-docker-compose logs subscriber | grep -i connect
+docker compose logs subscriber | grep -i connect
 ----
 
 2. Verify subscription exists:
@@ -729,7 +729,7 @@ curl http://localhost:5002/subscriptions
 +
 [source,bash]
 ----
-docker-compose logs celery-workers-small-files | tail -50
+docker compose logs celery-workers-small-files | tail -50
 ----
 
 4. Check queue depth:
@@ -775,7 +775,7 @@ If the Catalogue Search or Tree Search views show "Catalogue data not loaded":
 +
 [source,bash]
 ----
-docker-compose logs wis2downloader-ui | tail -30
+docker compose logs wis2downloader-ui | tail -30
 ----
 
 2. Confirm the GDC cache keys exist in Redis:
@@ -791,7 +791,7 @@ If no keys are present, the initial fetch either failed or is still in progress.
 +
 [source,bash]
 ----
-docker-compose restart wis2downloader-ui
+docker compose restart wis2downloader-ui
 ----
 
 4. If the GDC fetch consistently fails, check network connectivity from the UI container to the public GDC endpoints:

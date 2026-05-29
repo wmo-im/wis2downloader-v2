@@ -14,7 +14,7 @@ STRINGS: dict[str, str] = {
     'nav.manual':     'اشتراك يدوي',
     'nav.manage':     'إدارة الاشتراكات',
     'nav.settings':   'الإعدادات',
-    'nav.help':       'مساعدة',
+    'nav.help':       'التوثيق',
 
     # ------------------------------------------------------------------ #
     # Buttons                                                              #
@@ -23,7 +23,7 @@ STRINGS: dict[str, str] = {
     'btn.confirm':          'تأكيد',
     'btn.cancel':           'إلغاء',
     'btn.close':            'إغلاق',
-    'btn.filter':           'تصفية',
+    'btn.filter':           'بحث',
     'btn.reload':           'إعادة تحميل الاشتراكات',
     'btn.unsubscribe':      'إلغاء الاشتراك',
     'btn.refresh_gdc':      'تحديث بيانات GDC',

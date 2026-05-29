@@ -2,7 +2,6 @@ from setuptools import setup, find_packages
 
 setup(
     name='shared',
-    version='0.1.0',
     description='Shared utilities for wis2downloader modules',
     packages=find_packages(),
     include_package_data=True,

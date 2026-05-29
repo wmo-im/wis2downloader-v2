@@ -12,7 +12,7 @@ STRINGS: dict[str, str] = {
     'nav.manual':     'Suscripción manual',
     'nav.manage':     'Gestionar suscripciones',
     'nav.settings':   'Configuración',
-    'nav.help':       'Ayuda',
+    'nav.help':       'Documentación',
 
     # ------------------------------------------------------------------ #
     # Buttons                                                              #
@@ -21,7 +21,7 @@ STRINGS: dict[str, str] = {
     'btn.confirm':          'Confirmar',
     'btn.cancel':           'Cancelar',
     'btn.close':            'Cerrar',
-    'btn.filter':           'Filtrar',
+    'btn.filter':           'Buscar',
     'btn.reload':           'Recargar suscripciones',
     'btn.unsubscribe':      'Cancelar suscripción',
     'btn.refresh_gdc':      'Actualizar datos GDC',

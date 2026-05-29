@@ -21,7 +21,6 @@
 
 import io
 import os
-import re
 from setuptools import Command, find_packages, setup
 
 
@@ -48,16 +47,6 @@ def read(filename, encoding='utf-8'):
     return contents
 
 
-def get_package_version():
-    """get version from top-level package init"""
-    version_file = read('task_manager/__init__.py')
-    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                              version_file, re.M)
-    if version_match:
-        return version_match.group(1)
-    raise RuntimeError("Unable to find version string.")
-
-
 KEYWORDS = [
     'WMO',
     'BUFR',
@@ -75,7 +64,6 @@ if (os.path.exists('MANIFEST')):
 
 setup(
     name='task_manager',
-    version=get_package_version(),
     description=DESCRIPTION,
     long_description=read('README.md'),
     long_description_content_type='text/markdown',

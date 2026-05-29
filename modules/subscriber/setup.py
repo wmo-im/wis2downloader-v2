@@ -2,7 +2,6 @@ from setuptools import setup, find_packages
 
 setup(
     name='subscriber',
-    version='0.1.0',
     description='WIS2 MQTT Subscriber for wis2downloader',
     packages=find_packages(),
     include_package_data=True,
