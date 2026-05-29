@@ -379,7 +379,7 @@ docker plugin install grafana/loki-docker-driver:3.6.7-${ARCH} --alias loki --gr
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">معرّف المستخدم (UID)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10001</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10001</code> (الافتراضي — قابل للتهيئة عبر <code>WIS2DOWNLOADER_UID</code> في <code>.env</code>)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">اسم المجموعة</p></td>
@@ -387,12 +387,24 @@ docker plugin install grafana/loki-docker-driver:3.6.7-${ARCH} --alias loki --gr
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">معرّف المجموعة (GID)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>988</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>988</code> (الافتراضي — قابل للتهيئة عبر <code>WIS2DOWNLOADER_GID</code> في <code>.env</code>)</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>يكتب عامل Celery الملفات في <code>/data</code> داخل الحاوية، والذي يُخصَّص لمسار <code>./downloads/</code> على المضيف.</p>
+<p>يكتب عامل Celery الملفات في <code>/data</code> داخل الحاوية، والذي يُخصَّص للمسار <code>HOST_DATA_PATH</code> على المضيف (الافتراضي: <code>./downloads/</code>).</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+إذا غيّرت <code>WIS2DOWNLOADER_UID</code> أو <code>WIS2DOWNLOADER_GID</code> في <code>.env</code>، أعد بناء الصور بـ <code>docker compose build</code> قبل إعادة التشغيل، واستخدم القيم المطابقة في الأوامر أدناه.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect3">
@@ -561,14 +573,8 @@ docker-compose logs -f subscriber</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LOG_LEVEL</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DEBUG</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>INFO</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">مستوى التسجيل: DEBUG، INFO، WARNING، ERROR</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DATA_PATH</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">path</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/data</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">المجلد الأساسي للملفات المُنزَّلة</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>FLASK_SECRET_KEY</code></p></td>
@@ -593,6 +599,30 @@ docker-compose logs -f subscriber</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>5001</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">منفذ ربط API (داخلي)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_UID</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10001</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">معرّف المستخدم المستخدم عند بناء صور الحاويات. يجب أن يتطابق مع مالك مجلد المضيف لعمليات الكتابة على وحدة التخزين.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_GID</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>988</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">معرّف المجموعة المستخدم عند بناء صور الحاويات. يجب أن يتطابق مع مجموعة مجلد المضيف لعمليات الكتابة على وحدة التخزين.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>HOST_DATA_PATH</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./downloads</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">مسار المضيف المُثبَّت كوحدة تخزين التنزيل</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CONTAINER_DATA_PATH</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/data</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">نقطة التثبيت داخل الحاوية حيث تُكتب الملفات المُنزَّلة</p></td>
 </tr>
 </tbody>
 </table>
@@ -790,15 +820,21 @@ docker-compose logs -f subscriber</code></pre>
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_BASE_URL</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost" class="bare">http://localhost</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">عنوان URL العام الأساسي للنشر (IP الخادم أو اسم المضيف). يُشكِّل الافتراضيات للمتغيرَيْن أدناه. عيِّنه بعنوان خادمك عند النشر عن بُعد.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://subscription-manager:5001" class="bare">http://subscription-manager:5001</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">عنوان URL الداخلي الذي تستخدمه الواجهة للوصول إلى API مدير الاشتراكات</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>${WIS2DOWNLOADER_BASE_URL}:5002</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">عنوان URL لـ API مدير الاشتراكات المواجه للمتصفح</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_GRAFANA_URL</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:3000" class="bare">http://localhost:3000</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>${WIS2DOWNLOADER_BASE_URL}:3000</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">عنوان URL المستخدم لتضمين لوحات Grafana في عرض لوحة التحكم</p></td>
 </tr>
 <tr>
@@ -883,22 +919,55 @@ docker-compose logs -f subscriber</code></pre>
 <div class="sect2">
 <h3 id="_توسع_العمال">3.2. توسع العمال</h3>
 <div class="paragraph">
-<p>زيادة تزامن عامل Celery لإنتاجية أعلى:</p>
+<p>يُشغِّل المكدّس ثلاثة مجموعات من عمال Celery، كل منها يستهدف قائمة انتظار مخصصة:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 28.5714%;">
+<col style="width: 14.2857%;">
+<col style="width: 14.2857%;">
+<col style="width: 42.8572%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">الخدمة</th>
+<th class="tableblock halign-left valign-top">قائمة الانتظار</th>
+<th class="tableblock halign-left valign-top">التزامن الافتراضي</th>
+<th class="tableblock halign-left valign-top">الغرض</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>celery-workers-high-priority</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>high_priority</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">التنزيلات ذات الأولوية العالية</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>celery-workers-small-files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>small_files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">24</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">قائمة الانتظار الافتراضية للملفات الصغيرة</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>celery-workers-large-files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>large_files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">تنزيلات الملفات الكبيرة</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>عدِّل التزامن بتغيير خيار <code>--concurrency</code> في <code>command</code> الخاصة بالخدمة المعنية في <code>docker-compose.yaml</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml"># docker-compose.yaml
-celery:
-  command: ["... --concurrency=16 ..."]</code></pre>
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">celery-workers-small-files:
+  command: ["/bin/bash", "-c", "source .venv/bin/activate &amp;&amp; task_manager_start worker --pool=threads --concurrency=32 --loglevel=info -Q small_files"]</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>أو تشغيل حاويات عمال متعددة:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose up -d --scale celery=3</code></pre>
-</div>
+<p>عند إنشاء اشتراك عبر API، استخدم حقل <code>queue</code> لتوجيه التنزيلات إلى مجموعة محددة (<code>high_priority</code>، <code>small_files</code>، أو <code>large_files</code>). القيمة الافتراضية هي <code>small_files</code>.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1136,7 +1205,7 @@ wis2downloader_celery_queue_length</code></pre>
 docker-compose logs -f
 
 # خدمة محددة
-docker-compose logs -f celery
+docker-compose logs -f celery-workers-small-files
 
 # مع الطوابع الزمنية
 docker-compose logs -f -t subscriber</code></pre>
@@ -1261,7 +1330,7 @@ docker-compose config</code></pre>
 <p>تحقق من أن عامل Celery يعمل:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose logs celery | tail -50</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose logs celery-workers-small-files | tail -50</code></pre>
 </div>
 </div>
 </li>
@@ -1382,7 +1451,7 @@ docker-compose config</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

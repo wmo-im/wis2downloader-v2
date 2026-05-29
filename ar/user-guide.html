@@ -123,8 +123,9 @@ pre, code, .listingblock, .literalblock {
 </li>
 <li><a href="#_عرض_الشجرة">2.4. عرض الشجرة</a></li>
 <li><a href="#_إنشاء_اشتراك_من_الواجهة">2.5. إنشاء اشتراك من الواجهة</a></li>
-<li><a href="#_إدارة_الاشتراكات">2.6. إدارة الاشتراكات</a></li>
-<li><a href="#_الإعدادات">2.7. الإعدادات</a></li>
+<li><a href="#_بيانات_الاعتماد_الاشتراك_اليدوي">2.6. بيانات الاعتماد (الاشتراك اليدوي)</a></li>
+<li><a href="#_إدارة_الاشتراكات">2.7. إدارة الاشتراكات</a></li>
+<li><a href="#_الإعدادات">2.8. الإعدادات</a></li>
 </ul>
 </li>
 <li><a href="#_فهم_موضوعات_wis2">3. فهم موضوعات WIS2</a>
@@ -139,63 +140,70 @@ pre, code, .listingblock, .literalblock {
 <li><a href="#_معاملات_الاشتراك">4.2. معاملات الاشتراك</a></li>
 <li><a href="#_سرد_الاشتراكات">4.3. سرد الاشتراكات</a></li>
 <li><a href="#_الحصول_على_تفاصيل_الاشتراك">4.4. الحصول على تفاصيل الاشتراك</a></li>
-<li><a href="#_حذف_اشتراك">4.5. حذف اشتراك</a></li>
+<li><a href="#_تحديث_اشتراك">4.5. تحديث اشتراك</a></li>
+<li><a href="#_حذف_اشتراك">4.6. حذف اشتراك</a></li>
 </ul>
 </li>
-<li><a href="#التصفية">5. التصفية</a>
+<li><a href="#بيانات-الاعتماد-api">5. بيانات الاعتماد</a>
 <ul class="sectlevel2">
-<li><a href="#_هيكل_الفلتر">5.1. هيكل الفلتر</a></li>
-<li><a href="#_السلوك_الافتراضي_بدون_فلتر">5.2. السلوك الافتراضي (بدون فلتر)</a></li>
-<li><a href="#شروط-المطابقة">5.3. شروط المطابقة</a>
+<li><a href="#_المصادقة_الأساسية">5.1. المصادقة الأساسية</a></li>
+<li><a href="#_رمز_bearer_المميز">5.2. رمز Bearer المميز</a></li>
+</ul>
+</li>
+<li><a href="#التصفية">6. التصفية</a>
+<ul class="sectlevel2">
+<li><a href="#_هيكل_الفلتر">6.1. هيكل الفلتر</a></li>
+<li><a href="#_السلوك_الافتراضي_بدون_فلتر">6.2. السلوك الافتراضي (بدون فلتر)</a></li>
+<li><a href="#شروط-المطابقة">6.3. شروط المطابقة</a>
 <ul class="sectlevel3">
-<li><a href="#_دائمًا_أبدًا">5.3.1. دائمًا / أبدًا</a></li>
-<li><a href="#_الحقول_البسيطة">5.3.2. الحقول البسيطة</a></li>
-<li><a href="#_الحجم">5.3.3. الحجم</a></li>
-<li><a href="#_النطاق_الجغرافي_المحدد">5.3.4. النطاق الجغرافي المحدد</a></li>
-<li><a href="#_خصائص_الإشعار_الديناميكية">5.3.5. خصائص الإشعار الديناميكية</a></li>
+<li><a href="#_دائمًا_أبدًا">6.3.1. دائمًا / أبدًا</a></li>
+<li><a href="#_الحقول_البسيطة">6.3.2. الحقول البسيطة</a></li>
+<li><a href="#_الحجم">6.3.3. الحجم</a></li>
+<li><a href="#_النطاق_الجغرافي_المحدد">6.3.4. النطاق الجغرافي المحدد</a></li>
+<li><a href="#_خصائص_الإشعار_الديناميكية">6.3.5. خصائص الإشعار الديناميكية</a></li>
 </ul>
 </li>
-<li><a href="#_دوال_الجمع">5.4. دوال الجمع</a></li>
-<li><a href="#مرحلتان">5.5. التقييم قبل التنزيل وبعده</a></li>
-<li><a href="#_أنواع_الوسائط_المدعومة">5.6. أنواع الوسائط المدعومة</a></li>
-<li><a href="#_أمثلة_على_الفلاتر">5.7. أمثلة على الفلاتر</a>
+<li><a href="#_دوال_الجمع">6.4. دوال الجمع</a></li>
+<li><a href="#مرحلتان">6.5. التقييم قبل التنزيل وبعده</a></li>
+<li><a href="#_أنواع_الوسائط_المدعومة">6.6. أنواع الوسائط المدعومة</a></li>
+<li><a href="#_أمثلة_على_الفلاتر">6.7. أمثلة على الفلاتر</a>
 <ul class="sectlevel3">
-<li><a href="#_قبول_bufr_وgrib_فقط">5.7.1. قبول BUFR وGRIB فقط</a></li>
-<li><a href="#_رفض_الملفات_التي_تتجاوز_100_ميجابايت">5.7.2. رفض الملفات التي تتجاوز 100 ميجابايت</a></li>
-<li><a href="#_بيانات_من_مركز_محدد_قصير_المدى_فقط">5.7.3. بيانات من مركز محدد، قصير المدى فقط</a></li>
-<li><a href="#_فلتر_المنطقة_الجغرافية">5.7.4. فلتر المنطقة الجغرافية</a></li>
+<li><a href="#_قبول_bufr_وgrib_فقط">6.7.1. قبول BUFR وGRIB فقط</a></li>
+<li><a href="#_رفض_الملفات_التي_تتجاوز_100_ميجابايت">6.7.2. رفض الملفات التي تتجاوز 100 ميجابايت</a></li>
+<li><a href="#_بيانات_من_مركز_محدد_قصير_المدى_فقط">6.7.3. بيانات من مركز محدد، قصير المدى فقط</a></li>
+<li><a href="#_فلتر_المنطقة_الجغرافية">6.7.4. فلتر المنطقة الجغرافية</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_الملفات_المُنزَّلة">6. الملفات المُنزَّلة</a>
+<li><a href="#_الملفات_المُنزَّلة">7. الملفات المُنزَّلة</a>
 <ul class="sectlevel2">
-<li><a href="#_تنظيم_الملفات">6.1. تنظيم الملفات</a></li>
-<li><a href="#_تسمية_الملفات">6.2. تسمية الملفات</a></li>
-<li><a href="#_عرض_التنزيلات">6.3. عرض التنزيلات</a></li>
+<li><a href="#_تنظيم_الملفات">7.1. تنظيم الملفات</a></li>
+<li><a href="#_تسمية_الملفات">7.2. تسمية الملفات</a></li>
+<li><a href="#_عرض_التنزيلات">7.3. عرض التنزيلات</a></li>
 </ul>
 </li>
-<li><a href="#_المراقبة">7. المراقبة</a>
+<li><a href="#_المراقبة">8. المراقبة</a>
 <ul class="sectlevel2">
-<li><a href="#_فحص_الصحة">7.1. فحص الصحة</a></li>
-<li><a href="#_المقاييس">7.2. المقاييس</a></li>
-<li><a href="#_طريقة_عرض_لوحة_التحكم">7.3. طريقة عرض لوحة التحكم</a></li>
+<li><a href="#_فحص_الصحة">8.1. فحص الصحة</a></li>
+<li><a href="#_المقاييس">8.2. المقاييس</a></li>
+<li><a href="#_طريقة_عرض_لوحة_التحكم">8.3. طريقة عرض لوحة التحكم</a></li>
 </ul>
 </li>
-<li><a href="#_حالات_الاستخدام_الشائعة">8. حالات الاستخدام الشائعة</a>
+<li><a href="#_حالات_الاستخدام_الشائعة">9. حالات الاستخدام الشائعة</a>
 <ul class="sectlevel2">
-<li><a href="#_الاشتراك_في_جميع_الرصدات_السطحية">8.1. الاشتراك في جميع الرصدات السطحية</a></li>
-<li><a href="#_الاشتراك_في_دولة_محددة">8.2. الاشتراك في دولة محددة</a></li>
-<li><a href="#_تنزيل_ملفات_bufr_وgrib_فقط">8.3. تنزيل ملفات BUFR وGRIB فقط</a></li>
-<li><a href="#_اشتراكات_متعددة">8.4. اشتراكات متعددة</a></li>
+<li><a href="#_الاشتراك_في_جميع_الرصدات_السطحية">9.1. الاشتراك في جميع الرصدات السطحية</a></li>
+<li><a href="#_الاشتراك_في_دولة_محددة">9.2. الاشتراك في دولة محددة</a></li>
+<li><a href="#_تنزيل_ملفات_bufr_وgrib_فقط">9.3. تنزيل ملفات BUFR وGRIB فقط</a></li>
+<li><a href="#_اشتراكات_متعددة">9.4. اشتراكات متعددة</a></li>
 </ul>
 </li>
-<li><a href="#_استكشاف_الأخطاء_وإصلاحها">9. استكشاف الأخطاء وإصلاحها</a>
+<li><a href="#_استكشاف_الأخطاء_وإصلاحها">10. استكشاف الأخطاء وإصلاحها</a>
 <ul class="sectlevel2">
-<li><a href="#_لا_توجد_ملفات_مُنزَّلة">9.1. لا توجد ملفات مُنزَّلة</a></li>
-<li><a href="#_الملفات_تُتخطى">9.2. الملفات تُتخطى</a></li>
-<li><a href="#_تُنزَّل_أنواع_ملفات_خاطئة">9.3. تُنزَّل أنواع ملفات خاطئة</a></li>
-<li><a href="#_كل_شيء_يُرفض_بواسطة_الفلتر">9.4. كل شيء يُرفض بواسطة الفلتر</a></li>
+<li><a href="#_لا_توجد_ملفات_مُنزَّلة">10.1. لا توجد ملفات مُنزَّلة</a></li>
+<li><a href="#_الملفات_تُتخطى">10.2. الملفات تُتخطى</a></li>
+<li><a href="#_تُنزَّل_أنواع_ملفات_خاطئة">10.3. تُنزَّل أنواع ملفات خاطئة</a></li>
+<li><a href="#_كل_شيء_يُرفض_بواسطة_الفلتر">10.4. كل شيء يُرفض بواسطة الفلتر</a></li>
 </ul>
 </li>
 </ul>
@@ -338,12 +346,12 @@ pre, code, .listingblock, .literalblock {
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">kbd:[Alt+4]</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>اشتراك يدوي</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">إدخال موضوع ومجلد حفظ وفلتر مباشرةً دون استعراض الكتالوج</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">إدخال موضوع ومجلد حفظ وفلتر وقائمة انتظار وبيانات اعتماد مباشرةً دون استعراض الكتالوج</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">kbd:[Alt+5]</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>إدارة الاشتراكات</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">سرد جميع الاشتراكات النشطة وإلغاء الاشتراك في الموضوعات</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">سرد جميع الاشتراكات النشطة وتعديل إعداداتها وإلغاء الاشتراك في الموضوعات</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">kbd:[Alt+6]</p></td>
@@ -417,9 +425,24 @@ pre, code, .listingblock, .literalblock {
 <p><strong>عرض البيانات الوصفية</strong> — يفتح مربع حوار بتفاصيل السجل الكاملة وخريطة تفاعلية للنطاق الجغرافي لمجموعة البيانات</p>
 </li>
 <li>
+<p><strong>عرض الترخيص</strong> — يفتح رابط ترخيص مجموعة البيانات في تبويب جديد (يظهر فقط عندما يحتوي السجل على رابط ترخيص)</p>
+</li>
+<li>
 <p><strong>تحديد</strong> / <strong>إلغاء التحديد</strong> — يُضيف أو يُزيل موضوع MQTT لمجموعة البيانات إلى/من الشريط الجانبي للاشتراك</p>
 </li>
 </ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+إذا كانت مجموعة البيانات تحمل ترخيصًا، فإن النقر على <strong>تحديد</strong> يُظهر مربع حوار تأكيد الترخيص. يجب عليك عرض الترخيص والموافقة عليه قبل إضافة الموضوع إلى الشريط الجانبي للاشتراك.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -486,6 +509,10 @@ pre, code, .listingblock, .literalblock {
 <td class="tableblock halign-left valign-top"><p class="tableblock">فلاتر مخصصة</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">حقول فلتر خاصة بمجموعة البيانات من البيانات الوصفية للرابط في سجل GDC (طريقة عرض الكتالوج فقط)</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">قائمة الانتظار</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">قائمة انتظار ذات أولوية لمعالجة التنزيل: <code>high_priority</code> أو <code>small_files</code> (الافتراضي) أو <code>large_files</code>. استخدم <code>large_files</code> للموضوعات الضخمة أو كبيرة الحجم لتجنب تأخير التنزيلات الأصغر.</p></td>
+</tr>
 </tbody>
 </table>
 <div class="paragraph">
@@ -493,13 +520,70 @@ pre, code, .listingblock, .literalblock {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_إدارة_الاشتراكات">2.6. إدارة الاشتراكات</h3>
+<h3 id="_بيانات_الاعتماد_الاشتراك_اليدوي">2.6. بيانات الاعتماد (الاشتراك اليدوي)</h3>
 <div class="paragraph">
-<p>تسرد طريقة عرض الاشتراكات جميع الاشتراكات النشطة مع مسارات الحفظ الخاصة بها. انقر على <strong>إلغاء الاشتراك</strong> في أي إدخال لإزالته. استخدم <strong>إعادة تحميل الاشتراكات</strong> لتحديث القائمة بعد أي تغييرات أُجريت عبر API.</p>
+<p>تتضمن طريقة عرض <strong>الاشتراك اليدوي</strong> (kbd:[Alt+4]) قسمًا للمصادقة للمصادر التي تتطلب بيانات اعتماد. حدد نوع المصادقة بزر الراديو:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">النوع</th>
+<th class="tableblock halign-left valign-top">الحقول</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">لا شيء (افتراضي)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">بدون مصادقة — للمصادر العامة</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">أساسي</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">اسم المستخدم وكلمة المرور</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">حامل</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">رمز مميز (يُرسَل كـ <code>Authorization: Bearer &lt;token&gt;</code>)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+تُخزَّن بيانات الاعتماد في Redis وتُرسَل مع كل طلب تنزيل للاشتراك. تُحجَب كلمة المرور والرمز المميز في ردود API.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_الإعدادات">2.7. الإعدادات</h3>
+<h3 id="_إدارة_الاشتراكات">2.7. إدارة الاشتراكات</h3>
+<div class="paragraph">
+<p>تسرد طريقة عرض الاشتراكات جميع الاشتراكات النشطة مع موضوعها ومسار الحفظ وملخص الفلتر. يتوفر إجراءان على كل إدخال:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>تعديل</strong> — يفتح مربع حوار لتعديل مجلد الحفظ والفلتر وقائمة الانتظار وبيانات الاعتماد للاشتراك. لا يمكن تغيير الموضوع؛ للاشتراك في موضوع مختلف يجب إنشاء اشتراك جديد.</p>
+</li>
+<li>
+<p><strong>إلغاء الاشتراك</strong> — يُزيل الاشتراك. إذا كان هذا آخر اشتراك للموضوع، يُغلَق اتصال MQTT أيضًا.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>استخدم <strong>إعادة تحميل الاشتراكات</strong> لتحديث القائمة بعد أي تغييرات أُجريت عبر API.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_الإعدادات">2.8. الإعدادات</h3>
 <div class="paragraph">
 <p>تُظهر طريقة عرض الإعدادات عدد السجلات المُحمَّلة من كل GDC. انقر على <strong>تحديث بيانات GDC</strong> لإجبار جلب جديد من الكتالوجات الثلاثة، متجاوزًا ذاكرة التخزين المؤقت Redis.</p>
 </div>
@@ -663,6 +747,16 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 <td class="tableblock halign-left valign-top"><p class="tableblock">لا</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">إعداد الفلتر (انظر <a href="#التصفية">التصفية</a>)</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">لا</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">قائمة انتظار ذات أولوية للمعالجة: <code>high_priority</code> أو <code>small_files</code> (الافتراضي) أو <code>large_files</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">لا</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">المصادقة لمصدر البيانات (انظر <a href="#بيانات-الاعتماد-api">بيانات الاعتماد</a>)</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -714,7 +808,26 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="_حذف_اشتراك">4.5. حذف اشتراك</h3>
+<h3 id="_تحديث_اشتراك">4.5. تحديث اشتراك</h3>
+<div class="paragraph">
+<p>حدِّث مجلد الحفظ أو الفلتر أو قائمة الانتظار أو بيانات الاعتماد لاشتراك دون إعادة إنشائه:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X PUT http://localhost:5002/subscriptions/&lt;id&gt; \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target": "new-directory",
+    "queue": "large_files"
+  }'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>تتغير الحقول المُدرَجة فقط؛ تحتفظ الحقول المحذوفة بقيمها الحالية. يمكن تعيين <code>credentials</code> إلى <code>null</code> لإزالة المصادقة.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_حذف_اشتراك">4.6. حذف اشتراك</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE http://localhost:5002/subscriptions/&lt;id&gt;</code></pre>
@@ -727,14 +840,61 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect1">
-<h2 id="التصفية">5. التصفية</h2>
+<h2 id="بيانات-الاعتماد-api">5. بيانات الاعتماد</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>تقبل الاشتراكات التي تُنزِّل من مصادر محمية بكلمة مرور أو رمز مميز كائن <code>credentials</code> اختياريًا.</p>
+</div>
+<div class="sect2">
+<h3 id="_المصادقة_الأساسية">5.1. المصادقة الأساسية</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "credentials": {
+    "type": "basic",
+    "username": "myuser",
+    "password": "mypassword"
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_رمز_bearer_المميز">5.2. رمز Bearer المميز</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "credentials": {
+    "type": "bearer",
+    "token": "eyJhbGciOi..."
+  }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+تحجب واجهة API الأسرار في الردود — يُحذف <code>password</code> ويُستبدل <code>token</code> بـ <code><strong>*</strong></code>. تُخزَّن بيانات الاعتماد الكاملة في Redis وتُستخدَم فقط أثناء التنزيل.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="التصفية">6. التصفية</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>تقبل الاشتراكات كائن <code>filter</code> اختياريًا يتحكم في الإشعارات التي تُنزَّل.
 تستخدم الفلاتر قواعد مُرتَّبة — تُحدِّد أول قاعدة تتطابق النتيجة.</p>
 </div>
 <div class="sect2">
-<h3 id="_هيكل_الفلتر">5.1. هيكل الفلتر</h3>
+<h3 id="_هيكل_الفلتر">6.1. هيكل الفلتر</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -807,7 +967,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="_السلوك_الافتراضي_بدون_فلتر">5.2. السلوك الافتراضي (بدون فلتر)</h3>
+<h3 id="_السلوك_الافتراضي_بدون_فلتر">6.2. السلوك الافتراضي (بدون فلتر)</h3>
 <div class="paragraph">
 <p>عند عدم تقديم أي <code>filter</code>، يُشغَّل فلتر افتراضي مُدمَج يرفض أي نوع وسائط غير موجود في قائمة مسموح بها قياسية (BUFR وGRIB وNetCDF وHDF5 والصور الشائعة وصيغ النص). لقبول كل شيء، استخدم فلتر قبول صريحًا:</p>
 </div>
@@ -825,9 +985,9 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="شروط-المطابقة">5.3. شروط المطابقة</h3>
+<h3 id="شروط-المطابقة">6.3. شروط المطابقة</h3>
 <div class="sect3">
-<h4 id="_دائمًا_أبدًا">5.3.1. دائمًا / أبدًا</h4>
+<h4 id="_دائمًا_أبدًا">6.3.1. دائمًا / أبدًا</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"always": true}   <i class="conum" data-value="1"></i><b>(1)</b>
@@ -848,7 +1008,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_الحقول_البسيطة">5.3.2. الحقول البسيطة</h4>
+<h4 id="_الحقول_البسيطة">6.3.2. الحقول البسيطة</h4>
 <div class="paragraph">
 <p>تُطابق البيانات الوصفية المتاحة في إشعار WIS2:</p>
 </div>
@@ -906,7 +1066,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_الحجم">5.3.3. الحجم</h4>
+<h4 id="_الحجم">6.3.3. الحجم</h4>
 <div class="paragraph">
 <p>يُطابق حجم الملف بالبايتات. يستخدم حقل <code>size</code> مشغِّلاته الخاصة بوحدات البايت:</p>
 </div>
@@ -950,7 +1110,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_النطاق_الجغرافي_المحدد">5.3.4. النطاق الجغرافي المحدد</h4>
+<h4 id="_النطاق_الجغرافي_المحدد">6.3.4. النطاق الجغرافي المحدد</h4>
 <div class="paragraph">
 <p>يتطابق إذا كانت هندسة الإشعار تقع داخل المربع. تمر الإشعارات التي لا تحتوي على هندسة.</p>
 </div>
@@ -964,7 +1124,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_خصائص_الإشعار_الديناميكية">5.3.5. خصائص الإشعار الديناميكية</h4>
+<h4 id="_خصائص_الإشعار_الديناميكية">6.3.5. خصائص الإشعار الديناميكية</h4>
 <div class="paragraph">
 <p>تُطابق أي حقل داخل كائن <code>properties</code> لإشعار WIS2 باستخدام المفتاح <code>property</code>:</p>
 </div>
@@ -981,7 +1141,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="_دوال_الجمع">5.4. دوال الجمع</h3>
+<h3 id="_دوال_الجمع">6.4. دوال الجمع</h3>
 <div class="paragraph">
 <p>يمكن تداخل الشروط باستخدام دوال الجمع المنطقية:</p>
 </div>
@@ -1027,7 +1187,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="مرحلتان">5.5. التقييم قبل التنزيل وبعده</h3>
+<h3 id="مرحلتان">6.5. التقييم قبل التنزيل وبعده</h3>
 <div class="admonitionblock warning">
 <table>
 <tr>
@@ -1078,7 +1238,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="_أنواع_الوسائط_المدعومة">5.6. أنواع الوسائط المدعومة</h3>
+<h3 id="_أنواع_الوسائط_المدعومة">6.6. أنواع الوسائط المدعومة</h3>
 <div class="paragraph">
 <p>الأنواع المقبولة افتراضيًا عند عدم تحديد فلتر:</p>
 </div>
@@ -1122,9 +1282,9 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </table>
 </div>
 <div class="sect2">
-<h3 id="_أمثلة_على_الفلاتر">5.7. أمثلة على الفلاتر</h3>
+<h3 id="_أمثلة_على_الفلاتر">6.7. أمثلة على الفلاتر</h3>
 <div class="sect3">
-<h4 id="_قبول_bufr_وgrib_فقط">5.7.1. قبول BUFR وGRIB فقط</h4>
+<h4 id="_قبول_bufr_وgrib_فقط">6.7.1. قبول BUFR وGRIB فقط</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1151,7 +1311,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_رفض_الملفات_التي_تتجاوز_100_ميجابايت">5.7.2. رفض الملفات التي تتجاوز 100 ميجابايت</h4>
+<h4 id="_رفض_الملفات_التي_تتجاوز_100_ميجابايت">6.7.2. رفض الملفات التي تتجاوز 100 ميجابايت</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1172,7 +1332,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_بيانات_من_مركز_محدد_قصير_المدى_فقط">5.7.3. بيانات من مركز محدد، قصير المدى فقط</h4>
+<h4 id="_بيانات_من_مركز_محدد_قصير_المدى_فقط">6.7.3. بيانات من مركز محدد، قصير المدى فقط</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1210,7 +1370,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_فلتر_المنطقة_الجغرافية">5.7.4. فلتر المنطقة الجغرافية</h4>
+<h4 id="_فلتر_المنطقة_الجغرافية">6.7.4. فلتر المنطقة الجغرافية</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1240,10 +1400,10 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect1">
-<h2 id="_الملفات_المُنزَّلة">6. الملفات المُنزَّلة</h2>
+<h2 id="_الملفات_المُنزَّلة">7. الملفات المُنزَّلة</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_تنظيم_الملفات">6.1. تنظيم الملفات</h3>
+<h3 id="_تنظيم_الملفات">7.1. تنظيم الملفات</h3>
 <div class="paragraph">
 <p>تُنظَّم الملفات تحت مجلدك المستهدف في مجلدات فرعية بتنسيق <code>YYYY/MM/DD</code> استنادًا إلى تاريخ <strong>تنزيل</strong> الملف (وليس وقت الرصد أو وقت صلاحية البيانات):</p>
 </div>
@@ -1273,13 +1433,13 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="_تسمية_الملفات">6.2. تسمية الملفات</h3>
+<h3 id="_تسمية_الملفات">7.2. تسمية الملفات</h3>
 <div class="paragraph">
 <p>تحتفظ الملفات بأسمائها الأصلية من عنوان URL للتنزيل. إذا كان ملف بنفس الاسم موجودًا بالفعل ولم يكن تحديثًا، يُتخطى التنزيل.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_عرض_التنزيلات">6.3. عرض التنزيلات</h3>
+<h3 id="_عرض_التنزيلات">7.3. عرض التنزيلات</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># سرد أحدث التنزيلات
@@ -1308,10 +1468,10 @@ du -sh downloads/</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_المراقبة">7. المراقبة</h2>
+<h2 id="_المراقبة">8. المراقبة</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_فحص_الصحة">7.1. فحص الصحة</h3>
+<h3 id="_فحص_الصحة">8.1. فحص الصحة</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/health</code></pre>
@@ -1327,7 +1487,7 @@ du -sh downloads/</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_المقاييس">7.2. المقاييس</h3>
+<h3 id="_المقاييس">8.2. المقاييس</h3>
 <div class="paragraph">
 <p>عرض إحصائيات التنزيل:</p>
 </div>
@@ -1345,7 +1505,7 @@ curl -s http://localhost:5002/metrics | grep wis2downloader_celery_queue_length<
 </div>
 </div>
 <div class="sect2">
-<h3 id="_طريقة_عرض_لوحة_التحكم">7.3. طريقة عرض لوحة التحكم</h3>
+<h3 id="_طريقة_عرض_لوحة_التحكم">8.3. طريقة عرض لوحة التحكم</h3>
 <div class="paragraph">
 <p>تعرض لوحة التحكم المدمجة (kbd:[Alt+1]) معدلات التنزيل وعمق قائمة الانتظار ومساحة القرص وإجماليات البايتات في الوقت الفعلي. لا يلزم تسجيل دخول منفصل.</p>
 </div>
@@ -1365,10 +1525,10 @@ curl -s http://localhost:5002/metrics | grep wis2downloader_celery_queue_length<
 </div>
 </div>
 <div class="sect1">
-<h2 id="_حالات_الاستخدام_الشائعة">8. حالات الاستخدام الشائعة</h2>
+<h2 id="_حالات_الاستخدام_الشائعة">9. حالات الاستخدام الشائعة</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_الاشتراك_في_جميع_الرصدات_السطحية">8.1. الاشتراك في جميع الرصدات السطحية</h3>
+<h3 id="_الاشتراك_في_جميع_الرصدات_السطحية">9.1. الاشتراك في جميع الرصدات السطحية</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
@@ -1381,7 +1541,7 @@ curl -s http://localhost:5002/metrics | grep wis2downloader_celery_queue_length<
 </div>
 </div>
 <div class="sect2">
-<h3 id="_الاشتراك_في_دولة_محددة">8.2. الاشتراك في دولة محددة</h3>
+<h3 id="_الاشتراك_في_دولة_محددة">9.2. الاشتراك في دولة محددة</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
@@ -1394,7 +1554,7 @@ curl -s http://localhost:5002/metrics | grep wis2downloader_celery_queue_length<
 </div>
 </div>
 <div class="sect2">
-<h3 id="_تنزيل_ملفات_bufr_وgrib_فقط">8.3. تنزيل ملفات BUFR وGRIB فقط</h3>
+<h3 id="_تنزيل_ملفات_bufr_وgrib_فقط">9.3. تنزيل ملفات BUFR وGRIB فقط</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
@@ -1425,7 +1585,7 @@ curl -s http://localhost:5002/metrics | grep wis2downloader_celery_queue_length<
 </div>
 </div>
 <div class="sect2">
-<h3 id="_اشتراكات_متعددة">8.4. اشتراكات متعددة</h3>
+<h3 id="_اشتراكات_متعددة">9.4. اشتراكات متعددة</h3>
 <div class="paragraph">
 <p>إنشاء اشتراكات منفصلة لأنواع بيانات مختلفة:</p>
 </div>
@@ -1451,10 +1611,10 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect1">
-<h2 id="_استكشاف_الأخطاء_وإصلاحها">9. استكشاف الأخطاء وإصلاحها</h2>
+<h2 id="_استكشاف_الأخطاء_وإصلاحها">10. استكشاف الأخطاء وإصلاحها</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_لا_توجد_ملفات_مُنزَّلة">9.1. لا توجد ملفات مُنزَّلة</h3>
+<h3 id="_لا_توجد_ملفات_مُنزَّلة">10.1. لا توجد ملفات مُنزَّلة</h3>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -1485,7 +1645,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect2">
-<h3 id="_الملفات_تُتخطى">9.2. الملفات تُتخطى</h3>
+<h3 id="_الملفات_تُتخطى">10.2. الملفات تُتخطى</h3>
 <div class="paragraph">
 <p>تحقق من سبب التخطي في المقاييس:</p>
 </div>
@@ -1512,7 +1672,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect2">
-<h3 id="_تُنزَّل_أنواع_ملفات_خاطئة">9.3. تُنزَّل أنواع ملفات خاطئة</h3>
+<h3 id="_تُنزَّل_أنواع_ملفات_خاطئة">10.3. تُنزَّل أنواع ملفات خاطئة</h3>
 <div class="paragraph">
 <p>احذف الاشتراك الموجود وأعد إنشاءه بفلتر <code>media_type</code>. استخدم <code>media_type.exists</code> كحارس للرفض — وليس <code>always: true</code> — حتى لا تُفعَّل قاعدة الرفض إلا بعد معرفة نوع الملف (انظر <a href="#مرحلتان">التقييم قبل التنزيل وبعده</a>):</p>
 </div>
@@ -1553,7 +1713,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect2">
-<h3 id="_كل_شيء_يُرفض_بواسطة_الفلتر">9.4. كل شيء يُرفض بواسطة الفلتر</h3>
+<h3 id="_كل_شيء_يُرفض_بواسطة_الفلتر">10.4. كل شيء يُرفض بواسطة الفلتر</h3>
 <div class="paragraph">
 <p>إذا رُفضت جميع الإشعارات بسبب <code>FilterRejected</code>، فالسبب الأكثر شيوعًا هو تفعيل قاعدة رفض <code>always: true</code> في مرحلة ما قبل التنزيل قبل معرفة <code>media_type</code>.</p>
 </div>
@@ -1566,7 +1726,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

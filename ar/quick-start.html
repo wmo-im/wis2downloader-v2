@@ -264,7 +264,7 @@ docker plugin install grafana/loki-docker-driver:3.6.7-${ARCH} --alias loki --gr
 <h2 id="_4_إعداد_مجلد_التنزيلات">4. إعداد مجلد التنزيلات</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>تعمل الحاويات بصلاحيات مستخدم غير جذري (UID 10001، GID 988). على نظام Linux، يجب إعداد مجلد التنزيلات قبل البدء:</p>
+<p>تعمل الحاويات بصلاحيات مستخدم غير جذري (UID 10001، GID 988 افتراضيًا). على نظام Linux، يجب إعداد مجلد التنزيلات قبل البدء:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -273,6 +273,18 @@ sudo useradd -u 10001 -g wis2 -M -s /usr/sbin/nologin wis2
 mkdir -p downloads
 sudo chown wis2:wis2 downloads</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+إذا تعارض UID 10001 أو GID 988 مع مستخدمين موجودين في نظامك، يمكنك تجاوز هذه القيم بتعيين <code>WIS2DOWNLOADER_UID</code> و`WIS2DOWNLOADER_GID` في ملف <code>.env</code> قبل تشغيل <code>docker compose up</code>. استخدم القيم المقابلة في الأوامر أعلاه. إذا غيّرت <code>WIS2DOWNLOADER_UID</code> أو <code>WIS2DOWNLOADER_GID</code> بعد بناء الصور، أعد بناءها باستخدام <code>docker compose build</code> قبل إعادة التشغيل.
+</td>
+</tr>
+</table>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -300,7 +312,7 @@ sudo chown wis2:wis2 downloads</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>يُشغّل هذا الأمر جميع الخدمات: مدير الاشتراكات، مشتركو MQTT (Global Brokers لفرنسا والبرازيل)، عمّال Celery للتنزيل، Redis، Prometheus، Grafana، وLoki.</p>
+<p>يُشغّل هذا الأمر جميع الخدمات: مدير الاشتراكات، مشتركو MQTT (Global Brokers لفرنسا والبرازيل)، عمّال Celery (طوابير الأولوية العالية والملفات الصغيرة والملفات الكبيرة)، Redis، Prometheus، Grafana، وLoki.</p>
 </div>
 <div class="paragraph">
 <p>تحقق من تشغيل جميع الخدمات:</p>
@@ -416,7 +428,7 @@ sudo chown wis2:wis2 downloads</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

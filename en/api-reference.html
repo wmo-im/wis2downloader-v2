@@ -98,39 +98,38 @@ body {
 <li><a href="#_request_body">3.2.1. Request Body</a></li>
 <li><a href="#_response_2">3.2.2. Response</a></li>
 <li><a href="#_response_headers">3.2.3. Response Headers</a></li>
-<li><a href="#_example_2">3.2.4. Example</a></li>
+<li><a href="#_examples">3.2.4. Examples</a></li>
 </ul>
 </li>
 <li><a href="#_get_subscription">3.3. Get Subscription</a>
 <ul class="sectlevel3">
 <li><a href="#_path_parameters">3.3.1. Path Parameters</a></li>
-<li><a href="#_url_encoding">3.3.2. URL Encoding</a></li>
-<li><a href="#_response_3">3.3.3. Response</a></li>
-<li><a href="#_example_3">3.3.4. Example</a></li>
+<li><a href="#_response_3">3.3.2. Response</a></li>
+<li><a href="#_example_2">3.3.3. Example</a></li>
 </ul>
 </li>
-<li><a href="#_delete_subscription">3.4. Delete Subscription</a>
+<li><a href="#_update_subscription">3.4. Update Subscription</a>
 <ul class="sectlevel3">
-<li><a href="#_path_parameters_2">3.4.1. Path Parameters</a></li>
+<li><a href="#_request_body_2">3.4.1. Request Body</a></li>
 <li><a href="#_response_4">3.4.2. Response</a></li>
-<li><a href="#_example_4">3.4.3. Example</a></li>
+<li><a href="#_example_3">3.4.3. Example</a></li>
+</ul>
+</li>
+<li><a href="#_delete_subscription">3.5. Delete Subscription</a>
+<ul class="sectlevel3">
+<li><a href="#_response_5">3.5.1. Response</a></li>
+<li><a href="#_example_4">3.5.2. Example</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li><a href="#_monitoring_api">4. Monitoring API</a>
 <ul class="sectlevel2">
-<li><a href="#_health_check">4.1. Health Check</a>
-<ul class="sectlevel3">
-<li><a href="#_response_5">4.1.1. Response</a></li>
-<li><a href="#_example_5">4.1.2. Example</a></li>
-</ul>
-</li>
+<li><a href="#_health_check">4.1. Health Check</a></li>
 <li><a href="#_prometheus_metrics">4.2. Prometheus Metrics</a>
 <ul class="sectlevel3">
-<li><a href="#_response_6">4.2.1. Response</a></li>
-<li><a href="#_available_metrics">4.2.2. Available Metrics</a></li>
-<li><a href="#_example_6">4.2.3. Example</a></li>
+<li><a href="#_available_metrics">4.2.1. Available Metrics</a></li>
+<li><a href="#_example_5">4.2.2. Example</a></li>
 </ul>
 </li>
 <li><a href="#_openapi_specification">4.3. OpenAPI Specification</a></li>
@@ -145,18 +144,21 @@ body {
 <li><a href="#_data_schemas">6. Data Schemas</a>
 <ul class="sectlevel2">
 <li><a href="#_subscription">6.1. Subscription</a></li>
-<li><a href="#_filters">6.2. Filters</a>
+<li><a href="#_filter_schema">6.2. Filter Schema</a>
 <ul class="sectlevel3">
-<li><a href="#_default_accepted_media_types">6.2.1. Default Accepted Media Types</a></li>
+<li><a href="#_filter_rule_schema">6.2.1. Filter Rule Schema</a></li>
+<li><a href="#_match_conditions">6.2.2. Match Conditions</a></li>
+<li><a href="#_filter_example">6.2.3. Filter Example</a></li>
 </ul>
 </li>
+<li><a href="#_credentials_schema">6.3. Credentials Schema</a></li>
 </ul>
 </li>
 <li><a href="#_topic_pattern_reference">7. Topic Pattern Reference</a>
 <ul class="sectlevel2">
 <li><a href="#_wis2_topic_structure">7.1. WIS2 Topic Structure</a></li>
 <li><a href="#_wildcards">7.2. Wildcards</a></li>
-<li><a href="#_examples">7.3. Examples</a></li>
+<li><a href="#_examples_2">7.3. Examples</a></li>
 </ul>
 </li>
 </ul>
@@ -182,23 +184,38 @@ body {
 </li>
 </ul>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Replace <code>localhost:5002</code> with your server&#8217;s address if deployed remotely. The base URL is configured via <code>WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL</code> in <code>.env</code>.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_authentication">2. Authentication</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Currently, the API does not require authentication. In production, consider placing it behind a reverse proxy with authentication.</p>
+<p>The API does not require authentication. In production, place it behind a reverse proxy with authentication (see the <a href="admin-guide.html#_access_control">Access Control</a> section of the Admin Guide).</p>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_subscriptions_api">3. Subscriptions API</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>Each subscription is identified by a UUID and binds together an MQTT topic, a save path, an optional filter, optional credentials, and a queue. Multiple subscriptions can share the same topic — the MQTT connection is opened once and messages are routed to all matching subscriptions.</p>
+</div>
 <div class="sect2">
 <h3 id="_list_subscriptions">3.1. List Subscriptions</h3>
 <div class="paragraph">
-<p>Returns all active subscriptions.</p>
+<p>Returns all active subscriptions grouped by topic.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -221,7 +238,7 @@ body {
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">200</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Success - returns map of topic to subscription details</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Success — map of topic → map of subscription UUID → subscription detail</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
@@ -241,10 +258,18 @@ body {
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
   "cache/a/wis2/+/data/core/weather/surface-based-observations/#": {
-    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-    "save_path": "surface-obs",
-    "filters": {
-      "accepted_media_types": ["application/bufr", "application/grib"]
+    "550e8400-e29b-41d4-a716-446655440000": {
+      "save_path": "surface-obs",
+      "filter": {}
+    },
+    "661f9511-f30c-52e5-b827-557766551111": {
+      "save_path": "surface-obs-bufr",
+      "filter": {
+        "name": "bufr-only",
+        "rules": [
+          { "id": "accept-bufr", "order": 1, "match": { "media_type": { "equals": "application/bufr" } }, "action": "accept" }
+        ]
+      }
     }
   }
 }</code></pre>
@@ -255,7 +280,10 @@ body {
 <div class="sect2">
 <h3 id="_create_subscription">3.2. Create Subscription</h3>
 <div class="paragraph">
-<p>Creates a new subscription to a WIS2 topic.</p>
+<p>Creates a new subscription. Assigns a UUID and returns the full subscription record.</p>
+</div>
+<div class="paragraph">
+<p>If this is the first subscription for the given topic, an MQTT connection is opened. Additional subscriptions for the same topic reuse the existing connection.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -291,19 +319,25 @@ Content-Type: application/json</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>target</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Subdirectory under <code>/data</code> where files will be saved.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subdirectory under the data root where files are saved.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filters</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Filter configuration.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Rule-based filter. See <a href="#_filter_schema">Filter Schema</a>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filters.accepted_media_types</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">array</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">List of allowed MIME types. Supports wildcards (e.g., <code>application/x-grib*</code>).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HTTP credentials for access-controlled datasets. See <a href="#_credentials_schema">Credentials Schema</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Download queue: <code>high_priority</code>, <code>small_files</code> (default), or <code>large_files</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -323,16 +357,16 @@ Content-Type: application/json</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">202</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Accepted - subscription queued for processing</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">201</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Created — returns the full subscription record</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Bad request - missing or invalid topic</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bad request — missing or invalid fields</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Service unavailable - Redis connection failed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Service unavailable — Redis connection failed</p></td>
 </tr>
 </tbody>
 </table>
@@ -353,32 +387,75 @@ Content-Type: application/json</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Location</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">URL to retrieve subscription details</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL to retrieve the created subscription (<code>/subscriptions/{id}</code>)</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_example_2">3.2.4. Example</h4>
+<h4 id="_examples">3.2.4. Examples</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Simple subscription
+curl -X POST http://localhost:5002/subscriptions \
   -H "Content-Type: application/json" \
   -d '{
     "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-    "target": "surface-obs",
-    "filters": {
-      "accepted_media_types": ["application/bufr", "application/grib"]
+    "target": "surface-obs"
+  }'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Subscription with a filter
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+    "target": "surface-obs-bufr",
+    "filter": {
+      "name": "bufr-only",
+      "rules": [
+        { "id": "accept-bufr", "order": 1, "match": { "media_type": { "equals": "application/bufr" } }, "action": "accept" },
+        { "id": "default-reject", "order": 999, "match": { "always": true }, "action": "reject" }
+      ]
     }
   }'</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Subscription to an access-controlled dataset using basic auth
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/recommended/weather/surface-based-observations/#",
+    "target": "restricted-obs",
+    "credentials": { "type": "basic", "username": "myuser", "password": "s3cr3t" }
+  }'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Route large downloads to the large-files queue
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/fr-meteofrance/data/core/weather/space-based-observations/noaa-21/cris",
+    "target": "space-obs",
+    "queue": "large_files"
+  }'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "status": "accepted",
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-  "target": "surface-obs"
+  "save_path": "surface-obs",
+  "filter": {},
+  "credentials": null,
+  "queue": "small_files"
 }</code></pre>
 </div>
 </div>
@@ -387,11 +464,11 @@ Content-Type: application/json</code></pre>
 <div class="sect2">
 <h3 id="_get_subscription">3.3. Get Subscription</h3>
 <div class="paragraph">
-<p>Returns details for a specific subscription.</p>
+<p>Returns the full record for a specific subscription.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /subscriptions/{topic}</code></pre>
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /subscriptions/{id}</code></pre>
 </div>
 </div>
 <div class="sect3">
@@ -411,54 +488,15 @@ Content-Type: application/json</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">WIS2 topic (only <code>#</code> requires encoding as <code>%23</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (UUID)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subscription UUID returned when the subscription was created</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_url_encoding">3.3.2. URL Encoding</h4>
-<div class="paragraph">
-<p>Only the <code>#</code> character requires URL encoding:</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Character</th>
-<th class="tableblock halign-left valign-top">Encoded</th>
-<th class="tableblock halign-left valign-top">Reason</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%23</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Otherwise interpreted as URL fragment</p></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Slashes (<code>/</code>) and <code>+</code> do not require encoding in the path.
-</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_3">3.3.3. Response</h4>
+<h4 id="_response_3">3.3.2. Response</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -476,52 +514,61 @@ Slashes (<code>/</code>) and <code>+</code> do not require encoding in the path.
 <td class="tableblock halign-left valign-top"><p class="tableblock">Success</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Invalid topic</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Subscription not found</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Redis unavailable</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_example_3">3.3.4. Example</h4>
+<h4 id="_example_2">3.3.3. Example</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
   "save_path": "surface-obs",
-  "filters": {
-    "accepted_media_types": ["application/bufr", "application/grib"]
-  }
+  "filter": {},
+  "credentials": null,
+  "queue": "small_files"
 }</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Credential secrets (<code>password</code>, <code>token</code>) are never returned. Only <code>type</code> and <code>username</code> (for basic auth) are included in responses.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_delete_subscription">3.4. Delete Subscription</h3>
+<h3 id="_update_subscription">3.4. Update Subscription</h3>
 <div class="paragraph">
-<p>Removes a subscription.</p>
+<p>Updates the save path, filter, credentials, or queue of an existing subscription. The topic cannot be changed — delete and recreate to change the topic.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">DELETE /subscriptions/{topic}</code></pre>
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">PUT /subscriptions/{id}
+Content-Type: application/json</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_path_parameters_2">3.4.1. Path Parameters</h4>
+<h4 id="_request_body_2">3.4.1. Request Body</h4>
+<div class="paragraph">
+<p>All fields are optional. Only provided fields are updated.</p>
+</div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -530,16 +577,31 @@ Slashes (<code>/</code>) and <code>+</code> do not require encoding in the path.
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Field</th>
 <th class="tableblock halign-left valign-top">Type</th>
 <th class="tableblock halign-left valign-top">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>target</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">URL-encoded WIS2 topic</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">New subdirectory under the data root</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">New rule-based filter (replaces existing filter)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">New credentials (replaces existing credentials)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">New queue: <code>high_priority</code>, <code>small_files</code>, or <code>large_files</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -560,11 +622,15 @@ Slashes (<code>/</code>) and <code>+</code> do not require encoding in the path.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">200</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Successfully deleted</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Updated subscription record</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Invalid topic</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Invalid field value</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subscription not found</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
@@ -574,87 +640,28 @@ Slashes (<code>/</code>) and <code>+</code> do not require encoding in the path.
 </table>
 </div>
 <div class="sect3">
-<h4 id="_example_4">3.4.3. Example</h4>
+<h4 id="_example_3">3.4.3. Example</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "status": "deleted",
-  "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#"
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_monitoring_api">4. Monitoring API</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_health_check">4.1. Health Check</h3>
-<div class="paragraph">
-<p>Returns service health status.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /health</code></pre>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_5">4.1.1. Response</h4>
-<div class="paragraph">
-<p>Always returns 200. Check the <code>status</code> field for actual health.</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 75%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Field</th>
-<th class="tableblock halign-left valign-top">Values</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>status</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>healthy</code> or <code>unhealthy</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_example_5">4.1.2. Example</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/health</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"status": "healthy"}</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X PUT http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Content-Type: application/json" \
+  -d '{ "target": "surface-obs-v2", "queue": "high_priority" }'</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_prometheus_metrics">4.2. Prometheus Metrics</h3>
+<h3 id="_delete_subscription">3.5. Delete Subscription</h3>
 <div class="paragraph">
-<p>Returns metrics in Prometheus text format.</p>
+<p>Removes a subscription. If it is the last subscription for its topic, the MQTT connection for that topic is closed.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /metrics</code></pre>
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">DELETE /subscriptions/{id}</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_response_6">4.2.1. Response</h4>
+<h4 id="_response_5">3.5.1. Response</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -669,17 +676,71 @@ Slashes (<code>/</code>) and <code>+</code> do not require encoding in the path.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">200</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Prometheus text format metrics</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Successfully deleted</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">500</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Error generating metrics</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subscription not found</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Redis unavailable</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_available_metrics">4.2.2. Available Metrics</h4>
+<h4 id="_example_4">3.5.2. Example</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{ "status": "deleted", "id": "550e8400-e29b-41d4-a716-446655440000" }</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_monitoring_api">4. Monitoring API</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_health_check">4.1. Health Check</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /health</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Always returns 200. Check the <code>status</code> field for actual health.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/health</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{ "status": "healthy" }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_prometheus_metrics">4.2. Prometheus Metrics</h3>
+<div class="paragraph">
+<p>Returns metrics in Prometheus text format.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /metrics</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_available_metrics">4.2.1. Available Metrics</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -700,7 +761,7 @@ Slashes (<code>/</code>) and <code>+</code> do not require encoding in the path.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>wis2downloader_notifications_total</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counter</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">status</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Total notifications processed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Total notifications processed by Celery</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>wis2downloader_downloads_total</code></p></td>
@@ -730,37 +791,22 @@ Slashes (<code>/</code>) and <code>+</code> do not require encoding in the path.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>wis2downloader_celery_queue_length</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Gauge</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">queue_name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Current tasks in Celery queue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Current tasks across all Celery queues</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_example_6">4.2.3. Example</h4>
+<h4 id="_example_5">4.2.2. Example</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/metrics</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-prometheus hljs" data-lang="prometheus"># HELP wis2downloader_downloads_total Total number of files downloaded.
-# TYPE wis2downloader_downloads_total counter
-wis2downloader_downloads_total{cache="example.cache.com",media_type="application/bufr"} 42.0
-
-# HELP wis2downloader_notifications_total Total notifications processed.
-# TYPE wis2downloader_notifications_total counter
-wis2downloader_notifications_total{status="success"} 42.0
-wis2downloader_notifications_total{status="skipped"} 5.0</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_openapi_specification">4.3. OpenAPI Specification</h3>
-<div class="paragraph">
-<p>Returns the OpenAPI 3.0 specification as JSON.</p>
-</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /openapi</code></pre>
@@ -770,7 +816,7 @@ wis2downloader_notifications_total{status="skipped"} 5.0</code></pre>
 <div class="sect2">
 <h3 id="_swagger_ui">4.4. Swagger UI</h3>
 <div class="paragraph">
-<p>Interactive API documentation.</p>
+<p>Interactive API documentation available at:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -789,9 +835,7 @@ GET /swagger</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "error": "Error message describing the problem"
-}</code></pre>
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{ "error": "Error message describing the problem" }</code></pre>
 </div>
 </div>
 <div class="sect2">
@@ -813,17 +857,22 @@ GET /swagger</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">"No topic provided"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">POST /subscriptions without topic field</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POST /subscriptions without a <code>topic</code> field</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">"No topic passed"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">GET/DELETE with empty topic</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"credentials.type must be 'basic' or 'bearer'"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Invalid credentials type</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"queue must be one of: high_priority, large_files, small_files"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unknown queue name</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">"Subscription for topic X not found"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Topic not subscribed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"Subscription '{id}' not found"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UUID does not exist</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
@@ -835,11 +884,6 @@ GET /swagger</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">"Failed to queue subscription command&#8230;&#8203;"</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Redis pub/sub failed</p></td>
 </tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">"Failed to persist subscription&#8230;&#8203;"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Redis write failed</p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -850,50 +894,262 @@ GET /swagger</code></pre>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_subscription">6.1. Subscription</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "topic": "string (required) - WIS2 MQTT topic pattern",
-  "save_path": "string | null - Subdirectory for downloads",
-  "filters": {
-    "accepted_media_types": ["array of MIME type strings"]
-  }
-}</code></pre>
+<div class="paragraph">
+<p>Full subscription record as stored and returned by the API.</p>
 </div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Field</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (UUID)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unique identifier assigned on creation</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">WIS2 MQTT topic pattern</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>save_path</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string | null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subdirectory under the data root where files are saved</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Rule-based filter (empty object <code>{}</code> means no filtering)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">object | null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Credentials used for downloading. Secrets are redacted in responses.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Download queue: <code>high_priority</code>, <code>small_files</code>, or <code>large_files</code></p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect2">
-<h3 id="_filters">6.2. Filters</h3>
+<h3 id="_filter_schema">6.2. Filter Schema</h3>
+<div class="paragraph">
+<p>Filters use an ordered list of rules. Rules are evaluated in order; the first matching rule&#8217;s action is applied. If no rule matches, the file is accepted.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Field</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Filter name for identification</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rules</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">array</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ordered list of <a href="#_filter_rule_schema">filter rules</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect3">
+<h4 id="_filter_rule_schema">6.2.1. Filter Rule Schema</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Field</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unique rule identifier</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>order</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Execution order — lower values run first</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>match</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Condition to match against. See <a href="#_match_conditions">Match Conditions</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>action</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>accept</code>, <code>reject</code>, or <code>continue</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_match_conditions">6.2.2. Match Conditions</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Condition</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>media_type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Match on the file&#8217;s MIME type</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Match on file size in bytes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>centre_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Match on the originating centre ID (e.g., <code>de-dwd</code>, <code>fr-meteofrance</code>). The first field is the ISO2C country code, the second field is a descriptive name for the centre.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Match on the WIS2 data ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>href</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Match on the download URL</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>always: true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unconditionally match (use as a catch-all default rule)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>String operators: <code>equals</code>, <code>not_equals</code>, <code>in</code>, <code>not_in</code>, <code>pattern</code> (glob), <code>regex</code></p>
+</div>
+<div class="paragraph">
+<p>Size/numeric operators: <code>gt_bytes</code>, <code>lt_bytes</code>, <code>gte_bytes</code>, <code>lte_bytes</code>, <code>between_bytes</code></p>
+</div>
+<div class="paragraph">
+<p>Logical combinators: <code>all</code> (AND), <code>any</code> (OR), <code>not</code></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_filter_example">6.2.3. Filter Example</h4>
+<div class="paragraph">
+<p>Accept only BUFR files smaller than 10 MB; reject everything else:</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "accepted_media_types": [
-    "application/bufr",
-    "application/grib",
-    "application/x-netcdf*"
+  "name": "bufr-small",
+  "rules": [
+    {
+      "id": "accept-small-bufr",
+      "order": 1,
+      "match": {
+        "all": [
+          { "media_type": { "equals": "application/bufr" } },
+          { "size": { "lt_bytes": 10485760 } }
+        ]
+      },
+      "action": "accept"
+    },
+    {
+      "id": "default-reject",
+      "order": 999,
+      "match": { "always": true },
+      "action": "reject"
+    }
   ]
 }</code></pre>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_default_accepted_media_types">6.2.1. Default Accepted Media Types</h4>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_credentials_schema">6.3. Credentials Schema</h3>
 <div class="paragraph">
-<p>When no filter is specified, these types are accepted:</p>
+<p>Used to authenticate HTTP downloads from access-controlled datasets.</p>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
-  "image/gif", "image/jpeg", "image/png", "image/tiff",
-  "application/pdf", "application/postscript",
-  "application/bufr", "application/grib",
-  "application/x-hdf", "application/x-hdf5",
-  "application/x-netcdf", "application/x-netcdf4",
-  "text/plain", "text/html", "text/xml", "text/csv",
-  "text/tab-separated-values"
-]</code></pre>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>password</code> and <code>token</code> are write-only — they are accepted in requests but never returned in responses.
+</td>
+</tr>
+</table>
 </div>
-</div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Field</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic</code> or <code>bearer</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>username</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required when <code>type</code> is <code>basic</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (write-only)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required when <code>type</code> is <code>basic</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>token</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (write-only)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required when <code>type</code> is <code>bearer</code></p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -910,19 +1166,19 @@ GET /swagger</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p><code>origin</code> - Original data from the data provider</p>
+<p><code>origin</code> — Original data from the data provider</p>
 </li>
 <li>
-<p><code>cache</code> - Cached copy from a Global Cache (recommended for reliability)</p>
+<p><code>cache</code> — Cached copy from a Global Cache (recommended for reliability)</p>
 </li>
 <li>
-<p><code>{centre-id}</code> - Centre identifier — first field is the ISO2C country code, second field is a descriptive name for the centre (e.g., <code>de-dwd</code>)</p>
+<p><code>{centre-id}</code> — Centre identifier. The first field is the ISO2C country code and the second is a descriptive name for the centre (e.g., <code>de-dwd</code> for Deutscher Wetterdienst, <code>fr-meteofrance</code> for Météo-France)</p>
 </li>
 <li>
-<p><code>{data-policy}</code> - WMO Unified Data Policy: <code>core</code> or <code>recommended</code></p>
+<p><code>{data-policy}</code> — WMO Unified Data Policy: <code>core</code> (freely available) or <code>recommended</code> (may require credentials)</p>
 </li>
 <li>
-<p><code>{earth-system-domain}</code> - Earth system domain from the WMO Unified Data Policy</p>
+<p><code>{earth-system-domain}</code> — Earth system domain from the WMO Unified Data Policy</p>
 </li>
 </ul>
 </div>
@@ -957,7 +1213,7 @@ GET /swagger</code></pre>
 </table>
 </div>
 <div class="sect2">
-<h3 id="_examples">7.3. Examples</h3>
+<h3 id="_examples_2">7.3. Examples</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 40%;">
@@ -994,7 +1250,7 @@ GET /swagger</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

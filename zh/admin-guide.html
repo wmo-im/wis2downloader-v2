@@ -352,7 +352,7 @@ WIS2 Downloader 在 Web 界面和订阅管理器 REST API 上未实现身份验�
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">用户 ID（UID）</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10001</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10001</code>（默认值 — 可通过 <code>.env</code> 中的 <code>WIS2DOWNLOADER_UID</code> 配置）</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">组名</p></td>
@@ -360,12 +360,24 @@ WIS2 Downloader 在 Web 界面和订阅管理器 REST API 上未实现身份验�
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">组 ID（GID）</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>988</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>988</code>（默认值 — 可通过 <code>.env</code> 中的 <code>WIS2DOWNLOADER_GID</code> 配置）</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>Celery worker 在容器内将文件写入 <code>/data</code>，对应主机上的 <code>./downloads/</code>。</p>
+<p>Celery worker 在容器内将文件写入 <code>/data</code>，对应主机上的 <code>HOST_DATA_PATH</code>（默认：<code>./downloads/</code>）。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+如果在 <code>.env</code> 中更改了 <code>WIS2DOWNLOADER_UID</code> 或 <code>WIS2DOWNLOADER_GID</code>，请在重启前执行 <code>docker compose build</code> 重新构建镜像，并在下方命令中使用对应的值。
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect3">
@@ -534,14 +546,8 @@ docker-compose logs -f subscriber</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LOG_LEVEL</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DEBUG</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>INFO</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">日志级别：DEBUG、INFO、WARNING、ERROR</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DATA_PATH</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">path</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/data</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">下载文件的基础目录</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>FLASK_SECRET_KEY</code></p></td>
@@ -566,6 +572,30 @@ docker-compose logs -f subscriber</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>5001</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">API 绑定端口（内部）</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_UID</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10001</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">构建容器镜像时使用的用户 ID。必须与卷写入所需的主机目录所有者匹配。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_GID</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>988</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">构建容器镜像时使用的组 ID。必须与卷写入所需的主机目录所属组匹配。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>HOST_DATA_PATH</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./downloads</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">挂载为下载卷的主机路径</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CONTAINER_DATA_PATH</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/data</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">容器内下载文件写入的挂载点</p></td>
 </tr>
 </tbody>
 </table>
@@ -763,15 +793,21 @@ docker-compose logs -f subscriber</code></pre>
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_BASE_URL</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost" class="bare">http://localhost</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">部署的公共基础 URL（服务器 IP 或主机名）。用于驱动下方两个变量的默认值。远程部署时请设置为服务器地址。</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://subscription-manager:5001" class="bare">http://subscription-manager:5001</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">UI 用于访问订阅管理器 API 的内部 URL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>${WIS2DOWNLOADER_BASE_URL}:5002</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">浏览器访问订阅管理器 API 的 URL</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_GRAFANA_URL</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:3000" class="bare">http://localhost:3000</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>${WIS2DOWNLOADER_BASE_URL}:3000</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">用于在仪表板视图中嵌入 Grafana 面板的 URL</p></td>
 </tr>
 <tr>
@@ -856,22 +892,55 @@ docker-compose logs -f subscriber</code></pre>
 <div class="sect2">
 <h3 id="_扩展_worker">3.2. 扩展 Worker</h3>
 <div class="paragraph">
-<p>增加 Celery worker 并发数以提高吞吐量：</p>
+<p>该服务栈运行三个 Celery worker 池，每个池对应一个专用队列：</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 28.5714%;">
+<col style="width: 14.2857%;">
+<col style="width: 14.2857%;">
+<col style="width: 42.8572%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">服务</th>
+<th class="tableblock halign-left valign-top">队列</th>
+<th class="tableblock halign-left valign-top">默认并发数</th>
+<th class="tableblock halign-left valign-top">用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>celery-workers-high-priority</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>high_priority</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">高优先级下载</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>celery-workers-small-files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>small_files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">24</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">小文件的默认队列</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>celery-workers-large-files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>large_files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">大文件下载</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>通过修改 <code>docker-compose.yaml</code> 中相应服务的 <code>command</code> 中的 <code>--concurrency</code> 参数来调整并发数：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml"># docker-compose.yaml
-celery:
-  command: ["... --concurrency=16 ..."]</code></pre>
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">celery-workers-small-files:
+  command: ["/bin/bash", "-c", "source .venv/bin/activate &amp;&amp; task_manager_start worker --pool=threads --concurrency=32 --loglevel=info -Q small_files"]</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>或运行多个 worker 容器：</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose up -d --scale celery=3</code></pre>
-</div>
+<p>通过 API 创建订阅时，使用 <code>queue</code> 字段将下载路由到指定的 worker 池（<code>high_priority</code>、<code>small_files</code> 或 <code>large_files</code>）。默认值为 <code>small_files</code>。</p>
 </div>
 </div>
 <div class="sect2">
@@ -1109,7 +1178,7 @@ wis2downloader_celery_queue_length</code></pre>
 docker-compose logs -f
 
 # 特定服务
-docker-compose logs -f celery
+docker-compose logs -f celery-workers-small-files
 
 # 带时间戳
 docker-compose logs -f -t subscriber</code></pre>
@@ -1234,7 +1303,7 @@ docker-compose config</code></pre>
 <p>检查 Celery worker 是否在处理：</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose logs celery | tail -50</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose logs celery-workers-small-files | tail -50</code></pre>
 </div>
 </div>
 </li>
@@ -1355,7 +1424,7 @@ docker-compose config</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

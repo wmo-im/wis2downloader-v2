@@ -96,8 +96,9 @@ body {
 </li>
 <li><a href="#_tree_view">2.4. Tree View</a></li>
 <li><a href="#_creating_a_subscription_from_the_ui">2.5. Creating a Subscription from the UI</a></li>
-<li><a href="#_managing_subscriptions">2.6. Managing Subscriptions</a></li>
-<li><a href="#_settings">2.7. Settings</a></li>
+<li><a href="#_credentials_manual_subscribe">2.6. Credentials (Manual Subscribe)</a></li>
+<li><a href="#_managing_subscriptions">2.7. Managing Subscriptions</a></li>
+<li><a href="#_settings">2.8. Settings</a></li>
 </ul>
 </li>
 <li><a href="#_understanding_wis2_topics">3. Understanding WIS2 Topics</a>
@@ -112,63 +113,70 @@ body {
 <li><a href="#_subscription_parameters">4.2. Subscription Parameters</a></li>
 <li><a href="#_listing_subscriptions">4.3. Listing Subscriptions</a></li>
 <li><a href="#_getting_subscription_details">4.4. Getting Subscription Details</a></li>
-<li><a href="#_deleting_a_subscription">4.5. Deleting a Subscription</a></li>
+<li><a href="#_updating_a_subscription">4.5. Updating a Subscription</a></li>
+<li><a href="#_deleting_a_subscription">4.6. Deleting a Subscription</a></li>
 </ul>
 </li>
-<li><a href="#Filtering">5. Filtering</a>
+<li><a href="#Credentials">5. Credentials</a>
 <ul class="sectlevel2">
-<li><a href="#_filter_structure">5.1. Filter Structure</a></li>
-<li><a href="#_default_behaviour_no_filter">5.2. Default Behaviour (No Filter)</a></li>
-<li><a href="#match-conditions">5.3. Match Conditions</a>
+<li><a href="#_basic_authentication">5.1. Basic Authentication</a></li>
+<li><a href="#_bearer_token">5.2. Bearer Token</a></li>
+</ul>
+</li>
+<li><a href="#Filtering">6. Filtering</a>
+<ul class="sectlevel2">
+<li><a href="#_filter_structure">6.1. Filter Structure</a></li>
+<li><a href="#_default_behaviour_no_filter">6.2. Default Behaviour (No Filter)</a></li>
+<li><a href="#match-conditions">6.3. Match Conditions</a>
 <ul class="sectlevel3">
-<li><a href="#_always_never">5.3.1. Always / Never</a></li>
-<li><a href="#_simple_fields">5.3.2. Simple Fields</a></li>
-<li><a href="#_size">5.3.3. Size</a></li>
-<li><a href="#_geographic_bounding_box">5.3.4. Geographic Bounding Box</a></li>
-<li><a href="#_dynamic_notification_properties">5.3.5. Dynamic Notification Properties</a></li>
+<li><a href="#_always_never">6.3.1. Always / Never</a></li>
+<li><a href="#_simple_fields">6.3.2. Simple Fields</a></li>
+<li><a href="#_size">6.3.3. Size</a></li>
+<li><a href="#_geographic_bounding_box">6.3.4. Geographic Bounding Box</a></li>
+<li><a href="#_dynamic_notification_properties">6.3.5. Dynamic Notification Properties</a></li>
 </ul>
 </li>
-<li><a href="#_combinators">5.4. Combinators</a></li>
-<li><a href="#two-pass">5.5. Pre-download and Post-download Evaluation</a></li>
-<li><a href="#_supported_media_types">5.6. Supported Media Types</a></li>
-<li><a href="#_filter_examples">5.7. Filter Examples</a>
+<li><a href="#_combinators">6.4. Combinators</a></li>
+<li><a href="#two-pass">6.5. Pre-download and Post-download Evaluation</a></li>
+<li><a href="#_supported_media_types">6.6. Supported Media Types</a></li>
+<li><a href="#_filter_examples">6.7. Filter Examples</a>
 <ul class="sectlevel3">
-<li><a href="#_accept_only_bufr_and_grib">5.7.1. Accept only BUFR and GRIB</a></li>
-<li><a href="#_reject_files_over_100_mb">5.7.2. Reject files over 100 MB</a></li>
-<li><a href="#_data_from_a_specific_centre_short_range_only">5.7.3. Data from a specific centre, short-range only</a></li>
-<li><a href="#_geographic_area_filter">5.7.4. Geographic area filter</a></li>
+<li><a href="#_accept_only_bufr_and_grib">6.7.1. Accept only BUFR and GRIB</a></li>
+<li><a href="#_reject_files_over_100_mb">6.7.2. Reject files over 100 MB</a></li>
+<li><a href="#_data_from_a_specific_centre_short_range_only">6.7.3. Data from a specific centre, short-range only</a></li>
+<li><a href="#_geographic_area_filter">6.7.4. Geographic area filter</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_downloaded_files">6. Downloaded Files</a>
+<li><a href="#_downloaded_files">7. Downloaded Files</a>
 <ul class="sectlevel2">
-<li><a href="#_file_organization">6.1. File Organization</a></li>
-<li><a href="#_file_naming">6.2. File Naming</a></li>
-<li><a href="#_viewing_downloads">6.3. Viewing Downloads</a></li>
+<li><a href="#_file_organization">7.1. File Organization</a></li>
+<li><a href="#_file_naming">7.2. File Naming</a></li>
+<li><a href="#_viewing_downloads">7.3. Viewing Downloads</a></li>
 </ul>
 </li>
-<li><a href="#_monitoring">7. Monitoring</a>
+<li><a href="#_monitoring">8. Monitoring</a>
 <ul class="sectlevel2">
-<li><a href="#_health_check">7.1. Health Check</a></li>
-<li><a href="#_metrics">7.2. Metrics</a></li>
-<li><a href="#_dashboard_view">7.3. Dashboard View</a></li>
+<li><a href="#_health_check">8.1. Health Check</a></li>
+<li><a href="#_metrics">8.2. Metrics</a></li>
+<li><a href="#_dashboard_view">8.3. Dashboard View</a></li>
 </ul>
 </li>
-<li><a href="#_common_use_cases">8. Common Use Cases</a>
+<li><a href="#_common_use_cases">9. Common Use Cases</a>
 <ul class="sectlevel2">
-<li><a href="#_subscribe_to_all_surface_observations">8.1. Subscribe to All Surface Observations</a></li>
-<li><a href="#_subscribe_to_specific_country">8.2. Subscribe to Specific Country</a></li>
-<li><a href="#_download_only_bufr_and_grib_files">8.3. Download Only BUFR and GRIB Files</a></li>
-<li><a href="#_multiple_subscriptions">8.4. Multiple Subscriptions</a></li>
+<li><a href="#_subscribe_to_all_surface_observations">9.1. Subscribe to All Surface Observations</a></li>
+<li><a href="#_subscribe_to_specific_country">9.2. Subscribe to Specific Country</a></li>
+<li><a href="#_download_only_bufr_and_grib_files">9.3. Download Only BUFR and GRIB Files</a></li>
+<li><a href="#_multiple_subscriptions">9.4. Multiple Subscriptions</a></li>
 </ul>
 </li>
-<li><a href="#_troubleshooting">9. Troubleshooting</a>
+<li><a href="#_troubleshooting">10. Troubleshooting</a>
 <ul class="sectlevel2">
-<li><a href="#_no_files_downloaded">9.1. No Files Downloaded</a></li>
-<li><a href="#_files_being_skipped">9.2. Files Being Skipped</a></li>
-<li><a href="#_wrong_file_types_downloaded">9.3. Wrong File Types Downloaded</a></li>
-<li><a href="#_everything_being_rejected_by_filter">9.4. Everything Being Rejected by Filter</a></li>
+<li><a href="#_no_files_downloaded">10.1. No Files Downloaded</a></li>
+<li><a href="#_files_being_skipped">10.2. Files Being Skipped</a></li>
+<li><a href="#_wrong_file_types_downloaded">10.3. Wrong File Types Downloaded</a></li>
+<li><a href="#_everything_being_rejected_by_filter">10.4. Everything Being Rejected by Filter</a></li>
 </ul>
 </li>
 </ul>
@@ -293,12 +301,12 @@ The interface translations are machine-generated.  If you notice an inaccurate t
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">kbd:[Alt+4]</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Manual Subscribe</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Enter a topic, save directory, and filter directly without browsing the catalogue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enter a topic, save directory, filter, queue, and credentials directly without browsing the catalogue</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">kbd:[Alt+5]</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Manage Subscriptions</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">List all active subscriptions and unsubscribe from topics</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">List all active subscriptions, edit their settings, and unsubscribe from topics</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">kbd:[Alt+6]</p></td>
@@ -372,9 +380,24 @@ The interface translations are machine-generated.  If you notice an inaccurate t
 <p><strong>Show Metadata</strong> — opens a dialog with full record details and an interactive map of the dataset&#8217;s geographic extent</p>
 </li>
 <li>
+<p><strong>View License</strong> — opens the dataset&#8217;s license URL in a new tab (only shown when the record includes a license link)</p>
+</li>
+<li>
 <p><strong>Select</strong> / <strong>Unselect</strong> — adds or removes the dataset&#8217;s MQTT topic to the subscription sidebar</p>
 </li>
 </ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If a dataset carries a license, clicking <strong>Select</strong> shows a license confirmation dialog. You must view and accept the license before the topic is added to the subscription sidebar.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -441,6 +464,10 @@ Only one topic can be active at a time in the tree view.
 <td class="tableblock halign-left valign-top"><p class="tableblock">Custom filters</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Dataset-specific filter fields from the GDC record&#8217;s link metadata (catalogue view only)</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Queue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Priority queue for download processing: <code>high_priority</code>, <code>small_files</code> (default), or <code>large_files</code>. Use <code>large_files</code> for bulk or large-file topics to avoid blocking smaller downloads.</p></td>
+</tr>
 </tbody>
 </table>
 <div class="paragraph">
@@ -448,13 +475,70 @@ Only one topic can be active at a time in the tree view.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_managing_subscriptions">2.6. Managing Subscriptions</h3>
+<h3 id="_credentials_manual_subscribe">2.6. Credentials (Manual Subscribe)</h3>
 <div class="paragraph">
-<p>The Subscriptions view lists all active subscriptions with their save paths. Click <strong>Unsubscribe</strong> on any entry to remove it. Use <strong>Reload Subscriptions</strong> to refresh the list after any changes made via the API.</p>
+<p>The <strong>Manual Subscribe</strong> view (kbd:[Alt+4]) includes an authentication section for data sources that require credentials.  Select the authentication type with the radio button:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">None (default)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No authentication — used for public data sources</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Basic</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Username and password</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Token (sent as <code>Authorization: Bearer &lt;token&gt;</code>)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Credentials are stored in Redis and sent with each download request for the subscription. The password and token are redacted in API responses.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_settings">2.7. Settings</h3>
+<h3 id="_managing_subscriptions">2.7. Managing Subscriptions</h3>
+<div class="paragraph">
+<p>The Subscriptions view lists all active subscriptions with their topic, save path, and filter summary. Two actions are available on each entry:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Edit</strong> — opens a dialog to modify the subscription&#8217;s save directory, filter, queue, and credentials. The topic cannot be changed; to subscribe to a different topic you must create a new subscription.</p>
+</li>
+<li>
+<p><strong>Unsubscribe</strong> — removes the subscription. If it was the last subscription for that topic, the MQTT connection is also closed.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Use <strong>Reload Subscriptions</strong> to refresh the list after any changes made via the API.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_settings">2.8. Settings</h3>
 <div class="paragraph">
 <p>The Settings view shows how many records were loaded from each GDC. Click <strong>Refresh GDC data</strong> to force a fresh fetch from all three catalogues, bypassing the Redis cache.</p>
 </div>
@@ -618,6 +702,16 @@ Use the Swagger UI at <code><a href="http://&lt;host&gt;:5002/swagger" class="ba
 <td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Filter configuration (see <a href="#Filtering">Filtering</a>)</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Priority queue for processing: <code>high_priority</code>, <code>small_files</code> (default), or <code>large_files</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Authentication for the data source (see <a href="#Credentials">Credentials</a>)</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -669,7 +763,26 @@ Use the Swagger UI at <code><a href="http://&lt;host&gt;:5002/swagger" class="ba
 </div>
 </div>
 <div class="sect2">
-<h3 id="_deleting_a_subscription">4.5. Deleting a Subscription</h3>
+<h3 id="_updating_a_subscription">4.5. Updating a Subscription</h3>
+<div class="paragraph">
+<p>Update a subscription&#8217;s save directory, filter, queue, or credentials without recreating it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X PUT http://localhost:5002/subscriptions/&lt;id&gt; \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target": "new-directory",
+    "queue": "large_files"
+  }'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Only the fields you include are changed; omitted fields keep their current values. <code>credentials</code> can be set to <code>null</code> to remove authentication.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_deleting_a_subscription">4.6. Deleting a Subscription</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE http://localhost:5002/subscriptions/&lt;id&gt;</code></pre>
@@ -682,14 +795,61 @@ Use the Swagger UI at <code><a href="http://&lt;host&gt;:5002/swagger" class="ba
 </div>
 </div>
 <div class="sect1">
-<h2 id="Filtering">5. Filtering</h2>
+<h2 id="Credentials">5. Credentials</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Subscriptions that download from password-protected or token-protected sources accept an optional <code>credentials</code> object.</p>
+</div>
+<div class="sect2">
+<h3 id="_basic_authentication">5.1. Basic Authentication</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "credentials": {
+    "type": "basic",
+    "username": "myuser",
+    "password": "mypassword"
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_bearer_token">5.2. Bearer Token</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "credentials": {
+    "type": "bearer",
+    "token": "eyJhbGciOi..."
+  }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The API redacts secrets in responses — <code>password</code> is omitted and <code>token</code> is replaced with <code><strong>*</strong></code>. The full credentials are stored in Redis and used only during download.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="Filtering">6. Filtering</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Subscriptions accept an optional <code>filter</code> object that controls which notifications are downloaded.
 Filters use ordered rules — the first rule that matches determines the outcome.</p>
 </div>
 <div class="sect2">
-<h3 id="_filter_structure">5.1. Filter Structure</h3>
+<h3 id="_filter_structure">6.1. Filter Structure</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -762,7 +922,7 @@ Filters use ordered rules — the first rule that matches determines the outcome
 </div>
 </div>
 <div class="sect2">
-<h3 id="_default_behaviour_no_filter">5.2. Default Behaviour (No Filter)</h3>
+<h3 id="_default_behaviour_no_filter">6.2. Default Behaviour (No Filter)</h3>
 <div class="paragraph">
 <p>When no <code>filter</code> is provided, a built-in default filter runs that rejects any media type not in a standard allowed list (BUFR, GRIB, NetCDF, HDF5, common images and text formats). To accept everything, use an explicit accept-all filter:</p>
 </div>
@@ -780,9 +940,9 @@ Filters use ordered rules — the first rule that matches determines the outcome
 </div>
 </div>
 <div class="sect2">
-<h3 id="match-conditions">5.3. Match Conditions</h3>
+<h3 id="match-conditions">6.3. Match Conditions</h3>
 <div class="sect3">
-<h4 id="_always_never">5.3.1. Always / Never</h4>
+<h4 id="_always_never">6.3.1. Always / Never</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"always": true}   <i class="conum" data-value="1"></i><b>(1)</b>
@@ -803,7 +963,7 @@ Filters use ordered rules — the first rule that matches determines the outcome
 </div>
 </div>
 <div class="sect3">
-<h4 id="_simple_fields">5.3.2. Simple Fields</h4>
+<h4 id="_simple_fields">6.3.2. Simple Fields</h4>
 <div class="paragraph">
 <p>Match against metadata available in the WIS2 notification:</p>
 </div>
@@ -861,7 +1021,7 @@ Filters use ordered rules — the first rule that matches determines the outcome
 </div>
 </div>
 <div class="sect3">
-<h4 id="_size">5.3.3. Size</h4>
+<h4 id="_size">6.3.3. Size</h4>
 <div class="paragraph">
 <p>Match on file size in bytes. The <code>size</code> field uses its own byte-unit operators:</p>
 </div>
@@ -905,7 +1065,7 @@ Filters use ordered rules — the first rule that matches determines the outcome
 </div>
 </div>
 <div class="sect3">
-<h4 id="_geographic_bounding_box">5.3.4. Geographic Bounding Box</h4>
+<h4 id="_geographic_bounding_box">6.3.4. Geographic Bounding Box</h4>
 <div class="paragraph">
 <p>Matches if the notification&#8217;s geometry falls within the box. Notifications with no geometry are passed through.</p>
 </div>
@@ -919,7 +1079,7 @@ Filters use ordered rules — the first rule that matches determines the outcome
 </div>
 </div>
 <div class="sect3">
-<h4 id="_dynamic_notification_properties">5.3.5. Dynamic Notification Properties</h4>
+<h4 id="_dynamic_notification_properties">6.3.5. Dynamic Notification Properties</h4>
 <div class="paragraph">
 <p>Match against any field inside the WIS2 notification&#8217;s <code>properties</code> object using the <code>property</code> key:</p>
 </div>
@@ -936,7 +1096,7 @@ Filters use ordered rules — the first rule that matches determines the outcome
 </div>
 </div>
 <div class="sect2">
-<h3 id="_combinators">5.4. Combinators</h3>
+<h3 id="_combinators">6.4. Combinators</h3>
 <div class="paragraph">
 <p>Conditions can be nested using logical combinators:</p>
 </div>
@@ -982,7 +1142,7 @@ Filters use ordered rules — the first rule that matches determines the outcome
 </div>
 </div>
 <div class="sect2">
-<h3 id="two-pass">5.5. Pre-download and Post-download Evaluation</h3>
+<h3 id="two-pass">6.5. Pre-download and Post-download Evaluation</h3>
 <div class="admonitionblock warning">
 <table>
 <tr>
@@ -1033,7 +1193,7 @@ Post-download: rule 1 accepts BUFR/octet-stream; rule 2 rejects everything else.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_supported_media_types">5.6. Supported Media Types</h3>
+<h3 id="_supported_media_types">6.6. Supported Media Types</h3>
 <div class="paragraph">
 <p>Default accepted types when no filter is specified:</p>
 </div>
@@ -1077,9 +1237,9 @@ Post-download: rule 1 accepts BUFR/octet-stream; rule 2 rejects everything else.
 </table>
 </div>
 <div class="sect2">
-<h3 id="_filter_examples">5.7. Filter Examples</h3>
+<h3 id="_filter_examples">6.7. Filter Examples</h3>
 <div class="sect3">
-<h4 id="_accept_only_bufr_and_grib">5.7.1. Accept only BUFR and GRIB</h4>
+<h4 id="_accept_only_bufr_and_grib">6.7.1. Accept only BUFR and GRIB</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1106,7 +1266,7 @@ Post-download: rule 1 accepts BUFR/octet-stream; rule 2 rejects everything else.
 </div>
 </div>
 <div class="sect3">
-<h4 id="_reject_files_over_100_mb">5.7.2. Reject files over 100 MB</h4>
+<h4 id="_reject_files_over_100_mb">6.7.2. Reject files over 100 MB</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1127,7 +1287,7 @@ Post-download: rule 1 accepts BUFR/octet-stream; rule 2 rejects everything else.
 </div>
 </div>
 <div class="sect3">
-<h4 id="_data_from_a_specific_centre_short_range_only">5.7.3. Data from a specific centre, short-range only</h4>
+<h4 id="_data_from_a_specific_centre_short_range_only">6.7.3. Data from a specific centre, short-range only</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1165,7 +1325,7 @@ Post-download: rule 1 accepts BUFR/octet-stream; rule 2 rejects everything else.
 </div>
 </div>
 <div class="sect3">
-<h4 id="_geographic_area_filter">5.7.4. Geographic area filter</h4>
+<h4 id="_geographic_area_filter">6.7.4. Geographic area filter</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1195,10 +1355,10 @@ Post-download: rule 1 accepts BUFR/octet-stream; rule 2 rejects everything else.
 </div>
 </div>
 <div class="sect1">
-<h2 id="_downloaded_files">6. Downloaded Files</h2>
+<h2 id="_downloaded_files">7. Downloaded Files</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_file_organization">6.1. File Organization</h3>
+<h3 id="_file_organization">7.1. File Organization</h3>
 <div class="paragraph">
 <p>Files are organized under your target directory in a <code>YYYY/MM/DD</code> sub-directory based on the date the file was <strong>downloaded</strong> (not the observation time or data valid time):</p>
 </div>
@@ -1228,13 +1388,13 @@ The directory date reflects when the file arrived, not when the data was produce
 </div>
 </div>
 <div class="sect2">
-<h3 id="_file_naming">6.2. File Naming</h3>
+<h3 id="_file_naming">7.2. File Naming</h3>
 <div class="paragraph">
 <p>Files retain their original names from the download URL. If a file with the same name already exists and is not an update, the download is skipped.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_viewing_downloads">6.3. Viewing Downloads</h3>
+<h3 id="_viewing_downloads">7.3. Viewing Downloads</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># List recent downloads
@@ -1263,10 +1423,10 @@ du -sh downloads/</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_monitoring">7. Monitoring</h2>
+<h2 id="_monitoring">8. Monitoring</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_health_check">7.1. Health Check</h3>
+<h3 id="_health_check">8.1. Health Check</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/health</code></pre>
@@ -1282,7 +1442,7 @@ du -sh downloads/</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_metrics">7.2. Metrics</h3>
+<h3 id="_metrics">8.2. Metrics</h3>
 <div class="paragraph">
 <p>View download statistics:</p>
 </div>
@@ -1300,7 +1460,7 @@ curl -s http://localhost:5002/metrics | grep wis2downloader_celery_queue_length<
 </div>
 </div>
 <div class="sect2">
-<h3 id="_dashboard_view">7.3. Dashboard View</h3>
+<h3 id="_dashboard_view">8.3. Dashboard View</h3>
 <div class="paragraph">
 <p>The integrated Dashboard (kbd:[Alt+1]) shows download rates, queue depth, disk usage, and byte totals in real time. No separate login is required.</p>
 </div>
@@ -1320,10 +1480,10 @@ The Dashboard is embedded directly in the web interface — no need to open Graf
 </div>
 </div>
 <div class="sect1">
-<h2 id="_common_use_cases">8. Common Use Cases</h2>
+<h2 id="_common_use_cases">9. Common Use Cases</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_subscribe_to_all_surface_observations">8.1. Subscribe to All Surface Observations</h3>
+<h3 id="_subscribe_to_all_surface_observations">9.1. Subscribe to All Surface Observations</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
@@ -1336,7 +1496,7 @@ The Dashboard is embedded directly in the web interface — no need to open Graf
 </div>
 </div>
 <div class="sect2">
-<h3 id="_subscribe_to_specific_country">8.2. Subscribe to Specific Country</h3>
+<h3 id="_subscribe_to_specific_country">9.2. Subscribe to Specific Country</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
@@ -1349,7 +1509,7 @@ The Dashboard is embedded directly in the web interface — no need to open Graf
 </div>
 </div>
 <div class="sect2">
-<h3 id="_download_only_bufr_and_grib_files">8.3. Download Only BUFR and GRIB Files</h3>
+<h3 id="_download_only_bufr_and_grib_files">9.3. Download Only BUFR and GRIB Files</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
@@ -1380,7 +1540,7 @@ The Dashboard is embedded directly in the web interface — no need to open Graf
 </div>
 </div>
 <div class="sect2">
-<h3 id="_multiple_subscriptions">8.4. Multiple Subscriptions</h3>
+<h3 id="_multiple_subscriptions">9.4. Multiple Subscriptions</h3>
 <div class="paragraph">
 <p>Create separate subscriptions for different data types:</p>
 </div>
@@ -1406,10 +1566,10 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect1">
-<h2 id="_troubleshooting">9. Troubleshooting</h2>
+<h2 id="_troubleshooting">10. Troubleshooting</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_no_files_downloaded">9.1. No Files Downloaded</h3>
+<h3 id="_no_files_downloaded">10.1. No Files Downloaded</h3>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -1440,7 +1600,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect2">
-<h3 id="_files_being_skipped">9.2. Files Being Skipped</h3>
+<h3 id="_files_being_skipped">10.2. Files Being Skipped</h3>
 <div class="paragraph">
 <p>Check the skip reason in metrics:</p>
 </div>
@@ -1467,7 +1627,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect2">
-<h3 id="_wrong_file_types_downloaded">9.3. Wrong File Types Downloaded</h3>
+<h3 id="_wrong_file_types_downloaded">10.3. Wrong File Types Downloaded</h3>
 <div class="paragraph">
 <p>Delete the existing subscription and recreate it with a <code>media_type</code> filter. Use <code>media_type.exists</code> as the reject guard — not <code>always: true</code> — so the reject rule only fires after the file type is known (see <a href="#two-pass">Pre-download and Post-download Evaluation</a>):</p>
 </div>
@@ -1508,7 +1668,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect2">
-<h3 id="_everything_being_rejected_by_filter">9.4. Everything Being Rejected by Filter</h3>
+<h3 id="_everything_being_rejected_by_filter">10.4. Everything Being Rejected by Filter</h3>
 <div class="paragraph">
 <p>If all notifications are rejected with reason <code>FilterRejected</code>, the most common cause is an <code>always: true</code> reject rule firing pre-download before <code>media_type</code> is known.</p>
 </div>
@@ -1521,7 +1681,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

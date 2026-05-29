@@ -332,7 +332,7 @@ WIS2 Downloader no implementa autenticación ni autorización en la interfaz web
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identificador de usuario (UID)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10001</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10001</code> (por defecto — configurable mediante <code>WIS2DOWNLOADER_UID</code> en <code>.env</code>)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Nombre del grupo</p></td>
@@ -340,12 +340,24 @@ WIS2 Downloader no implementa autenticación ni autorización en la interfaz web
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identificador de grupo (GID)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>988</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>988</code> (por defecto — configurable mediante <code>WIS2DOWNLOADER_GID</code> en <code>.env</code>)</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>El worker Celery escribe archivos en <code>/data</code> dentro del contenedor, que se mapea a <code>./downloads/</code> en el host.</p>
+<p>El worker Celery escribe archivos en <code>/data</code> dentro del contenedor, que se mapea a <code>HOST_DATA_PATH</code> en el host (por defecto: <code>./downloads/</code>).</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Si cambia <code>WIS2DOWNLOADER_UID</code> o <code>WIS2DOWNLOADER_GID</code> en <code>.env</code>, reconstruya las imágenes con <code>docker compose build</code> antes de reiniciar, y use los valores correspondientes en los comandos a continuación.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect3">
@@ -514,14 +526,8 @@ docker-compose logs -f subscriber</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>LOG_LEVEL</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DEBUG</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>INFO</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Nivel de registro: DEBUG, INFO, WARNING, ERROR</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DATA_PATH</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">path</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/data</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Directorio base para archivos descargados</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>FLASK_SECRET_KEY</code></p></td>
@@ -545,7 +551,31 @@ docker-compose logs -f subscriber</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>FLASK_PORT</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>5001</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Puerto de enlace de la API (interno)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Puerto de enlace de la API (puerto interno del contenedor)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_UID</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10001</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID de usuario utilizado al construir las imágenes. Debe coincidir con el propietario del directorio host para las escrituras de volumen.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_GID</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>988</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID de grupo utilizado al construir las imágenes. Debe coincidir con el grupo del directorio host para las escrituras de volumen.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>HOST_DATA_PATH</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./downloads</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ruta del host montada como volumen de descargas</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CONTAINER_DATA_PATH</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/data</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Punto de montaje dentro de los contenedores</p></td>
 </tr>
 </tbody>
 </table>
@@ -743,16 +773,22 @@ docker-compose logs -f subscriber</code></pre>
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_BASE_URL</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost" class="bare">http://localhost</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL pública base del despliegue (IP o nombre de host del servidor). Establezca la dirección de su servidor en despliegues remotos.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://subscription-manager:5001" class="bare">http://subscription-manager:5001</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">URL interna que usa la interfaz para acceder a la API del gestor de suscripciones</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>${WIS2DOWNLOADER_BASE_URL}:5002</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL pública de la API del gestor de suscripciones (vista desde el navegador)</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>WIS2DOWNLOADER_GRAFANA_URL</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:3000" class="bare">http://localhost:3000</a></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">URL utilizada para incrustar paneles de Grafana en la vista Panel de control</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>${WIS2DOWNLOADER_BASE_URL}:3000</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL pública utilizada para incrustar paneles de Grafana en la vista Panel de control</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>STORAGE_SECRET</code></p></td>
@@ -836,22 +872,55 @@ docker-compose logs -f subscriber</code></pre>
 <div class="sect2">
 <h3 id="_escalado_de_workers">3.2. Escalado de workers</h3>
 <div class="paragraph">
-<p>Aumente la concurrencia del worker Celery para mayor rendimiento:</p>
+<p>La pila ejecuta tres grupos de workers Celery, cada uno dirigido a una cola dedicada:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 28.5714%;">
+<col style="width: 14.2857%;">
+<col style="width: 14.2857%;">
+<col style="width: 42.8572%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Servicio</th>
+<th class="tableblock halign-left valign-top">Cola</th>
+<th class="tableblock halign-left valign-top">Concurrencia por defecto</th>
+<th class="tableblock halign-left valign-top">Propósito</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>celery-workers-high-priority</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>high_priority</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Descargas de alta prioridad</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>celery-workers-small-files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>small_files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">24</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cola por defecto para archivos pequeños</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>celery-workers-large-files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>large_files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Descargas de archivos grandes</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Ajuste la concurrencia editando el flag <code>--concurrency</code> en el <code>command</code> del servicio correspondiente en <code>docker-compose.yaml</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml"># docker-compose.yaml
-celery:
-  command: ["... --concurrency=16 ..."]</code></pre>
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">celery-workers-small-files:
+  command: ["/bin/bash", "-c", "source .venv/bin/activate &amp;&amp; task_manager_start worker --pool=threads --concurrency=32 --loglevel=info -Q small_files"]</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>O ejecute múltiples contenedores worker:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose up -d --scale celery=3</code></pre>
-</div>
+<p>Al crear una suscripción mediante la API, use el campo <code>queue</code> para enrutar las descargas a un grupo específico (<code>high_priority</code>, <code>small_files</code> o <code>large_files</code>). El valor predeterminado es <code>small_files</code>.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1089,7 +1158,7 @@ Cambie la contraseña predeterminada de Grafana tras el primer inicio de sesión
 docker-compose logs -f
 
 # Servicio específico
-docker-compose logs -f celery
+docker-compose logs -f celery-workers-small-files
 
 # Con marcas de tiempo
 docker-compose logs -f -t subscriber</code></pre>
@@ -1214,7 +1283,7 @@ docker-compose config</code></pre>
 <p>Verifique que el worker Celery está procesando:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose logs celery | tail -50</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose logs celery-workers-small-files | tail -50</code></pre>
 </div>
 </div>
 </li>
@@ -1335,7 +1404,7 @@ docker-compose config</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

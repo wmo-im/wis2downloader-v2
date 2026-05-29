@@ -98,39 +98,38 @@ body {
 <li><a href="#_corps_de_la_requête">3.2.1. Corps de la requête</a></li>
 <li><a href="#_réponse_2">3.2.2. Réponse</a></li>
 <li><a href="#_en_têtes_de_réponse">3.2.3. En-têtes de réponse</a></li>
-<li><a href="#_exemple_2">3.2.4. Exemple</a></li>
+<li><a href="#_exemples">3.2.4. Exemples</a></li>
 </ul>
 </li>
 <li><a href="#_obtenir_un_abonnement">3.3. Obtenir un abonnement</a>
 <ul class="sectlevel3">
 <li><a href="#_paramètres_de_chemin">3.3.1. Paramètres de chemin</a></li>
-<li><a href="#_encodage_url">3.3.2. Encodage URL</a></li>
-<li><a href="#_réponse_3">3.3.3. Réponse</a></li>
-<li><a href="#_exemple_3">3.3.4. Exemple</a></li>
+<li><a href="#_réponse_3">3.3.2. Réponse</a></li>
+<li><a href="#_exemple_2">3.3.3. Exemple</a></li>
 </ul>
 </li>
-<li><a href="#_supprimer_un_abonnement">3.4. Supprimer un abonnement</a>
+<li><a href="#_mettre_à_jour_un_abonnement">3.4. Mettre à jour un abonnement</a>
 <ul class="sectlevel3">
-<li><a href="#_paramètres_de_chemin_2">3.4.1. Paramètres de chemin</a></li>
+<li><a href="#_corps_de_la_requête_2">3.4.1. Corps de la requête</a></li>
 <li><a href="#_réponse_4">3.4.2. Réponse</a></li>
-<li><a href="#_exemple_4">3.4.3. Exemple</a></li>
+<li><a href="#_exemple_3">3.4.3. Exemple</a></li>
+</ul>
+</li>
+<li><a href="#_supprimer_un_abonnement">3.5. Supprimer un abonnement</a>
+<ul class="sectlevel3">
+<li><a href="#_réponse_5">3.5.1. Réponse</a></li>
+<li><a href="#_exemple_4">3.5.2. Exemple</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li><a href="#_api_de_surveillance">4. API de surveillance</a>
 <ul class="sectlevel2">
-<li><a href="#_vérification_de_létat_de_santé">4.1. Vérification de l&#8217;état de santé</a>
-<ul class="sectlevel3">
-<li><a href="#_réponse_5">4.1.1. Réponse</a></li>
-<li><a href="#_exemple_5">4.1.2. Exemple</a></li>
-</ul>
-</li>
+<li><a href="#_vérification_de_létat_de_santé">4.1. Vérification de l&#8217;état de santé</a></li>
 <li><a href="#_métriques_prometheus">4.2. Métriques Prometheus</a>
 <ul class="sectlevel3">
-<li><a href="#_réponse_6">4.2.1. Réponse</a></li>
-<li><a href="#_métriques_disponibles">4.2.2. Métriques disponibles</a></li>
-<li><a href="#_exemple_6">4.2.3. Exemple</a></li>
+<li><a href="#_métriques_disponibles">4.2.1. Métriques disponibles</a></li>
+<li><a href="#_exemple_5">4.2.2. Exemple</a></li>
 </ul>
 </li>
 <li><a href="#_spécification_openapi">4.3. Spécification OpenAPI</a></li>
@@ -145,18 +144,21 @@ body {
 <li><a href="#_schémas_de_données">6. Schémas de données</a>
 <ul class="sectlevel2">
 <li><a href="#_abonnement">6.1. Abonnement</a></li>
-<li><a href="#_filtres">6.2. Filtres</a>
+<li><a href="#_schéma_de_filtre">6.2. Schéma de filtre</a>
 <ul class="sectlevel3">
-<li><a href="#_types_de_médias_acceptés_par_défaut">6.2.1. Types de médias acceptés par défaut</a></li>
+<li><a href="#_schéma_de_règle_de_filtre">6.2.1. Schéma de règle de filtre</a></li>
+<li><a href="#_conditions_de_correspondance">6.2.2. Conditions de correspondance</a></li>
+<li><a href="#_exemple_de_filtre">6.2.3. Exemple de filtre</a></li>
 </ul>
 </li>
+<li><a href="#_schéma_des_identifiants">6.3. Schéma des identifiants</a></li>
 </ul>
 </li>
 <li><a href="#_référence_des_modèles_de_topics">7. Référence des modèles de topics</a>
 <ul class="sectlevel2">
 <li><a href="#_structure_des_topics_wis2">7.1. Structure des topics WIS2</a></li>
 <li><a href="#_caractères_génériques">7.2. Caractères génériques</a></li>
-<li><a href="#_exemples">7.3. Exemples</a></li>
+<li><a href="#_exemples_2">7.3. Exemples</a></li>
 </ul>
 </li>
 </ul>
@@ -202,23 +204,38 @@ toute utilisation en production. Consultez le lien:../en/[document original en a
 </li>
 </ul>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Remplacez <code>localhost:5002</code> par l&#8217;adresse de votre serveur en cas de déploiement distant. L&#8217;URL de base est configurée via <code>WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL</code> dans <code>.env</code>.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_authentification">2. Authentification</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Actuellement, l&#8217;API ne nécessite pas d&#8217;authentification. En production, envisagez de la placer derrière un proxy inverse avec authentification.</p>
+<p>L&#8217;API ne requiert pas d&#8217;authentification. En production, placez-la derrière un proxy inverse avec authentification (voir la section <a href="admin-guide.html#_access_control">Contrôle d&#8217;accès</a> du Guide d&#8217;administration).</p>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_api_des_abonnements">3. API des abonnements</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>Chaque abonnement est identifié par un UUID et associe un topic MQTT, un chemin de sauvegarde, un filtre optionnel, des identifiants optionnels et une file d&#8217;attente. Plusieurs abonnements peuvent partager le même topic — la connexion MQTT est ouverte une seule fois et les messages sont routés vers tous les abonnements correspondants.</p>
+</div>
 <div class="sect2">
 <h3 id="_lister_les_abonnements">3.1. Lister les abonnements</h3>
 <div class="paragraph">
-<p>Retourne tous les abonnements actifs.</p>
+<p>Retourne tous les abonnements actifs groupés par topic.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -241,7 +258,7 @@ toute utilisation en production. Consultez le lien:../en/[document original en a
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">200</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Succès — retourne la correspondance entre les topics et les détails des abonnements</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Succès — map topic → map UUID abonnement → détails de l&#8217;abonnement</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
@@ -261,10 +278,18 @@ toute utilisation en production. Consultez le lien:../en/[document original en a
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
   "cache/a/wis2/+/data/core/weather/surface-based-observations/#": {
-    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-    "save_path": "surface-obs",
-    "filters": {
-      "accepted_media_types": ["application/bufr", "application/grib"]
+    "550e8400-e29b-41d4-a716-446655440000": {
+      "save_path": "surface-obs",
+      "filter": {}
+    },
+    "661f9511-f30c-52e5-b827-557766551111": {
+      "save_path": "surface-obs-bufr",
+      "filter": {
+        "name": "bufr-only",
+        "rules": [
+          { "id": "accept-bufr", "order": 1, "match": { "media_type": { "equals": "application/bufr" } }, "action": "accept" }
+        ]
+      }
     }
   }
 }</code></pre>
@@ -275,7 +300,10 @@ toute utilisation en production. Consultez le lien:../en/[document original en a
 <div class="sect2">
 <h3 id="_créer_un_abonnement">3.2. Créer un abonnement</h3>
 <div class="paragraph">
-<p>Crée un nouvel abonnement à un topic WIS2.</p>
+<p>Crée un nouvel abonnement. Attribue un UUID et retourne l&#8217;enregistrement d&#8217;abonnement complet.</p>
+</div>
+<div class="paragraph">
+<p>Si c&#8217;est le premier abonnement pour le topic donné, une connexion MQTT est ouverte. Les abonnements supplémentaires pour le même topic réutilisent la connexion existante.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -311,19 +339,25 @@ Content-Type: application/json</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>target</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Non</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sous-répertoire sous <code>/data</code> où les fichiers seront enregistrés.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sous-répertoire sous la racine des données où les fichiers sont enregistrés.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filters</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filter</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">objet</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Non</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Configuration du filtre.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Filtre basé sur des règles. Voir <a href="#_schéma_de_filtre">Schéma de filtre</a>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filters.accepted_media_types</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">tableau</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">objet</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Non</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Liste des types MIME autorisés. Prend en charge les caractères génériques (ex. <code>application/x-grib*</code>).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifiants HTTP pour les jeux de données à accès contrôlé. Voir <a href="#_schéma_des_identifiants">Schéma des identifiants</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Non</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">File d&#8217;attente de téléchargement : <code>high_priority</code>, <code>small_files</code> (par défaut) ou <code>large_files</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -343,12 +377,12 @@ Content-Type: application/json</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">202</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Accepté — abonnement mis en file d&#8217;attente pour traitement</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">201</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Créé — retourne l&#8217;enregistrement d&#8217;abonnement complet</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Requête incorrecte — topic manquant ou invalide</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Requête incorrecte — champs manquants ou invalides</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
@@ -373,32 +407,75 @@ Content-Type: application/json</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Location</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">URL pour récupérer les détails de l&#8217;abonnement</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL pour récupérer l&#8217;abonnement créé (<code>/subscriptions/{id}</code>)</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_exemple_2">3.2.4. Exemple</h4>
+<h4 id="_exemples">3.2.4. Exemples</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Abonnement simple
+curl -X POST http://localhost:5002/subscriptions \
   -H "Content-Type: application/json" \
   -d '{
     "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-    "target": "surface-obs",
-    "filters": {
-      "accepted_media_types": ["application/bufr", "application/grib"]
+    "target": "surface-obs"
+  }'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Abonnement avec filtre
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+    "target": "surface-obs-bufr",
+    "filter": {
+      "name": "bufr-only",
+      "rules": [
+        { "id": "accept-bufr", "order": 1, "match": { "media_type": { "equals": "application/bufr" } }, "action": "accept" },
+        { "id": "default-reject", "order": 999, "match": { "always": true }, "action": "reject" }
+      ]
     }
   }'</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Abonnement à un jeu de données à accès contrôlé avec authentification de base
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/recommended/weather/surface-based-observations/#",
+    "target": "restricted-obs",
+    "credentials": { "type": "basic", "username": "myuser", "password": "s3cr3t" }
+  }'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Router les gros téléchargements vers la file large-files
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/fr-meteofrance/data/core/weather/space-based-observations/noaa-21/cris",
+    "target": "space-obs",
+    "queue": "large_files"
+  }'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "status": "accepted",
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-  "target": "surface-obs"
+  "save_path": "surface-obs",
+  "filter": {},
+  "credentials": null,
+  "queue": "small_files"
 }</code></pre>
 </div>
 </div>
@@ -407,11 +484,11 @@ Content-Type: application/json</code></pre>
 <div class="sect2">
 <h3 id="_obtenir_un_abonnement">3.3. Obtenir un abonnement</h3>
 <div class="paragraph">
-<p>Retourne les détails d&#8217;un abonnement spécifique.</p>
+<p>Retourne l&#8217;enregistrement complet d&#8217;un abonnement spécifique.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /subscriptions/{topic}</code></pre>
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /subscriptions/{id}</code></pre>
 </div>
 </div>
 <div class="sect3">
@@ -431,54 +508,15 @@ Content-Type: application/json</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Topic WIS2 (seul <code>#</code> nécessite l&#8217;encodage en <code>%23</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (UUID)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UUID de l&#8217;abonnement retourné lors de sa création</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_encodage_url">3.3.2. Encodage URL</h4>
-<div class="paragraph">
-<p>Seul le caractère <code>#</code> nécessite un encodage URL :</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Caractère</th>
-<th class="tableblock halign-left valign-top">Encodé</th>
-<th class="tableblock halign-left valign-top">Raison</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%23</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sinon interprété comme un fragment d&#8217;URL</p></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Les barres obliques (<code>/</code>) et <code>+</code> ne nécessitent pas d&#8217;encodage dans le chemin.
-</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_réponse_3">3.3.3. Réponse</h4>
+<h4 id="_réponse_3">3.3.2. Réponse</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -496,52 +534,61 @@ Les barres obliques (<code>/</code>) et <code>+</code> ne nécessitent pas d&#82
 <td class="tableblock halign-left valign-top"><p class="tableblock">Succès</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Topic invalide</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Abonnement introuvable</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Redis indisponible</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_exemple_3">3.3.4. Exemple</h4>
+<h4 id="_exemple_2">3.3.3. Exemple</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
   "save_path": "surface-obs",
-  "filters": {
-    "accepted_media_types": ["application/bufr", "application/grib"]
-  }
+  "filter": {},
+  "credentials": null,
+  "queue": "small_files"
 }</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Les secrets d&#8217;identifiants (<code>password</code>, <code>token</code>) ne sont jamais retournés. Seuls <code>type</code> et <code>username</code> (pour l&#8217;authentification de base) sont inclus dans les réponses.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_supprimer_un_abonnement">3.4. Supprimer un abonnement</h3>
+<h3 id="_mettre_à_jour_un_abonnement">3.4. Mettre à jour un abonnement</h3>
 <div class="paragraph">
-<p>Supprime un abonnement.</p>
+<p>Met à jour le chemin de sauvegarde, le filtre, les identifiants ou la file d&#8217;attente d&#8217;un abonnement existant. Le topic ne peut pas être modifié — supprimez et recréez l&#8217;abonnement pour changer le topic.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">DELETE /subscriptions/{topic}</code></pre>
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">PUT /subscriptions/{id}
+Content-Type: application/json</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_paramètres_de_chemin_2">3.4.1. Paramètres de chemin</h4>
+<h4 id="_corps_de_la_requête_2">3.4.1. Corps de la requête</h4>
+<div class="paragraph">
+<p>Tous les champs sont optionnels. Seuls les champs fournis sont mis à jour.</p>
+</div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -550,16 +597,31 @@ Les barres obliques (<code>/</code>) et <code>+</code> ne nécessitent pas d&#82
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">Paramètre</th>
+<th class="tableblock halign-left valign-top">Champ</th>
 <th class="tableblock halign-left valign-top">Type</th>
 <th class="tableblock halign-left valign-top">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>target</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Topic WIS2 encodé URL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nouveau sous-répertoire sous la racine des données</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">objet</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nouveau filtre basé sur des règles (remplace le filtre existant)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">objet</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nouveaux identifiants (remplace les identifiants existants)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nouvelle file d&#8217;attente : <code>high_priority</code>, <code>small_files</code> ou <code>large_files</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -580,11 +642,15 @@ Les barres obliques (<code>/</code>) et <code>+</code> ne nécessitent pas d&#82
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">200</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Supprimé avec succès</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enregistrement d&#8217;abonnement mis à jour</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Topic invalide</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Valeur de champ invalide</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Abonnement introuvable</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
@@ -594,87 +660,28 @@ Les barres obliques (<code>/</code>) et <code>+</code> ne nécessitent pas d&#82
 </table>
 </div>
 <div class="sect3">
-<h4 id="_exemple_4">3.4.3. Exemple</h4>
+<h4 id="_exemple_3">3.4.3. Exemple</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "status": "deleted",
-  "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#"
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_api_de_surveillance">4. API de surveillance</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_vérification_de_létat_de_santé">4.1. Vérification de l&#8217;état de santé</h3>
-<div class="paragraph">
-<p>Retourne l&#8217;état de santé du service.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /health</code></pre>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_réponse_5">4.1.1. Réponse</h4>
-<div class="paragraph">
-<p>Retourne toujours 200. Vérifiez le champ <code>status</code> pour connaître l&#8217;état réel.</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 75%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Champ</th>
-<th class="tableblock halign-left valign-top">Valeurs</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>status</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>healthy</code> ou <code>unhealthy</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_exemple_5">4.1.2. Exemple</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/health</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"status": "healthy"}</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X PUT http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Content-Type: application/json" \
+  -d '{ "target": "surface-obs-v2", "queue": "high_priority" }'</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_métriques_prometheus">4.2. Métriques Prometheus</h3>
+<h3 id="_supprimer_un_abonnement">3.5. Supprimer un abonnement</h3>
 <div class="paragraph">
-<p>Retourne les métriques au format texte Prometheus.</p>
+<p>Supprime un abonnement. S&#8217;il s&#8217;agit du dernier abonnement pour son topic, la connexion MQTT pour ce topic est fermée.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /metrics</code></pre>
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">DELETE /subscriptions/{id}</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_réponse_6">4.2.1. Réponse</h4>
+<h4 id="_réponse_5">3.5.1. Réponse</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -689,17 +696,71 @@ Les barres obliques (<code>/</code>) et <code>+</code> ne nécessitent pas d&#82
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">200</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Métriques au format texte Prometheus</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Supprimé avec succès</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">500</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Erreur lors de la génération des métriques</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Abonnement introuvable</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Redis indisponible</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_métriques_disponibles">4.2.2. Métriques disponibles</h4>
+<h4 id="_exemple_4">3.5.2. Exemple</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{ "status": "deleted", "id": "550e8400-e29b-41d4-a716-446655440000" }</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_api_de_surveillance">4. API de surveillance</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_vérification_de_létat_de_santé">4.1. Vérification de l&#8217;état de santé</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /health</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Retourne toujours 200. Vérifiez le champ <code>status</code> pour l&#8217;état réel.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/health</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{ "status": "healthy" }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_métriques_prometheus">4.2. Métriques Prometheus</h3>
+<div class="paragraph">
+<p>Retourne les métriques au format texte Prometheus.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /metrics</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_métriques_disponibles">4.2.1. Métriques disponibles</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -720,7 +781,7 @@ Les barres obliques (<code>/</code>) et <code>+</code> ne nécessitent pas d&#82
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>wis2downloader_notifications_total</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counter</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">status</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Total des notifications traitées</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Total des notifications traitées par Celery</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>wis2downloader_downloads_total</code></p></td>
@@ -750,37 +811,22 @@ Les barres obliques (<code>/</code>) et <code>+</code> ne nécessitent pas d&#82
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>wis2downloader_celery_queue_length</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Gauge</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">queue_name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Tâches actuellement dans la file d&#8217;attente Celery</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tâches actuelles dans toutes les files Celery</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_exemple_6">4.2.3. Exemple</h4>
+<h4 id="_exemple_5">4.2.2. Exemple</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/metrics</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-prometheus hljs" data-lang="prometheus"># HELP wis2downloader_downloads_total Total number of files downloaded.
-# TYPE wis2downloader_downloads_total counter
-wis2downloader_downloads_total{cache="example.cache.com",media_type="application/bufr"} 42.0
-
-# HELP wis2downloader_notifications_total Total notifications processed.
-# TYPE wis2downloader_notifications_total counter
-wis2downloader_notifications_total{status="success"} 42.0
-wis2downloader_notifications_total{status="skipped"} 5.0</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_spécification_openapi">4.3. Spécification OpenAPI</h3>
-<div class="paragraph">
-<p>Retourne la spécification OpenAPI 3.0 au format JSON.</p>
-</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /openapi</code></pre>
@@ -790,7 +836,7 @@ wis2downloader_notifications_total{status="skipped"} 5.0</code></pre>
 <div class="sect2">
 <h3 id="_interface_swagger">4.4. Interface Swagger</h3>
 <div class="paragraph">
-<p>Documentation API interactive.</p>
+<p>Documentation API interactive disponible à :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -809,9 +855,7 @@ GET /swagger</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "error": "Error message describing the problem"
-}</code></pre>
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{ "error": "Error message describing the problem" }</code></pre>
 </div>
 </div>
 <div class="sect2">
@@ -833,17 +877,22 @@ GET /swagger</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">"No topic provided"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">POST /subscriptions sans champ topic</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POST /subscriptions sans champ <code>topic</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">"No topic passed"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">GET/DELETE avec topic vide</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"credentials.type must be 'basic' or 'bearer'"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type d&#8217;identifiants invalide</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"queue must be one of: high_priority, large_files, small_files"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nom de file d&#8217;attente inconnu</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">"Subscription for topic X not found"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Topic non abonné</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"Subscription '{id}' not found"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UUID inexistant</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
@@ -855,11 +904,6 @@ GET /swagger</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">"Failed to queue subscription command&#8230;&#8203;"</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Redis pub/sub échoué</p></td>
 </tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">"Failed to persist subscription&#8230;&#8203;"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Écriture Redis échouée</p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -870,50 +914,262 @@ GET /swagger</code></pre>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_abonnement">6.1. Abonnement</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "topic": "string (required) - WIS2 MQTT topic pattern",
-  "save_path": "string | null - Subdirectory for downloads",
-  "filters": {
-    "accepted_media_types": ["array of MIME type strings"]
-  }
-}</code></pre>
+<div class="paragraph">
+<p>Enregistrement d&#8217;abonnement complet tel que stocké et retourné par l&#8217;API.</p>
 </div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Champ</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (UUID)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifiant unique attribué à la création</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modèle de topic MQTT WIS2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>save_path</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string | null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sous-répertoire sous la racine des données où les fichiers sont enregistrés</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">objet</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Filtre basé sur des règles (objet vide <code>{}</code> signifie aucun filtrage)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">objet | null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifiants utilisés pour le téléchargement. Les secrets sont masqués dans les réponses.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">File d&#8217;attente de téléchargement : <code>high_priority</code>, <code>small_files</code> ou <code>large_files</code></p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect2">
-<h3 id="_filtres">6.2. Filtres</h3>
+<h3 id="_schéma_de_filtre">6.2. Schéma de filtre</h3>
+<div class="paragraph">
+<p>Les filtres utilisent une liste ordonnée de règles. Les règles sont évaluées dans l&#8217;ordre ; l&#8217;action de la première règle correspondante est appliquée. Si aucune règle ne correspond, le fichier est accepté.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Champ</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nom du filtre pour identification</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rules</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">tableau</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Liste ordonnée de <a href="#_schéma_de_règle_de_filtre">règles de filtre</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect3">
+<h4 id="_schéma_de_règle_de_filtre">6.2.1. Schéma de règle de filtre</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Champ</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifiant unique de la règle</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>order</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ordre d&#8217;exécution — les valeurs plus basses s&#8217;exécutent en premier</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>match</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">objet</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Condition à vérifier. Voir <a href="#_conditions_de_correspondance">Conditions de correspondance</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>action</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>accept</code>, <code>reject</code> ou <code>continue</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_conditions_de_correspondance">6.2.2. Conditions de correspondance</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Condition</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>media_type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Correspondance sur le type MIME du fichier</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Correspondance sur la taille du fichier en octets</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>centre_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Correspondance sur l&#8217;identifiant du centre émetteur (ex. <code>de-dwd</code>, <code>fr-meteofrance</code>). Le premier champ est le code pays ISO2C, le second est un nom descriptif du centre.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Correspondance sur l&#8217;identifiant de données WIS2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>href</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Correspondance sur l&#8217;URL de téléchargement</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>always: true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Correspondance inconditionnelle (utiliser comme règle fourre-tout par défaut)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Opérateurs string : <code>equals</code>, <code>not_equals</code>, <code>in</code>, <code>not_in</code>, <code>pattern</code> (glob), <code>regex</code></p>
+</div>
+<div class="paragraph">
+<p>Opérateurs taille/numérique : <code>gt_bytes</code>, <code>lt_bytes</code>, <code>gte_bytes</code>, <code>lte_bytes</code>, <code>between_bytes</code></p>
+</div>
+<div class="paragraph">
+<p>Combinateurs logiques : <code>all</code> (ET), <code>any</code> (OU), <code>not</code></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_exemple_de_filtre">6.2.3. Exemple de filtre</h4>
+<div class="paragraph">
+<p>N&#8217;accepter que les fichiers BUFR de moins de 10 Mo ; rejeter tout le reste :</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "accepted_media_types": [
-    "application/bufr",
-    "application/grib",
-    "application/x-netcdf*"
+  "name": "bufr-small",
+  "rules": [
+    {
+      "id": "accept-small-bufr",
+      "order": 1,
+      "match": {
+        "all": [
+          { "media_type": { "equals": "application/bufr" } },
+          { "size": { "lt_bytes": 10485760 } }
+        ]
+      },
+      "action": "accept"
+    },
+    {
+      "id": "default-reject",
+      "order": 999,
+      "match": { "always": true },
+      "action": "reject"
+    }
   ]
 }</code></pre>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_types_de_médias_acceptés_par_défaut">6.2.1. Types de médias acceptés par défaut</h4>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_schéma_des_identifiants">6.3. Schéma des identifiants</h3>
 <div class="paragraph">
-<p>Lorsqu&#8217;aucun filtre n&#8217;est spécifié, ces types sont acceptés :</p>
+<p>Utilisé pour authentifier les téléchargements HTTP depuis des jeux de données à accès contrôlé.</p>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
-  "image/gif", "image/jpeg", "image/png", "image/tiff",
-  "application/pdf", "application/postscript",
-  "application/bufr", "application/grib",
-  "application/x-hdf", "application/x-hdf5",
-  "application/x-netcdf", "application/x-netcdf4",
-  "text/plain", "text/html", "text/xml", "text/csv",
-  "text/tab-separated-values"
-]</code></pre>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>password</code> et <code>token</code> sont en écriture seule — ils sont acceptés dans les requêtes mais jamais retournés dans les réponses.
+</td>
+</tr>
+</table>
 </div>
-</div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Champ</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic</code> ou <code>bearer</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>username</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Requis quand <code>type</code> est <code>basic</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (écriture seule)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Requis quand <code>type</code> est <code>basic</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>token</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (écriture seule)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Requis quand <code>type</code> est <code>bearer</code></p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -930,16 +1186,16 @@ GET /swagger</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p><code>origin</code> — Données originales provenant du fournisseur de données</p>
+<p><code>origin</code> — Données originales du fournisseur de données</p>
 </li>
 <li>
 <p><code>cache</code> — Copie mise en cache depuis un Global Cache (recommandé pour la fiabilité)</p>
 </li>
 <li>
-<p><code>{centre-id}</code> — Code pays/organisation, précédé du code pays ISO2C (ex. <code>de-dwd</code>)</p>
+<p><code>{centre-id}</code> — Identifiant du centre. Le premier champ est le code pays ISO2C et le second est un nom descriptif du centre (ex. <code>de-dwd</code> pour Deutscher Wetterdienst, <code>fr-meteofrance</code> pour Météo-France)</p>
 </li>
 <li>
-<p><code>{data-policy}</code> — Politique de données unifiée WMO : <code>core</code> ou <code>recommended</code></p>
+<p><code>{data-policy}</code> — Politique de données unifiée WMO : <code>core</code> (libre d&#8217;accès) ou <code>recommended</code> (peut nécessiter des identifiants)</p>
 </li>
 <li>
 <p><code>{earth-system-domain}</code> — Domaine du système terrestre issu de la politique de données unifiée WMO</p>
@@ -977,7 +1233,7 @@ GET /swagger</code></pre>
 </table>
 </div>
 <div class="sect2">
-<h3 id="_exemples">7.3. Exemples</h3>
+<h3 id="_exemples_2">7.3. Exemples</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 40%;">
@@ -1014,7 +1270,7 @@ GET /swagger</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

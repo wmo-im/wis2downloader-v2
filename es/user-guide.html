@@ -96,8 +96,9 @@ body {
 </li>
 <li><a href="#_vista_de_árbol">2.4. Vista de árbol</a></li>
 <li><a href="#_crear_una_suscripción_desde_la_interfaz">2.5. Crear una suscripción desde la interfaz</a></li>
-<li><a href="#_gestión_de_suscripciones">2.6. Gestión de suscripciones</a></li>
-<li><a href="#_configuración">2.7. Configuración</a></li>
+<li><a href="#_credenciales_suscripción_manual">2.6. Credenciales (Suscripción manual)</a></li>
+<li><a href="#_gestión_de_suscripciones">2.7. Gestión de suscripciones</a></li>
+<li><a href="#_configuración">2.8. Configuración</a></li>
 </ul>
 </li>
 <li><a href="#_entender_los_temas_wis2">3. Entender los temas WIS2</a>
@@ -112,63 +113,70 @@ body {
 <li><a href="#_parámetros_de_suscripción">4.2. Parámetros de suscripción</a></li>
 <li><a href="#_listar_suscripciones">4.3. Listar suscripciones</a></li>
 <li><a href="#_obtener_detalles_de_una_suscripción">4.4. Obtener detalles de una suscripción</a></li>
-<li><a href="#_eliminar_una_suscripción">4.5. Eliminar una suscripción</a></li>
+<li><a href="#_actualizar_una_suscripción">4.5. Actualizar una suscripción</a></li>
+<li><a href="#_eliminar_una_suscripción">4.6. Eliminar una suscripción</a></li>
 </ul>
 </li>
-<li><a href="#Filtrado">5. Filtrado</a>
+<li><a href="#Credenciales-API">5. Credenciales</a>
 <ul class="sectlevel2">
-<li><a href="#_estructura_del_filtro">5.1. Estructura del filtro</a></li>
-<li><a href="#_comportamiento_predeterminado_sin_filtro">5.2. Comportamiento predeterminado (sin filtro)</a></li>
-<li><a href="#condiciones-coincidencia">5.3. Condiciones de coincidencia</a>
+<li><a href="#_autenticación_básica">5.1. Autenticación básica</a></li>
+<li><a href="#_token_bearer">5.2. Token Bearer</a></li>
+</ul>
+</li>
+<li><a href="#Filtrado">6. Filtrado</a>
+<ul class="sectlevel2">
+<li><a href="#_estructura_del_filtro">6.1. Estructura del filtro</a></li>
+<li><a href="#_comportamiento_predeterminado_sin_filtro">6.2. Comportamiento predeterminado (sin filtro)</a></li>
+<li><a href="#condiciones-coincidencia">6.3. Condiciones de coincidencia</a>
 <ul class="sectlevel3">
-<li><a href="#_siempre_nunca">5.3.1. Siempre / Nunca</a></li>
-<li><a href="#_campos_simples">5.3.2. Campos simples</a></li>
-<li><a href="#_tamaño">5.3.3. Tamaño</a></li>
-<li><a href="#_bounding_box_geográfico">5.3.4. Bounding box geográfico</a></li>
-<li><a href="#_propiedades_dinámicas_de_la_notificación">5.3.5. Propiedades dinámicas de la notificación</a></li>
+<li><a href="#_siempre_nunca">6.3.1. Siempre / Nunca</a></li>
+<li><a href="#_campos_simples">6.3.2. Campos simples</a></li>
+<li><a href="#_tamaño">6.3.3. Tamaño</a></li>
+<li><a href="#_bounding_box_geográfico">6.3.4. Bounding box geográfico</a></li>
+<li><a href="#_propiedades_dinámicas_de_la_notificación">6.3.5. Propiedades dinámicas de la notificación</a></li>
 </ul>
 </li>
-<li><a href="#_combinadores">5.4. Combinadores</a></li>
-<li><a href="#dos-pasadas">5.5. Evaluación antes y después de la descarga</a></li>
-<li><a href="#_tipos_de_medios_compatibles">5.6. Tipos de medios compatibles</a></li>
-<li><a href="#_ejemplos_de_filtros">5.7. Ejemplos de filtros</a>
+<li><a href="#_combinadores">6.4. Combinadores</a></li>
+<li><a href="#dos-pasadas">6.5. Evaluación antes y después de la descarga</a></li>
+<li><a href="#_tipos_de_medios_compatibles">6.6. Tipos de medios compatibles</a></li>
+<li><a href="#_ejemplos_de_filtros">6.7. Ejemplos de filtros</a>
 <ul class="sectlevel3">
-<li><a href="#_aceptar_solo_bufr_y_grib">5.7.1. Aceptar solo BUFR y GRIB</a></li>
-<li><a href="#_rechazar_archivos_de_más_de_100_mb">5.7.2. Rechazar archivos de más de 100 MB</a></li>
-<li><a href="#_datos_de_un_centro_específico_solo_corto_alcance">5.7.3. Datos de un centro específico, solo corto alcance</a></li>
-<li><a href="#_filtro_de_área_geográfica">5.7.4. Filtro de área geográfica</a></li>
+<li><a href="#_aceptar_solo_bufr_y_grib">6.7.1. Aceptar solo BUFR y GRIB</a></li>
+<li><a href="#_rechazar_archivos_de_más_de_100_mb">6.7.2. Rechazar archivos de más de 100 MB</a></li>
+<li><a href="#_datos_de_un_centro_específico_solo_corto_alcance">6.7.3. Datos de un centro específico, solo corto alcance</a></li>
+<li><a href="#_filtro_de_área_geográfica">6.7.4. Filtro de área geográfica</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_archivos_descargados">6. Archivos descargados</a>
+<li><a href="#_archivos_descargados">7. Archivos descargados</a>
 <ul class="sectlevel2">
-<li><a href="#_organización_de_archivos">6.1. Organización de archivos</a></li>
-<li><a href="#_nomenclatura_de_archivos">6.2. Nomenclatura de archivos</a></li>
-<li><a href="#_ver_descargas">6.3. Ver descargas</a></li>
+<li><a href="#_organización_de_archivos">7.1. Organización de archivos</a></li>
+<li><a href="#_nomenclatura_de_archivos">7.2. Nomenclatura de archivos</a></li>
+<li><a href="#_ver_descargas">7.3. Ver descargas</a></li>
 </ul>
 </li>
-<li><a href="#_monitoreo">7. Monitoreo</a>
+<li><a href="#_monitoreo">8. Monitoreo</a>
 <ul class="sectlevel2">
-<li><a href="#_comprobación_de_estado">7.1. Comprobación de estado</a></li>
-<li><a href="#_métricas">7.2. Métricas</a></li>
-<li><a href="#_vista_de_panel_de_control">7.3. Vista de panel de control</a></li>
+<li><a href="#_comprobación_de_estado">8.1. Comprobación de estado</a></li>
+<li><a href="#_métricas">8.2. Métricas</a></li>
+<li><a href="#_vista_de_panel_de_control">8.3. Vista de panel de control</a></li>
 </ul>
 </li>
-<li><a href="#_casos_de_uso_comunes">8. Casos de uso comunes</a>
+<li><a href="#_casos_de_uso_comunes">9. Casos de uso comunes</a>
 <ul class="sectlevel2">
-<li><a href="#_suscribirse_a_todas_las_observaciones_de_superficie">8.1. Suscribirse a todas las observaciones de superficie</a></li>
-<li><a href="#_suscribirse_a_un_país_específico">8.2. Suscribirse a un país específico</a></li>
-<li><a href="#_descargar_solo_archivos_bufr_y_grib">8.3. Descargar solo archivos BUFR y GRIB</a></li>
-<li><a href="#_suscripciones_múltiples">8.4. Suscripciones múltiples</a></li>
+<li><a href="#_suscribirse_a_todas_las_observaciones_de_superficie">9.1. Suscribirse a todas las observaciones de superficie</a></li>
+<li><a href="#_suscribirse_a_un_país_específico">9.2. Suscribirse a un país específico</a></li>
+<li><a href="#_descargar_solo_archivos_bufr_y_grib">9.3. Descargar solo archivos BUFR y GRIB</a></li>
+<li><a href="#_suscripciones_múltiples">9.4. Suscripciones múltiples</a></li>
 </ul>
 </li>
-<li><a href="#_solución_de_problemas">9. Solución de problemas</a>
+<li><a href="#_solución_de_problemas">10. Solución de problemas</a>
 <ul class="sectlevel2">
-<li><a href="#_sin_archivos_descargados">9.1. Sin archivos descargados</a></li>
-<li><a href="#_archivos_siendo_omitidos">9.2. Archivos siendo omitidos</a></li>
-<li><a href="#_tipos_de_archivos_incorrectos_descargados">9.3. Tipos de archivos incorrectos descargados</a></li>
-<li><a href="#_todo_siendo_rechazado_por_el_filtro">9.4. Todo siendo rechazado por el filtro</a></li>
+<li><a href="#_sin_archivos_descargados">10.1. Sin archivos descargados</a></li>
+<li><a href="#_archivos_siendo_omitidos">10.2. Archivos siendo omitidos</a></li>
+<li><a href="#_tipos_de_archivos_incorrectos_descargados">10.3. Tipos de archivos incorrectos descargados</a></li>
+<li><a href="#_todo_siendo_rechazado_por_el_filtro">10.4. Todo siendo rechazado por el filtro</a></li>
 </ul>
 </li>
 </ul>
@@ -291,12 +299,12 @@ Las traducciones de la interfaz son generadas automáticamente. Si nota una trad
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">kbd:[Alt+4]</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Suscripción manual</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Introduzca un tema, directorio de guardado y filtro directamente sin explorar el catálogo</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Introduzca un tema, directorio de guardado, filtro, cola y credenciales directamente sin explorar el catálogo</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">kbd:[Alt+5]</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Gestionar suscripciones</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lista todas las suscripciones activas y permite cancelar la suscripción a temas</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lista todas las suscripciones activas, edita su configuración y permite cancelar la suscripción a temas</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">kbd:[Alt+6]</p></td>
@@ -370,9 +378,24 @@ Las traducciones de la interfaz son generadas automáticamente. Si nota una trad
 <p><strong>Mostrar metadatos</strong> — abre un diálogo con los detalles completos del registro y un mapa interactivo del alcance geográfico del conjunto de datos</p>
 </li>
 <li>
+<p><strong>Ver licencia</strong> — abre la URL de la licencia del conjunto de datos en una nueva pestaña (se muestra solo cuando el registro incluye un enlace de licencia)</p>
+</li>
+<li>
 <p><strong>Seleccionar</strong> / <strong>Deseleccionar</strong> — agrega o elimina el tema MQTT del conjunto de datos en el panel lateral de suscripción</p>
 </li>
 </ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Si un conjunto de datos tiene licencia, al hacer clic en <strong>Seleccionar</strong> se muestra un diálogo de confirmación de licencia. Debe ver y aceptar la licencia antes de que el tema se añada al panel lateral de suscripción.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -439,6 +462,10 @@ Solo un tema puede estar activo a la vez en la vista de árbol.
 <td class="tableblock halign-left valign-top"><p class="tableblock">Filtros personalizados</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Campos de filtro específicos del conjunto de datos de los metadatos de enlace del registro GDC (solo vista de catálogo)</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cola</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cola de prioridad para el procesamiento de descargas: <code>high_priority</code>, <code>small_files</code> (predeterminado) o <code>large_files</code>. Use <code>large_files</code> para temas masivos o de archivos grandes para evitar bloquear descargas menores.</p></td>
+</tr>
 </tbody>
 </table>
 <div class="paragraph">
@@ -446,13 +473,70 @@ Solo un tema puede estar activo a la vez en la vista de árbol.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gestión_de_suscripciones">2.6. Gestión de suscripciones</h3>
+<h3 id="_credenciales_suscripción_manual">2.6. Credenciales (Suscripción manual)</h3>
 <div class="paragraph">
-<p>La vista Suscripciones lista todas las suscripciones activas con sus rutas de guardado. Haga clic en <strong>Cancelar suscripción</strong> en cualquier entrada para eliminarla. Use <strong>Recargar suscripciones</strong> para actualizar la lista tras cualquier cambio realizado mediante la API.</p>
+<p>La vista <strong>Suscripción manual</strong> (kbd:[Alt+4]) incluye una sección de autenticación para fuentes que requieren credenciales. Seleccione el tipo de autenticación con el botón de radio:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Tipo</th>
+<th class="tableblock halign-left valign-top">Campos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ninguno (predeterminado)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sin autenticación — para fuentes de datos públicas</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Básica</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nombre de usuario y contraseña</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Token (enviado como <code>Authorization: Bearer &lt;token&gt;</code>)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Las credenciales se almacenan en Redis y se envían con cada solicitud de descarga de la suscripción. La contraseña y el token se ocultan en las respuestas de la API.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_configuración">2.7. Configuración</h3>
+<h3 id="_gestión_de_suscripciones">2.7. Gestión de suscripciones</h3>
+<div class="paragraph">
+<p>La vista Suscripciones lista todas las suscripciones activas con su tema, ruta de guardado y resumen del filtro. Hay dos acciones disponibles en cada entrada:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Editar</strong> — abre un diálogo para modificar el directorio de guardado, el filtro, la cola y las credenciales de la suscripción. El tema no puede cambiarse; para suscribirse a un tema diferente debe crear una nueva suscripción.</p>
+</li>
+<li>
+<p><strong>Cancelar suscripción</strong> — elimina la suscripción. Si era la última suscripción para ese tema, la conexión MQTT también se cierra.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Use <strong>Recargar suscripciones</strong> para actualizar la lista tras cualquier cambio realizado mediante la API.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_configuración">2.8. Configuración</h3>
 <div class="paragraph">
 <p>La vista Configuración muestra cuántos registros se cargaron desde cada GDC. Haga clic en <strong>Actualizar datos GDC</strong> para forzar una obtención nueva desde los tres catálogos, omitiendo la caché de Redis.</p>
 </div>
@@ -616,6 +700,16 @@ Use la interfaz Swagger en <code><a href="http://&lt;host&gt;:5002/swagger" clas
 <td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Configuración del filtro (ver <a href="#Filtrado">Filtrado</a>)</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cola de prioridad para el procesamiento: <code>high_priority</code>, <code>small_files</code> (predeterminado) o <code>large_files</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Autenticación para la fuente de datos (ver <a href="#Credenciales-API">Credenciales</a>)</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -667,7 +761,26 @@ Use la interfaz Swagger en <code><a href="http://&lt;host&gt;:5002/swagger" clas
 </div>
 </div>
 <div class="sect2">
-<h3 id="_eliminar_una_suscripción">4.5. Eliminar una suscripción</h3>
+<h3 id="_actualizar_una_suscripción">4.5. Actualizar una suscripción</h3>
+<div class="paragraph">
+<p>Actualice el directorio de guardado, el filtro, la cola o las credenciales de una suscripción sin recrearla:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X PUT http://localhost:5002/subscriptions/&lt;id&gt; \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target": "new-directory",
+    "queue": "large_files"
+  }'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Solo cambian los campos incluidos; los campos omitidos conservan sus valores actuales. <code>credentials</code> puede establecerse en <code>null</code> para eliminar la autenticación.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_eliminar_una_suscripción">4.6. Eliminar una suscripción</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE http://localhost:5002/subscriptions/&lt;id&gt;</code></pre>
@@ -689,14 +802,61 @@ Donde <code>&lt;id&gt;</code> es el UUID de suscripción obtenido de <code>GET /
 </div>
 </div>
 <div class="sect1">
-<h2 id="Filtrado">5. Filtrado</h2>
+<h2 id="Credenciales-API">5. Credenciales</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Las suscripciones que descargan desde fuentes protegidas por contraseña o token aceptan un objeto <code>credentials</code> opcional.</p>
+</div>
+<div class="sect2">
+<h3 id="_autenticación_básica">5.1. Autenticación básica</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "credentials": {
+    "type": "basic",
+    "username": "myuser",
+    "password": "mypassword"
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_token_bearer">5.2. Token Bearer</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "credentials": {
+    "type": "bearer",
+    "token": "eyJhbGciOi..."
+  }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+La API oculta los secretos en las respuestas — <code>password</code> se omite y <code>token</code> se reemplaza por <code><strong>*</strong></code>. Las credenciales completas se almacenan en Redis y se usan solo durante la descarga.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="Filtrado">6. Filtrado</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Las suscripciones aceptan un objeto <code>filter</code> opcional que controla qué notificaciones se descargan.
 Los filtros usan reglas ordenadas — la primera regla que coincida determina el resultado.</p>
 </div>
 <div class="sect2">
-<h3 id="_estructura_del_filtro">5.1. Estructura del filtro</h3>
+<h3 id="_estructura_del_filtro">6.1. Estructura del filtro</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -769,7 +929,7 @@ Los filtros usan reglas ordenadas — la primera regla que coincida determina el
 </div>
 </div>
 <div class="sect2">
-<h3 id="_comportamiento_predeterminado_sin_filtro">5.2. Comportamiento predeterminado (sin filtro)</h3>
+<h3 id="_comportamiento_predeterminado_sin_filtro">6.2. Comportamiento predeterminado (sin filtro)</h3>
 <div class="paragraph">
 <p>Cuando no se proporciona ningún <code>filter</code>, se ejecuta un filtro predeterminado integrado que rechaza cualquier tipo de medio que no esté en una lista de permitidos estándar (BUFR, GRIB, NetCDF, HDF5, imágenes comunes y formatos de texto). Para aceptar todo, use un filtro explícito que acepte todo:</p>
 </div>
@@ -787,9 +947,9 @@ Los filtros usan reglas ordenadas — la primera regla que coincida determina el
 </div>
 </div>
 <div class="sect2">
-<h3 id="condiciones-coincidencia">5.3. Condiciones de coincidencia</h3>
+<h3 id="condiciones-coincidencia">6.3. Condiciones de coincidencia</h3>
 <div class="sect3">
-<h4 id="_siempre_nunca">5.3.1. Siempre / Nunca</h4>
+<h4 id="_siempre_nunca">6.3.1. Siempre / Nunca</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"always": true}   <i class="conum" data-value="1"></i><b>(1)</b>
@@ -810,7 +970,7 @@ Los filtros usan reglas ordenadas — la primera regla que coincida determina el
 </div>
 </div>
 <div class="sect3">
-<h4 id="_campos_simples">5.3.2. Campos simples</h4>
+<h4 id="_campos_simples">6.3.2. Campos simples</h4>
 <div class="paragraph">
 <p>Coinciden contra los metadatos disponibles en la notificación WIS2:</p>
 </div>
@@ -868,7 +1028,7 @@ Los filtros usan reglas ordenadas — la primera regla que coincida determina el
 </div>
 </div>
 <div class="sect3">
-<h4 id="_tamaño">5.3.3. Tamaño</h4>
+<h4 id="_tamaño">6.3.3. Tamaño</h4>
 <div class="paragraph">
 <p>Coincide con el tamaño del archivo en bytes. El campo <code>size</code> usa sus propios operadores de unidades en bytes:</p>
 </div>
@@ -912,7 +1072,7 @@ Los filtros usan reglas ordenadas — la primera regla que coincida determina el
 </div>
 </div>
 <div class="sect3">
-<h4 id="_bounding_box_geográfico">5.3.4. Bounding box geográfico</h4>
+<h4 id="_bounding_box_geográfico">6.3.4. Bounding box geográfico</h4>
 <div class="paragraph">
 <p>Coincide si la geometría de la notificación cae dentro del cuadro. Las notificaciones sin geometría se dejan pasar.</p>
 </div>
@@ -926,7 +1086,7 @@ Los filtros usan reglas ordenadas — la primera regla que coincida determina el
 </div>
 </div>
 <div class="sect3">
-<h4 id="_propiedades_dinámicas_de_la_notificación">5.3.5. Propiedades dinámicas de la notificación</h4>
+<h4 id="_propiedades_dinámicas_de_la_notificación">6.3.5. Propiedades dinámicas de la notificación</h4>
 <div class="paragraph">
 <p>Coincide con cualquier campo dentro del objeto <code>properties</code> de la notificación WIS2 usando la clave <code>property</code>:</p>
 </div>
@@ -943,7 +1103,7 @@ Los filtros usan reglas ordenadas — la primera regla que coincida determina el
 </div>
 </div>
 <div class="sect2">
-<h3 id="_combinadores">5.4. Combinadores</h3>
+<h3 id="_combinadores">6.4. Combinadores</h3>
 <div class="paragraph">
 <p>Las condiciones pueden anidarse usando combinadores lógicos:</p>
 </div>
@@ -989,7 +1149,7 @@ Los filtros usan reglas ordenadas — la primera regla que coincida determina el
 </div>
 </div>
 <div class="sect2">
-<h3 id="dos-pasadas">5.5. Evaluación antes y después de la descarga</h3>
+<h3 id="dos-pasadas">6.5. Evaluación antes y después de la descarga</h3>
 <div class="admonitionblock warning">
 <table>
 <tr>
@@ -1040,7 +1200,7 @@ Post-descarga: la regla 1 acepta BUFR/octet-stream; la regla 2 rechaza todo lo d
 </div>
 </div>
 <div class="sect2">
-<h3 id="_tipos_de_medios_compatibles">5.6. Tipos de medios compatibles</h3>
+<h3 id="_tipos_de_medios_compatibles">6.6. Tipos de medios compatibles</h3>
 <div class="paragraph">
 <p>Tipos aceptados por defecto cuando no se especifica ningún filtro:</p>
 </div>
@@ -1084,9 +1244,9 @@ Post-descarga: la regla 1 acepta BUFR/octet-stream; la regla 2 rechaza todo lo d
 </table>
 </div>
 <div class="sect2">
-<h3 id="_ejemplos_de_filtros">5.7. Ejemplos de filtros</h3>
+<h3 id="_ejemplos_de_filtros">6.7. Ejemplos de filtros</h3>
 <div class="sect3">
-<h4 id="_aceptar_solo_bufr_y_grib">5.7.1. Aceptar solo BUFR y GRIB</h4>
+<h4 id="_aceptar_solo_bufr_y_grib">6.7.1. Aceptar solo BUFR y GRIB</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1113,7 +1273,7 @@ Post-descarga: la regla 1 acepta BUFR/octet-stream; la regla 2 rechaza todo lo d
 </div>
 </div>
 <div class="sect3">
-<h4 id="_rechazar_archivos_de_más_de_100_mb">5.7.2. Rechazar archivos de más de 100 MB</h4>
+<h4 id="_rechazar_archivos_de_más_de_100_mb">6.7.2. Rechazar archivos de más de 100 MB</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1134,7 +1294,7 @@ Post-descarga: la regla 1 acepta BUFR/octet-stream; la regla 2 rechaza todo lo d
 </div>
 </div>
 <div class="sect3">
-<h4 id="_datos_de_un_centro_específico_solo_corto_alcance">5.7.3. Datos de un centro específico, solo corto alcance</h4>
+<h4 id="_datos_de_un_centro_específico_solo_corto_alcance">6.7.3. Datos de un centro específico, solo corto alcance</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1172,7 +1332,7 @@ Post-descarga: la regla 1 acepta BUFR/octet-stream; la regla 2 rechaza todo lo d
 </div>
 </div>
 <div class="sect3">
-<h4 id="_filtro_de_área_geográfica">5.7.4. Filtro de área geográfica</h4>
+<h4 id="_filtro_de_área_geográfica">6.7.4. Filtro de área geográfica</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1202,10 +1362,10 @@ Post-descarga: la regla 1 acepta BUFR/octet-stream; la regla 2 rechaza todo lo d
 </div>
 </div>
 <div class="sect1">
-<h2 id="_archivos_descargados">6. Archivos descargados</h2>
+<h2 id="_archivos_descargados">7. Archivos descargados</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_organización_de_archivos">6.1. Organización de archivos</h3>
+<h3 id="_organización_de_archivos">7.1. Organización de archivos</h3>
 <div class="paragraph">
 <p>Los archivos se organizan bajo su directorio destino en un subdirectorio <code>YYYY/MM/DD</code> basado en la fecha en que el archivo fue <strong>descargado</strong> (no el tiempo de observación ni el tiempo de validez de los datos):</p>
 </div>
@@ -1235,13 +1395,13 @@ La fecha del directorio refleja cuándo llegó el archivo, no cuándo se produje
 </div>
 </div>
 <div class="sect2">
-<h3 id="_nomenclatura_de_archivos">6.2. Nomenclatura de archivos</h3>
+<h3 id="_nomenclatura_de_archivos">7.2. Nomenclatura de archivos</h3>
 <div class="paragraph">
 <p>Los archivos conservan sus nombres originales de la URL de descarga. Si ya existe un archivo con el mismo nombre y no es una actualización, la descarga se omite.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_ver_descargas">6.3. Ver descargas</h3>
+<h3 id="_ver_descargas">7.3. Ver descargas</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Listar descargas recientes
@@ -1270,10 +1430,10 @@ du -sh downloads/</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_monitoreo">7. Monitoreo</h2>
+<h2 id="_monitoreo">8. Monitoreo</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_comprobación_de_estado">7.1. Comprobación de estado</h3>
+<h3 id="_comprobación_de_estado">8.1. Comprobación de estado</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/health</code></pre>
@@ -1289,7 +1449,7 @@ du -sh downloads/</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_métricas">7.2. Métricas</h3>
+<h3 id="_métricas">8.2. Métricas</h3>
 <div class="paragraph">
 <p>Ver estadísticas de descarga:</p>
 </div>
@@ -1307,7 +1467,7 @@ curl -s http://localhost:5002/metrics | grep wis2downloader_celery_queue_length<
 </div>
 </div>
 <div class="sect2">
-<h3 id="_vista_de_panel_de_control">7.3. Vista de panel de control</h3>
+<h3 id="_vista_de_panel_de_control">8.3. Vista de panel de control</h3>
 <div class="paragraph">
 <p>El panel de control integrado (kbd:[Alt+1]) muestra tasas de descarga, profundidad de cola, uso de disco y totales de bytes en tiempo real. No se requiere inicio de sesión adicional.</p>
 </div>
@@ -1327,10 +1487,10 @@ El panel de control está integrado directamente en la interfaz web — no es ne
 </div>
 </div>
 <div class="sect1">
-<h2 id="_casos_de_uso_comunes">8. Casos de uso comunes</h2>
+<h2 id="_casos_de_uso_comunes">9. Casos de uso comunes</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_suscribirse_a_todas_las_observaciones_de_superficie">8.1. Suscribirse a todas las observaciones de superficie</h3>
+<h3 id="_suscribirse_a_todas_las_observaciones_de_superficie">9.1. Suscribirse a todas las observaciones de superficie</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
@@ -1343,7 +1503,7 @@ El panel de control está integrado directamente en la interfaz web — no es ne
 </div>
 </div>
 <div class="sect2">
-<h3 id="_suscribirse_a_un_país_específico">8.2. Suscribirse a un país específico</h3>
+<h3 id="_suscribirse_a_un_país_específico">9.2. Suscribirse a un país específico</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
@@ -1356,7 +1516,7 @@ El panel de control está integrado directamente en la interfaz web — no es ne
 </div>
 </div>
 <div class="sect2">
-<h3 id="_descargar_solo_archivos_bufr_y_grib">8.3. Descargar solo archivos BUFR y GRIB</h3>
+<h3 id="_descargar_solo_archivos_bufr_y_grib">9.3. Descargar solo archivos BUFR y GRIB</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
@@ -1387,7 +1547,7 @@ El panel de control está integrado directamente en la interfaz web — no es ne
 </div>
 </div>
 <div class="sect2">
-<h3 id="_suscripciones_múltiples">8.4. Suscripciones múltiples</h3>
+<h3 id="_suscripciones_múltiples">9.4. Suscripciones múltiples</h3>
 <div class="paragraph">
 <p>Cree suscripciones separadas para diferentes tipos de datos:</p>
 </div>
@@ -1413,10 +1573,10 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect1">
-<h2 id="_solución_de_problemas">9. Solución de problemas</h2>
+<h2 id="_solución_de_problemas">10. Solución de problemas</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_sin_archivos_descargados">9.1. Sin archivos descargados</h3>
+<h3 id="_sin_archivos_descargados">10.1. Sin archivos descargados</h3>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -1447,7 +1607,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect2">
-<h3 id="_archivos_siendo_omitidos">9.2. Archivos siendo omitidos</h3>
+<h3 id="_archivos_siendo_omitidos">10.2. Archivos siendo omitidos</h3>
 <div class="paragraph">
 <p>Compruebe el motivo de omisión en las métricas:</p>
 </div>
@@ -1474,7 +1634,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect2">
-<h3 id="_tipos_de_archivos_incorrectos_descargados">9.3. Tipos de archivos incorrectos descargados</h3>
+<h3 id="_tipos_de_archivos_incorrectos_descargados">10.3. Tipos de archivos incorrectos descargados</h3>
 <div class="paragraph">
 <p>Elimine la suscripción existente y vuelva a crearla con un filtro <code>media_type</code>. Use <code>media_type.exists</code> como guardia de rechazo — no <code>always: true</code> — para que la regla de rechazo solo se active después de que se conozca el tipo de archivo (ver <a href="#dos-pasadas">Evaluación antes y después de la descarga</a>):</p>
 </div>
@@ -1515,7 +1675,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect2">
-<h3 id="_todo_siendo_rechazado_por_el_filtro">9.4. Todo siendo rechazado por el filtro</h3>
+<h3 id="_todo_siendo_rechazado_por_el_filtro">10.4. Todo siendo rechazado por el filtro</h3>
 <div class="paragraph">
 <p>Si todas las notificaciones son rechazadas con el motivo <code>FilterRejected</code>, la causa más común es una regla de rechazo <code>always: true</code> que se activa en pre-descarga antes de que se conozca <code>media_type</code>.</p>
 </div>
@@ -1528,7 +1688,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

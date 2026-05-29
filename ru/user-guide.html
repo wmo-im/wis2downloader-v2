@@ -96,8 +96,9 @@ body {
 </li>
 <li><a href="#_просмотр_дерева">2.4. Просмотр дерева</a></li>
 <li><a href="#_создание_подписки_через_интерфейс">2.5. Создание подписки через интерфейс</a></li>
-<li><a href="#_управление_подписками">2.6. Управление подписками</a></li>
-<li><a href="#_настройки">2.7. Настройки</a></li>
+<li><a href="#_учётные_данные_ручная_подписка">2.6. Учётные данные (Ручная подписка)</a></li>
+<li><a href="#_управление_подписками">2.7. Управление подписками</a></li>
+<li><a href="#_настройки">2.8. Настройки</a></li>
 </ul>
 </li>
 <li><a href="#_понимание_тем_wis2">3. Понимание тем WIS2</a>
@@ -112,63 +113,70 @@ body {
 <li><a href="#_параметры_подписки">4.2. Параметры подписки</a></li>
 <li><a href="#_список_подписок">4.3. Список подписок</a></li>
 <li><a href="#_получение_деталей_подписки">4.4. Получение деталей подписки</a></li>
-<li><a href="#_удаление_подписки">4.5. Удаление подписки</a></li>
+<li><a href="#_обновление_подписки">4.5. Обновление подписки</a></li>
+<li><a href="#_удаление_подписки">4.6. Удаление подписки</a></li>
 </ul>
 </li>
-<li><a href="#Фильтрация">5. Фильтрация</a>
+<li><a href="#Учётные-данные-API">5. Учётные данные</a>
 <ul class="sectlevel2">
-<li><a href="#_структура_фильтра">5.1. Структура фильтра</a></li>
-<li><a href="#_поведение_по_умолчанию_без_фильтра">5.2. Поведение по умолчанию (без фильтра)</a></li>
-<li><a href="#условия-совпадения">5.3. Условия совпадения</a>
+<li><a href="#_базовая_аутентификация">5.1. Базовая аутентификация</a></li>
+<li><a href="#_bearer_токен">5.2. Bearer-токен</a></li>
+</ul>
+</li>
+<li><a href="#Фильтрация">6. Фильтрация</a>
+<ul class="sectlevel2">
+<li><a href="#_структура_фильтра">6.1. Структура фильтра</a></li>
+<li><a href="#_поведение_по_умолчанию_без_фильтра">6.2. Поведение по умолчанию (без фильтра)</a></li>
+<li><a href="#условия-совпадения">6.3. Условия совпадения</a>
 <ul class="sectlevel3">
-<li><a href="#_всегда_никогда">5.3.1. Всегда / Никогда</a></li>
-<li><a href="#_простые_поля">5.3.2. Простые поля</a></li>
-<li><a href="#_размер">5.3.3. Размер</a></li>
-<li><a href="#_географический_ограничивающий_прямоугольник">5.3.4. Географический ограничивающий прямоугольник</a></li>
-<li><a href="#_динамические_свойства_уведомления">5.3.5. Динамические свойства уведомления</a></li>
+<li><a href="#_всегда_никогда">6.3.1. Всегда / Никогда</a></li>
+<li><a href="#_простые_поля">6.3.2. Простые поля</a></li>
+<li><a href="#_размер">6.3.3. Размер</a></li>
+<li><a href="#_географический_ограничивающий_прямоугольник">6.3.4. Географический ограничивающий прямоугольник</a></li>
+<li><a href="#_динамические_свойства_уведомления">6.3.5. Динамические свойства уведомления</a></li>
 </ul>
 </li>
-<li><a href="#_комбинаторы">5.4. Комбинаторы</a></li>
-<li><a href="#два-прохода">5.5. Оценка до и после загрузки</a></li>
-<li><a href="#_поддерживаемые_типы_медиа">5.6. Поддерживаемые типы медиа</a></li>
-<li><a href="#_примеры_фильтров">5.7. Примеры фильтров</a>
+<li><a href="#_комбинаторы">6.4. Комбинаторы</a></li>
+<li><a href="#два-прохода">6.5. Оценка до и после загрузки</a></li>
+<li><a href="#_поддерживаемые_типы_медиа">6.6. Поддерживаемые типы медиа</a></li>
+<li><a href="#_примеры_фильтров">6.7. Примеры фильтров</a>
 <ul class="sectlevel3">
-<li><a href="#_принимать_только_bufr_и_grib">5.7.1. Принимать только BUFR и GRIB</a></li>
-<li><a href="#_отклонять_файлы_свыше_100_мб">5.7.2. Отклонять файлы свыше 100 МБ</a></li>
-<li><a href="#_данные_конкретного_центра_только_краткосрочные">5.7.3. Данные конкретного центра, только краткосрочные</a></li>
-<li><a href="#_географический_фильтр_по_области">5.7.4. Географический фильтр по области</a></li>
+<li><a href="#_принимать_только_bufr_и_grib">6.7.1. Принимать только BUFR и GRIB</a></li>
+<li><a href="#_отклонять_файлы_свыше_100_мб">6.7.2. Отклонять файлы свыше 100 МБ</a></li>
+<li><a href="#_данные_конкретного_центра_только_краткосрочные">6.7.3. Данные конкретного центра, только краткосрочные</a></li>
+<li><a href="#_географический_фильтр_по_области">6.7.4. Географический фильтр по области</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_загруженные_файлы">6. Загруженные файлы</a>
+<li><a href="#_загруженные_файлы">7. Загруженные файлы</a>
 <ul class="sectlevel2">
-<li><a href="#_организация_файлов">6.1. Организация файлов</a></li>
-<li><a href="#_именование_файлов">6.2. Именование файлов</a></li>
-<li><a href="#_просмотр_загрузок">6.3. Просмотр загрузок</a></li>
+<li><a href="#_организация_файлов">7.1. Организация файлов</a></li>
+<li><a href="#_именование_файлов">7.2. Именование файлов</a></li>
+<li><a href="#_просмотр_загрузок">7.3. Просмотр загрузок</a></li>
 </ul>
 </li>
-<li><a href="#_мониторинг">7. Мониторинг</a>
+<li><a href="#_мониторинг">8. Мониторинг</a>
 <ul class="sectlevel2">
-<li><a href="#_проверка_работоспособности">7.1. Проверка работоспособности</a></li>
-<li><a href="#_метрики">7.2. Метрики</a></li>
-<li><a href="#_представление_панели_управления">7.3. Представление панели управления</a></li>
+<li><a href="#_проверка_работоспособности">8.1. Проверка работоспособности</a></li>
+<li><a href="#_метрики">8.2. Метрики</a></li>
+<li><a href="#_представление_панели_управления">8.3. Представление панели управления</a></li>
 </ul>
 </li>
-<li><a href="#_типовые_сценарии_использования">8. Типовые сценарии использования</a>
+<li><a href="#_типовые_сценарии_использования">9. Типовые сценарии использования</a>
 <ul class="sectlevel2">
-<li><a href="#_подписка_на_все_приземные_наблюдения">8.1. Подписка на все приземные наблюдения</a></li>
-<li><a href="#_подписка_на_конкретную_страну">8.2. Подписка на конкретную страну</a></li>
-<li><a href="#_загрузка_только_файлов_bufr_и_grib">8.3. Загрузка только файлов BUFR и GRIB</a></li>
-<li><a href="#_несколько_подписок">8.4. Несколько подписок</a></li>
+<li><a href="#_подписка_на_все_приземные_наблюдения">9.1. Подписка на все приземные наблюдения</a></li>
+<li><a href="#_подписка_на_конкретную_страну">9.2. Подписка на конкретную страну</a></li>
+<li><a href="#_загрузка_только_файлов_bufr_и_grib">9.3. Загрузка только файлов BUFR и GRIB</a></li>
+<li><a href="#_несколько_подписок">9.4. Несколько подписок</a></li>
 </ul>
 </li>
-<li><a href="#_устранение_неполадок">9. Устранение неполадок</a>
+<li><a href="#_устранение_неполадок">10. Устранение неполадок</a>
 <ul class="sectlevel2">
-<li><a href="#_файлы_не_загружаются">9.1. Файлы не загружаются</a></li>
-<li><a href="#_файлы_пропускаются">9.2. Файлы пропускаются</a></li>
-<li><a href="#_загружаются_файлы_неверных_типов">9.3. Загружаются файлы неверных типов</a></li>
-<li><a href="#_всё_отклоняется_фильтром">9.4. Всё отклоняется фильтром</a></li>
+<li><a href="#_файлы_не_загружаются">10.1. Файлы не загружаются</a></li>
+<li><a href="#_файлы_пропускаются">10.2. Файлы пропускаются</a></li>
+<li><a href="#_загружаются_файлы_неверных_типов">10.3. Загружаются файлы неверных типов</a></li>
+<li><a href="#_всё_отклоняется_фильтром">10.4. Всё отклоняется фильтром</a></li>
 </ul>
 </li>
 </ul>
@@ -311,12 +319,12 @@ body {
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">kbd:[Alt+4]</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Ручная подписка</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Ввод темы, каталога сохранения и фильтра напрямую без просмотра каталога</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Ввод темы, каталога сохранения, фильтра, очереди и учётных данных напрямую без просмотра каталога</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">kbd:[Alt+5]</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Управление подписками</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Список всех активных подписок и отмена подписок</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Список всех активных подписок, редактирование их настроек и отмена подписок</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">kbd:[Alt+6]</p></td>
@@ -390,9 +398,24 @@ body {
 <p><strong>Показать метаданные</strong> — открывает диалог с полными деталями записи и интерактивной картой географического охвата набора данных</p>
 </li>
 <li>
+<p><strong>Просмотреть лицензию</strong> — открывает URL лицензии набора данных в новой вкладке (отображается только когда запись содержит ссылку на лицензию)</p>
+</li>
+<li>
 <p><strong>Выбрать</strong> / <strong>Отменить выбор</strong> — добавляет или удаляет MQTT тему набора данных в боковую панель подписки</p>
 </li>
 </ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Если набор данных имеет лицензию, нажатие <strong>Выбрать</strong> показывает диалог подтверждения лицензии. Необходимо ознакомиться с лицензией и принять её прежде, чем тема будет добавлена в боковую панель подписки.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -459,6 +482,10 @@ body {
 <td class="tableblock halign-left valign-top"><p class="tableblock">Пользовательские фильтры</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Поля фильтров, специфичные для набора данных, из метаданных ссылок записи GDC (только в представлении каталога)</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Очередь</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Приоритетная очередь обработки загрузок: <code>high_priority</code>, <code>small_files</code> (по умолчанию) или <code>large_files</code>. Используйте <code>large_files</code> для объёмных тем, чтобы не задерживать небольшие загрузки.</p></td>
+</tr>
 </tbody>
 </table>
 <div class="paragraph">
@@ -466,13 +493,70 @@ body {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_управление_подписками">2.6. Управление подписками</h3>
+<h3 id="_учётные_данные_ручная_подписка">2.6. Учётные данные (Ручная подписка)</h3>
 <div class="paragraph">
-<p>Представление «Подписки» перечисляет все активные подписки с их путями сохранения. Нажмите <strong>Отписаться</strong> на любой записи для её удаления. Используйте <strong>Перезагрузить подписки</strong> для обновления списка после изменений, сделанных через API.</p>
+<p>Представление <strong>Ручная подписка</strong> (kbd:[Alt+4]) включает раздел аутентификации для источников, требующих учётных данных. Выберите тип аутентификации с помощью переключателя:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Тип</th>
+<th class="tableblock halign-left valign-top">Поля</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Нет (по умолчанию)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Без аутентификации — для публичных источников данных</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Базовая</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Имя пользователя и пароль</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Токен (отправляется как <code>Authorization: Bearer &lt;token&gt;</code>)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Учётные данные хранятся в Redis и отправляются с каждым запросом загрузки подписки. Пароль и токен скрываются в ответах API.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_настройки">2.7. Настройки</h3>
+<h3 id="_управление_подписками">2.7. Управление подписками</h3>
+<div class="paragraph">
+<p>Представление «Подписки» перечисляет все активные подписки с их темой, путём сохранения и сводкой фильтра. Для каждой записи доступны два действия:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Редактировать</strong> — открывает диалог для изменения каталога сохранения, фильтра, очереди и учётных данных подписки. Тема не может быть изменена; для подписки на другую тему необходимо создать новую подписку.</p>
+</li>
+<li>
+<p><strong>Отписаться</strong> — удаляет подписку. Если это была последняя подписка на данную тему, соединение MQTT также будет закрыто.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Используйте <strong>Перезагрузить подписки</strong> для обновления списка после изменений, сделанных через API.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_настройки">2.8. Настройки</h3>
 <div class="paragraph">
 <p>Представление «Настройки» показывает количество записей, загруженных из каждого GDC. Нажмите <strong>Обновить данные GDC</strong> для принудительной свежей выборки из всех трёх каталогов, минуя кэш Redis.</p>
 </div>
@@ -636,6 +720,16 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 <td class="tableblock halign-left valign-top"><p class="tableblock">Нет</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Конфигурация фильтра (см. <a href="#Фильтрация">Фильтрация</a>)</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Нет</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Приоритетная очередь обработки: <code>high_priority</code>, <code>small_files</code> (по умолчанию) или <code>large_files</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Нет</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Аутентификация для источника данных (см. <a href="#Учётные-данные-API">Учётные данные</a>)</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -687,7 +781,26 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="_удаление_подписки">4.5. Удаление подписки</h3>
+<h3 id="_обновление_подписки">4.5. Обновление подписки</h3>
+<div class="paragraph">
+<p>Обновите каталог сохранения, фильтр, очередь или учётные данные подписки без её пересоздания:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X PUT http://localhost:5002/subscriptions/&lt;id&gt; \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target": "new-directory",
+    "queue": "large_files"
+  }'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Изменяются только включённые поля; пропущенные поля сохраняют свои текущие значения. <code>credentials</code> можно установить в <code>null</code> для удаления аутентификации.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_удаление_подписки">4.6. Удаление подписки</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE http://localhost:5002/subscriptions/&lt;id&gt;</code></pre>
@@ -709,14 +822,61 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect1">
-<h2 id="Фильтрация">5. Фильтрация</h2>
+<h2 id="Учётные-данные-API">5. Учётные данные</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Подписки, загружающие данные из источников, защищённых паролем или токеном, принимают необязательный объект <code>credentials</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="_базовая_аутентификация">5.1. Базовая аутентификация</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "credentials": {
+    "type": "basic",
+    "username": "myuser",
+    "password": "mypassword"
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_bearer_токен">5.2. Bearer-токен</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "credentials": {
+    "type": "bearer",
+    "token": "eyJhbGciOi..."
+  }
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+API скрывает секреты в ответах — <code>password</code> опускается, а <code>token</code> заменяется на <code><strong>*</strong></code>. Полные учётные данные хранятся в Redis и используются только при загрузке.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="Фильтрация">6. Фильтрация</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Подписки принимают необязательный объект <code>filter</code>, который контролирует, какие уведомления загружаются.
 Фильтры используют упорядоченные правила — первое совпавшее правило определяет результат.</p>
 </div>
 <div class="sect2">
-<h3 id="_структура_фильтра">5.1. Структура фильтра</h3>
+<h3 id="_структура_фильтра">6.1. Структура фильтра</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -789,7 +949,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="_поведение_по_умолчанию_без_фильтра">5.2. Поведение по умолчанию (без фильтра)</h3>
+<h3 id="_поведение_по_умолчанию_без_фильтра">6.2. Поведение по умолчанию (без фильтра)</h3>
 <div class="paragraph">
 <p>Если <code>filter</code> не предоставлен, запускается встроенный фильтр по умолчанию, который отклоняет любой тип медиа, не входящий в стандартный разрешённый список (BUFR, GRIB, NetCDF, HDF5, распространённые изображения и текстовые форматы). Чтобы принимать всё, используйте явный фильтр «принять всё»:</p>
 </div>
@@ -807,9 +967,9 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="условия-совпадения">5.3. Условия совпадения</h3>
+<h3 id="условия-совпадения">6.3. Условия совпадения</h3>
 <div class="sect3">
-<h4 id="_всегда_никогда">5.3.1. Всегда / Никогда</h4>
+<h4 id="_всегда_никогда">6.3.1. Всегда / Никогда</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"always": true}   <i class="conum" data-value="1"></i><b>(1)</b>
@@ -830,7 +990,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_простые_поля">5.3.2. Простые поля</h4>
+<h4 id="_простые_поля">6.3.2. Простые поля</h4>
 <div class="paragraph">
 <p>Сопоставляются с метаданными, доступными в уведомлении WIS2:</p>
 </div>
@@ -888,7 +1048,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_размер">5.3.3. Размер</h4>
+<h4 id="_размер">6.3.3. Размер</h4>
 <div class="paragraph">
 <p>Сопоставляется с размером файла в байтах. Поле <code>size</code> использует собственные операторы единиц байт:</p>
 </div>
@@ -932,7 +1092,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_географический_ограничивающий_прямоугольник">5.3.4. Географический ограничивающий прямоугольник</h4>
+<h4 id="_географический_ограничивающий_прямоугольник">6.3.4. Географический ограничивающий прямоугольник</h4>
 <div class="paragraph">
 <p>Совпадает, если геометрия уведомления попадает в прямоугольник. Уведомления без геометрии пропускаются.</p>
 </div>
@@ -946,7 +1106,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_динамические_свойства_уведомления">5.3.5. Динамические свойства уведомления</h4>
+<h4 id="_динамические_свойства_уведомления">6.3.5. Динамические свойства уведомления</h4>
 <div class="paragraph">
 <p>Сопоставляются с любым полем внутри объекта <code>properties</code> уведомления WIS2 с помощью ключа <code>property</code>:</p>
 </div>
@@ -963,7 +1123,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="_комбинаторы">5.4. Комбинаторы</h3>
+<h3 id="_комбинаторы">6.4. Комбинаторы</h3>
 <div class="paragraph">
 <p>Условия можно вкладывать с помощью логических комбинаторов:</p>
 </div>
@@ -1009,7 +1169,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="два-прохода">5.5. Оценка до и после загрузки</h3>
+<h3 id="два-прохода">6.5. Оценка до и после загрузки</h3>
 <div class="admonitionblock warning">
 <table>
 <tr>
@@ -1060,7 +1220,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="_поддерживаемые_типы_медиа">5.6. Поддерживаемые типы медиа</h3>
+<h3 id="_поддерживаемые_типы_медиа">6.6. Поддерживаемые типы медиа</h3>
 <div class="paragraph">
 <p>Принимаемые по умолчанию типы при отсутствии фильтра:</p>
 </div>
@@ -1104,9 +1264,9 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </table>
 </div>
 <div class="sect2">
-<h3 id="_примеры_фильтров">5.7. Примеры фильтров</h3>
+<h3 id="_примеры_фильтров">6.7. Примеры фильтров</h3>
 <div class="sect3">
-<h4 id="_принимать_только_bufr_и_grib">5.7.1. Принимать только BUFR и GRIB</h4>
+<h4 id="_принимать_только_bufr_и_grib">6.7.1. Принимать только BUFR и GRIB</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1133,7 +1293,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_отклонять_файлы_свыше_100_мб">5.7.2. Отклонять файлы свыше 100 МБ</h4>
+<h4 id="_отклонять_файлы_свыше_100_мб">6.7.2. Отклонять файлы свыше 100 МБ</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1154,7 +1314,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_данные_конкретного_центра_только_краткосрочные">5.7.3. Данные конкретного центра, только краткосрочные</h4>
+<h4 id="_данные_конкретного_центра_только_краткосрочные">6.7.3. Данные конкретного центра, только краткосрочные</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1192,7 +1352,7 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect3">
-<h4 id="_географический_фильтр_по_области">5.7.4. Географический фильтр по области</h4>
+<h4 id="_географический_фильтр_по_области">6.7.4. Географический фильтр по области</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
@@ -1222,10 +1382,10 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect1">
-<h2 id="_загруженные_файлы">6. Загруженные файлы</h2>
+<h2 id="_загруженные_файлы">7. Загруженные файлы</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_организация_файлов">6.1. Организация файлов</h3>
+<h3 id="_организация_файлов">7.1. Организация файлов</h3>
 <div class="paragraph">
 <p>Файлы организованы в вашем целевом каталоге в подкаталоге <code>YYYY/MM/DD</code> на основе даты <strong>загрузки</strong> файла (а не времени наблюдения или времени действия данных):</p>
 </div>
@@ -1255,13 +1415,13 @@ cache/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 </div>
 </div>
 <div class="sect2">
-<h3 id="_именование_файлов">6.2. Именование файлов</h3>
+<h3 id="_именование_файлов">7.2. Именование файлов</h3>
 <div class="paragraph">
 <p>Файлы сохраняют оригинальные имена из URL загрузки. Если файл с таким именем уже существует и не является обновлением, загрузка пропускается.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_просмотр_загрузок">6.3. Просмотр загрузок</h3>
+<h3 id="_просмотр_загрузок">7.3. Просмотр загрузок</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Вывести список последних загрузок
@@ -1290,10 +1450,10 @@ du -sh downloads/</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_мониторинг">7. Мониторинг</h2>
+<h2 id="_мониторинг">8. Мониторинг</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_проверка_работоспособности">7.1. Проверка работоспособности</h3>
+<h3 id="_проверка_работоспособности">8.1. Проверка работоспособности</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/health</code></pre>
@@ -1309,7 +1469,7 @@ du -sh downloads/</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_метрики">7.2. Метрики</h3>
+<h3 id="_метрики">8.2. Метрики</h3>
 <div class="paragraph">
 <p>Просмотр статистики загрузок:</p>
 </div>
@@ -1327,7 +1487,7 @@ curl -s http://localhost:5002/metrics | grep wis2downloader_celery_queue_length<
 </div>
 </div>
 <div class="sect2">
-<h3 id="_представление_панели_управления">7.3. Представление панели управления</h3>
+<h3 id="_представление_панели_управления">8.3. Представление панели управления</h3>
 <div class="paragraph">
 <p>Встроенная панель управления (kbd:[Alt+1]) отображает в реальном времени скорости загрузки, глубину очереди, использование диска и суммарные байты. Отдельный вход не требуется.</p>
 </div>
@@ -1347,10 +1507,10 @@ curl -s http://localhost:5002/metrics | grep wis2downloader_celery_queue_length<
 </div>
 </div>
 <div class="sect1">
-<h2 id="_типовые_сценарии_использования">8. Типовые сценарии использования</h2>
+<h2 id="_типовые_сценарии_использования">9. Типовые сценарии использования</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_подписка_на_все_приземные_наблюдения">8.1. Подписка на все приземные наблюдения</h3>
+<h3 id="_подписка_на_все_приземные_наблюдения">9.1. Подписка на все приземные наблюдения</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
@@ -1363,7 +1523,7 @@ curl -s http://localhost:5002/metrics | grep wis2downloader_celery_queue_length<
 </div>
 </div>
 <div class="sect2">
-<h3 id="_подписка_на_конкретную_страну">8.2. Подписка на конкретную страну</h3>
+<h3 id="_подписка_на_конкретную_страну">9.2. Подписка на конкретную страну</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
@@ -1376,7 +1536,7 @@ curl -s http://localhost:5002/metrics | grep wis2downloader_celery_queue_length<
 </div>
 </div>
 <div class="sect2">
-<h3 id="_загрузка_только_файлов_bufr_и_grib">8.3. Загрузка только файлов BUFR и GRIB</h3>
+<h3 id="_загрузка_только_файлов_bufr_и_grib">9.3. Загрузка только файлов BUFR и GRIB</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
@@ -1407,7 +1567,7 @@ curl -s http://localhost:5002/metrics | grep wis2downloader_celery_queue_length<
 </div>
 </div>
 <div class="sect2">
-<h3 id="_несколько_подписок">8.4. Несколько подписок</h3>
+<h3 id="_несколько_подписок">9.4. Несколько подписок</h3>
 <div class="paragraph">
 <p>Создайте отдельные подписки для разных типов данных:</p>
 </div>
@@ -1433,10 +1593,10 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect1">
-<h2 id="_устранение_неполадок">9. Устранение неполадок</h2>
+<h2 id="_устранение_неполадок">10. Устранение неполадок</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_файлы_не_загружаются">9.1. Файлы не загружаются</h3>
+<h3 id="_файлы_не_загружаются">10.1. Файлы не загружаются</h3>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -1467,7 +1627,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect2">
-<h3 id="_файлы_пропускаются">9.2. Файлы пропускаются</h3>
+<h3 id="_файлы_пропускаются">10.2. Файлы пропускаются</h3>
 <div class="paragraph">
 <p>Проверьте причину пропуска в метриках:</p>
 </div>
@@ -1494,7 +1654,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect2">
-<h3 id="_загружаются_файлы_неверных_типов">9.3. Загружаются файлы неверных типов</h3>
+<h3 id="_загружаются_файлы_неверных_типов">10.3. Загружаются файлы неверных типов</h3>
 <div class="paragraph">
 <p>Удалите существующую подписку и создайте её заново с фильтром <code>media_type</code>. Используйте <code>media_type.exists</code> в качестве защиты отклонения — не <code>always: true</code> — чтобы правило отклонения срабатывало только после того, как тип файла известен (см. <a href="#два-прохода">Оценка до и после загрузки</a>):</p>
 </div>
@@ -1535,7 +1695,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 </div>
 <div class="sect2">
-<h3 id="_всё_отклоняется_фильтром">9.4. Всё отклоняется фильтром</h3>
+<h3 id="_всё_отклоняется_фильтром">10.4. Всё отклоняется фильтром</h3>
 <div class="paragraph">
 <p>Если все уведомления отклоняются с причиной <code>FilterRejected</code>, наиболее частая причина — правило отклонения <code>always: true</code>, срабатывающее при предзагрузке до того, как <code>media_type</code> известен.</p>
 </div>
@@ -1548,7 +1708,7 @@ curl -X POST http://localhost:5002/subscriptions \
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

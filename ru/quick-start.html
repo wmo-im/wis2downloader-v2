@@ -237,7 +237,7 @@ docker plugin install grafana/loki-docker-driver:3.6.7-${ARCH} --alias loki --gr
 <h2 id="_4_настройка_каталога_загрузок">4. Настройка каталога загрузок</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Контейнеры работают от имени непривилегированного пользователя (UID 10001, GID 988). В Linux необходимо настроить каталог загрузок перед запуском:</p>
+<p>Контейнеры работают от имени непривилегированного пользователя (UID 10001, GID 988 по умолчанию). В Linux необходимо настроить каталог загрузок перед запуском:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -246,6 +246,18 @@ sudo useradd -u 10001 -g wis2 -M -s /usr/sbin/nologin wis2
 mkdir -p downloads
 sudo chown wis2:wis2 downloads</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Если UID 10001 или GID 988 конфликтуют с существующими пользователями системы, переопределите их, задав <code>WIS2DOWNLOADER_UID</code> и <code>WIS2DOWNLOADER_GID</code> в файле <code>.env</code> перед запуском <code>docker compose up</code>. Используйте соответствующие значения в командах выше. Если вы изменяете <code>WIS2DOWNLOADER_UID</code> или <code>WIS2DOWNLOADER_GID</code> после того, как образы уже были собраны, пересоберите их командой <code>docker compose build</code> перед перезапуском.
+</td>
+</tr>
+</table>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -273,7 +285,7 @@ sudo chown wis2:wis2 downloads</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Эта команда запускает все сервисы: менеджер подписок, MQTT-подписчики (Global Broker Франции и Бразилии), рабочие процессы Celery для загрузки файлов, Redis, Prometheus, Grafana и Loki.</p>
+<p>Эта команда запускает все сервисы: менеджер подписок, MQTT-подписчики (Global Broker Франции и Бразилии), рабочие процессы Celery (очереди высокого приоритета, малых и больших файлов), Redis, Prometheus, Grafana и Loki.</p>
 </div>
 <div class="paragraph">
 <p>Проверьте, что все сервисы работают:</p>
@@ -389,7 +401,7 @@ sudo chown wis2:wis2 downloads</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

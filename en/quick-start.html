@@ -221,7 +221,7 @@ If you see an error on install, check your architecture with <code>uname -m</cod
 <h2 id="_4_set_up_download_directory">4. Set Up Download Directory</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The containers run as a non-root user (UID 10001, GID 988). On Linux you must set up the downloads directory before starting:</p>
+<p>The containers run as a non-root user (UID 10001, GID 988 by default). On Linux you must set up the downloads directory before starting:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -230,6 +230,18 @@ sudo useradd -u 10001 -g wis2 -M -s /usr/sbin/nologin wis2
 mkdir -p downloads
 sudo chown wis2:wis2 downloads</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If UID 10001 or GID 988 conflict with existing users on your system, override them by setting <code>WIS2DOWNLOADER_UID</code> and <code>WIS2DOWNLOADER_GID</code> in your <code>.env</code> before running <code>docker compose up</code>. Use the matching values in the commands above. If you change <code>WIS2DOWNLOADER_UID</code> or <code>WIS2DOWNLOADER_GID</code> after having already built the images, rebuild them with <code>docker compose build</code> before restarting.
+</td>
+</tr>
+</table>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -257,7 +269,7 @@ On macOS and Windows (Docker Desktop) this step is not required — Docker Deskt
 </div>
 </div>
 <div class="paragraph">
-<p>This starts all services: subscription manager, MQTT subscribers (France and Brazil Global Brokers), Celery download workers, Redis, Prometheus, Grafana, and Loki.</p>
+<p>This starts all services: subscription manager, MQTT subscribers (France and Brazil Global Brokers), Celery workers (high-priority, small-files, and large-files queues), Redis, Prometheus, Grafana, and Loki.</p>
 </div>
 <div class="paragraph">
 <p>Check everything is running:</p>
@@ -373,7 +385,7 @@ Change the default Grafana password after first login.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

@@ -84,7 +84,7 @@ body {
 <div id="toctitle">目录</div>
 <ul class="sectlevel1">
 <li><a href="#_概述">1. 概述</a></li>
-<li><a href="#_身份验证">2. 身份验证</a></li>
+<li><a href="#_认证">2. 认证</a></li>
 <li><a href="#_订阅_api">3. 订阅 API</a>
 <ul class="sectlevel2">
 <li><a href="#_列出订阅">3.1. 列出订阅</a>
@@ -104,33 +104,32 @@ body {
 <li><a href="#_获取订阅">3.3. 获取订阅</a>
 <ul class="sectlevel3">
 <li><a href="#_路径参数">3.3.1. 路径参数</a></li>
-<li><a href="#_url_编码">3.3.2. URL 编码</a></li>
-<li><a href="#_响应_3">3.3.3. 响应</a></li>
-<li><a href="#_示例_3">3.3.4. 示例</a></li>
+<li><a href="#_响应_3">3.3.2. 响应</a></li>
+<li><a href="#_示例_3">3.3.3. 示例</a></li>
 </ul>
 </li>
-<li><a href="#_删除订阅">3.4. 删除订阅</a>
+<li><a href="#_更新订阅">3.4. 更新订阅</a>
 <ul class="sectlevel3">
-<li><a href="#_路径参数_2">3.4.1. 路径参数</a></li>
+<li><a href="#_请求体_2">3.4.1. 请求体</a></li>
 <li><a href="#_响应_4">3.4.2. 响应</a></li>
 <li><a href="#_示例_4">3.4.3. 示例</a></li>
+</ul>
+</li>
+<li><a href="#_删除订阅">3.5. 删除订阅</a>
+<ul class="sectlevel3">
+<li><a href="#_响应_5">3.5.1. 响应</a></li>
+<li><a href="#_示例_5">3.5.2. 示例</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li><a href="#_监控_api">4. 监控 API</a>
 <ul class="sectlevel2">
-<li><a href="#_健康检查">4.1. 健康检查</a>
-<ul class="sectlevel3">
-<li><a href="#_响应_5">4.1.1. 响应</a></li>
-<li><a href="#_示例_5">4.1.2. 示例</a></li>
-</ul>
-</li>
+<li><a href="#_健康检查">4.1. 健康检查</a></li>
 <li><a href="#_prometheus_指标">4.2. Prometheus 指标</a>
 <ul class="sectlevel3">
-<li><a href="#_响应_6">4.2.1. 响应</a></li>
-<li><a href="#_可用指标">4.2.2. 可用指标</a></li>
-<li><a href="#_示例_6">4.2.3. 示例</a></li>
+<li><a href="#_可用指标">4.2.1. 可用指标</a></li>
+<li><a href="#_示例_6">4.2.2. 示例</a></li>
 </ul>
 </li>
 <li><a href="#_openapi_规范">4.3. OpenAPI 规范</a></li>
@@ -145,11 +144,14 @@ body {
 <li><a href="#_数据模式">6. 数据模式</a>
 <ul class="sectlevel2">
 <li><a href="#_订阅">6.1. 订阅</a></li>
-<li><a href="#_过滤器">6.2. 过滤器</a>
+<li><a href="#_过滤器模式">6.2. 过滤器模式</a>
 <ul class="sectlevel3">
-<li><a href="#_默认接受的媒体类型">6.2.1. 默认接受的媒体类型</a></li>
+<li><a href="#_过滤器规则模式">6.2.1. 过滤器规则模式</a></li>
+<li><a href="#_匹配条件">6.2.2. 匹配条件</a></li>
+<li><a href="#_过滤器示例">6.2.3. 过滤器示例</a></li>
 </ul>
 </li>
+<li><a href="#_凭据模式">6.3. 凭据模式</a></li>
 </ul>
 </li>
 <li><a href="#_主题模式参考">7. 主题模式参考</a>
@@ -187,7 +189,7 @@ WMO/气象领域术语在正式使用前应由母语人士审阅。
 <h2 id="_概述">1. 概述</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>WIS2 Downloader 提供了用于管理订阅和监控系统的 REST API。</p>
+<p>WIS2 Downloader 提供 REST API，用于管理订阅和监控系统。</p>
 </div>
 <div class="ulist">
 <ul>
@@ -202,23 +204,38 @@ WMO/气象领域术语在正式使用前应由母语人士审阅。
 </li>
 </ul>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+如果远程部署，请将 <code>localhost:5002</code> 替换为服务器地址。基础 URL 通过 <code>.env</code> 中的 <code>WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL</code> 配置。
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_身份验证">2. 身份验证</h2>
+<h2 id="_认证">2. 认证</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>当前 API 不需要身份验证。在生产环境中，建议将其放在带有身份验证的反向代理后面。</p>
+<p>API 不需要认证。在生产环境中，请将其置于带认证的反向代理后面（参见管理指南的 <a href="admin-guide.html#_access_control">访问控制</a> 部分）。</p>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_订阅_api">3. 订阅 API</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>每个订阅由 UUID 标识，将 MQTT 主题、保存路径、可选过滤器、可选凭据和队列绑定在一起。多个订阅可以共享同一主题——MQTT 连接只开启一次，消息会路由到所有匹配的订阅。</p>
+</div>
 <div class="sect2">
 <h3 id="_列出订阅">3.1. 列出订阅</h3>
 <div class="paragraph">
-<p>返回所有活跃订阅。</p>
+<p>返回所有活动订阅，按主题分组。</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -235,13 +252,13 @@ WMO/气象领域术语在正式使用前应由母语人士审阅。
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">状态</th>
-<th class="tableblock halign-left valign-top">说明</th>
+<th class="tableblock halign-left valign-top">描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">200</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">成功 — 返回主题到订阅详情的映射</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">成功 — 主题 → 订阅 UUID → 订阅详情的映射</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
@@ -261,10 +278,18 @@ WMO/气象领域术语在正式使用前应由母语人士审阅。
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
   "cache/a/wis2/+/data/core/weather/surface-based-observations/#": {
-    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-    "save_path": "surface-obs",
-    "filters": {
-      "accepted_media_types": ["application/bufr", "application/grib"]
+    "550e8400-e29b-41d4-a716-446655440000": {
+      "save_path": "surface-obs",
+      "filter": {}
+    },
+    "661f9511-f30c-52e5-b827-557766551111": {
+      "save_path": "surface-obs-bufr",
+      "filter": {
+        "name": "bufr-only",
+        "rules": [
+          { "id": "accept-bufr", "order": 1, "match": { "media_type": { "equals": "application/bufr" } }, "action": "accept" }
+        ]
+      }
     }
   }
 }</code></pre>
@@ -275,7 +300,10 @@ WMO/气象领域术语在正式使用前应由母语人士审阅。
 <div class="sect2">
 <h3 id="_创建订阅">3.2. 创建订阅</h3>
 <div class="paragraph">
-<p>创建一个新的 WIS2 主题订阅。</p>
+<p>创建新订阅。分配 UUID 并返回完整的订阅记录。</p>
+</div>
+<div class="paragraph">
+<p>如果这是给定主题的第一个订阅，则开启 MQTT 连接。同一主题的其他订阅复用现有连接。</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -297,7 +325,7 @@ Content-Type: application/json</code></pre>
 <th class="tableblock halign-left valign-top">字段</th>
 <th class="tableblock halign-left valign-top">类型</th>
 <th class="tableblock halign-left valign-top">必填</th>
-<th class="tableblock halign-left valign-top">说明</th>
+<th class="tableblock halign-left valign-top">描述</th>
 </tr>
 </thead>
 <tbody>
@@ -311,19 +339,25 @@ Content-Type: application/json</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>target</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">否</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/data</code> 下用于保存文件的子目录。</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">数据根目录下保存文件的子目录。</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filters</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">对象</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">否</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">过滤器配置。</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">基于规则的过滤器。参见 <a href="#_过滤器模式">过滤器模式</a>。</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filters.accepted_media_types</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">array</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">对象</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">否</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">允许的 MIME 类型列表。支持通配符（如 <code>application/x-grib*</code>）。</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">用于访问受控数据集的 HTTP 凭据。参见 <a href="#_凭据模式">凭据模式</a>。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">否</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">下载队列：<code>high_priority</code>、<code>small_files</code>（默认）或 <code>large_files</code>。</p></td>
 </tr>
 </tbody>
 </table>
@@ -338,17 +372,17 @@ Content-Type: application/json</code></pre>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">状态</th>
-<th class="tableblock halign-left valign-top">说明</th>
+<th class="tableblock halign-left valign-top">描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">202</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">已接受 — 订阅已加入处理队列</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">201</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">已创建 — 返回完整的订阅记录</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">错误请求 — 主题缺失或无效</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">请求错误 — 字段缺失或无效</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
@@ -367,13 +401,13 @@ Content-Type: application/json</code></pre>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">头部</th>
-<th class="tableblock halign-left valign-top">说明</th>
+<th class="tableblock halign-left valign-top">描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Location</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">用于获取订阅详情的 URL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">获取已创建订阅的 URL（<code>/subscriptions/{id}</code>）</p></td>
 </tr>
 </tbody>
 </table>
@@ -382,23 +416,66 @@ Content-Type: application/json</code></pre>
 <h4 id="_示例_2">3.2.4. 示例</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 简单订阅
+curl -X POST http://localhost:5002/subscriptions \
   -H "Content-Type: application/json" \
   -d '{
     "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-    "target": "surface-obs",
-    "filters": {
-      "accepted_media_types": ["application/bufr", "application/grib"]
+    "target": "surface-obs"
+  }'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 带过滤器的订阅
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+    "target": "surface-obs-bufr",
+    "filter": {
+      "name": "bufr-only",
+      "rules": [
+        { "id": "accept-bufr", "order": 1, "match": { "media_type": { "equals": "application/bufr" } }, "action": "accept" },
+        { "id": "default-reject", "order": 999, "match": { "always": true }, "action": "reject" }
+      ]
     }
   }'</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 使用基本认证订阅访问受控数据集
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/recommended/weather/surface-based-observations/#",
+    "target": "restricted-obs",
+    "credentials": { "type": "basic", "username": "myuser", "password": "s3cr3t" }
+  }'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 将大文件下载路由到 large-files 队列
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/fr-meteofrance/data/core/weather/space-based-observations/noaa-21/cris",
+    "target": "space-obs",
+    "queue": "large_files"
+  }'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "status": "accepted",
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-  "target": "surface-obs"
+  "save_path": "surface-obs",
+  "filter": {},
+  "credentials": null,
+  "queue": "small_files"
 }</code></pre>
 </div>
 </div>
@@ -407,11 +484,11 @@ Content-Type: application/json</code></pre>
 <div class="sect2">
 <h3 id="_获取订阅">3.3. 获取订阅</h3>
 <div class="paragraph">
-<p>返回特定订阅的详情。</p>
+<p>返回特定订阅的完整记录。</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /subscriptions/{topic}</code></pre>
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /subscriptions/{id}</code></pre>
 </div>
 </div>
 <div class="sect3">
@@ -426,59 +503,20 @@ Content-Type: application/json</code></pre>
 <tr>
 <th class="tableblock halign-left valign-top">参数</th>
 <th class="tableblock halign-left valign-top">类型</th>
-<th class="tableblock halign-left valign-top">说明</th>
+<th class="tableblock halign-left valign-top">描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">WIS2 主题（只有 <code>#</code> 需要编码为 <code>%23</code>）</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (UUID)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">创建订阅时返回的订阅 UUID</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_url_编码">3.3.2. URL 编码</h4>
-<div class="paragraph">
-<p>只有 <code>#</code> 字符需要 URL 编码：</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">字符</th>
-<th class="tableblock halign-left valign-top">编码</th>
-<th class="tableblock halign-left valign-top">原因</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%23</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">否则会被解释为 URL 片段</p></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-路径中的斜杠（<code>/</code>）和 <code>+</code> 不需要编码。
-</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_响应_3">3.3.3. 响应</h4>
+<h4 id="_响应_3">3.3.2. 响应</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -487,7 +525,7 @@ Content-Type: application/json</code></pre>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">状态</th>
-<th class="tableblock halign-left valign-top">说明</th>
+<th class="tableblock halign-left valign-top">描述</th>
 </tr>
 </thead>
 <tbody>
@@ -496,52 +534,61 @@ Content-Type: application/json</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">成功</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">无效主题</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">订阅未找到</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Redis 不可用</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">订阅不存在</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_示例_3">3.3.4. 示例</h4>
+<h4 id="_示例_3">3.3.3. 示例</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
   "save_path": "surface-obs",
-  "filters": {
-    "accepted_media_types": ["application/bufr", "application/grib"]
-  }
+  "filter": {},
+  "credentials": null,
+  "queue": "small_files"
 }</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+凭据密钥（<code>password</code>、<code>token</code>）永不返回。响应中只包含 <code>type</code> 和 <code>username</code>（用于基本认证）。
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_删除订阅">3.4. 删除订阅</h3>
+<h3 id="_更新订阅">3.4. 更新订阅</h3>
 <div class="paragraph">
-<p>删除一个订阅。</p>
+<p>更新现有订阅的保存路径、过滤器、凭据或队列。主题不能更改——删除并重新创建订阅以更改主题。</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">DELETE /subscriptions/{topic}</code></pre>
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">PUT /subscriptions/{id}
+Content-Type: application/json</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_路径参数_2">3.4.1. 路径参数</h4>
+<h4 id="_请求体_2">3.4.1. 请求体</h4>
+<div class="paragraph">
+<p>所有字段均为可选。只有提供的字段会被更新。</p>
+</div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -550,16 +597,31 @@ Content-Type: application/json</code></pre>
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">参数</th>
+<th class="tableblock halign-left valign-top">字段</th>
 <th class="tableblock halign-left valign-top">类型</th>
-<th class="tableblock halign-left valign-top">说明</th>
+<th class="tableblock halign-left valign-top">描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>target</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">URL 编码的 WIS2 主题</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">数据根目录下的新子目录</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">对象</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">新的基于规则的过滤器（替换现有过滤器）</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">对象</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">新凭据（替换现有凭据）</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">新队列：<code>high_priority</code>、<code>small_files</code> 或 <code>large_files</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -574,17 +636,21 @@ Content-Type: application/json</code></pre>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">状态</th>
-<th class="tableblock halign-left valign-top">说明</th>
+<th class="tableblock halign-left valign-top">描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">200</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">删除成功</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">已更新的订阅记录</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">无效主题</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">字段值无效</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">订阅不存在</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
@@ -597,15 +663,62 @@ Content-Type: application/json</code></pre>
 <h4 id="_示例_4">3.4.3. 示例</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X PUT http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Content-Type: application/json" \
+  -d '{ "target": "surface-obs-v2", "queue": "high_priority" }'</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_删除订阅">3.5. 删除订阅</h3>
+<div class="paragraph">
+<p>删除订阅。如果它是该主题的最后一个订阅，则关闭该主题的 MQTT 连接。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">DELETE /subscriptions/{id}</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_响应_5">3.5.1. 响应</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">状态</th>
+<th class="tableblock halign-left valign-top">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">200</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">删除成功</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">订阅不存在</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Redis 不可用</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_示例_5">3.5.2. 示例</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "status": "deleted",
-  "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#"
-}</code></pre>
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{ "status": "deleted", "id": "550e8400-e29b-41d4-a716-446655440000" }</code></pre>
 </div>
 </div>
 </div>
@@ -617,40 +730,14 @@ Content-Type: application/json</code></pre>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_健康检查">4.1. 健康检查</h3>
-<div class="paragraph">
-<p>返回服务健康状态。</p>
-</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /health</code></pre>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_响应_5">4.1.1. 响应</h4>
 <div class="paragraph">
-<p>始终返回 200。检查 <code>status</code> 字段以获取实际健康状态。</p>
+<p>始终返回 200。检查 <code>status</code> 字段了解实际健康状态。</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 75%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">字段</th>
-<th class="tableblock halign-left valign-top">值</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>status</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>healthy</code> 或 <code>unhealthy</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_示例_5">4.1.2. 示例</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/health</code></pre>
@@ -658,8 +745,7 @@ Content-Type: application/json</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"status": "healthy"}</code></pre>
-</div>
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{ "status": "healthy" }</code></pre>
 </div>
 </div>
 </div>
@@ -674,32 +760,7 @@ Content-Type: application/json</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_响应_6">4.2.1. 响应</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 75%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">状态</th>
-<th class="tableblock halign-left valign-top">说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">200</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Prometheus 文本格式指标</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">500</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">生成指标时出错</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_可用指标">4.2.2. 可用指标</h4>
+<h4 id="_可用指标">4.2.1. 可用指标</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -712,7 +773,7 @@ Content-Type: application/json</code></pre>
 <th class="tableblock halign-left valign-top">指标</th>
 <th class="tableblock halign-left valign-top">类型</th>
 <th class="tableblock halign-left valign-top">标签</th>
-<th class="tableblock halign-left valign-top">说明</th>
+<th class="tableblock halign-left valign-top">描述</th>
 </tr>
 </thead>
 <tbody>
@@ -720,7 +781,7 @@ Content-Type: application/json</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>wis2downloader_notifications_total</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counter</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">status</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">已处理的通知总数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Celery 处理的通知总数</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>wis2downloader_downloads_total</code></p></td>
@@ -750,37 +811,22 @@ Content-Type: application/json</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>wis2downloader_celery_queue_length</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Gauge</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">queue_name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Celery 队列中的当前任务数</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">所有 Celery 队列中的当前任务数</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_示例_6">4.2.3. 示例</h4>
+<h4 id="_示例_6">4.2.2. 示例</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/metrics</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-prometheus hljs" data-lang="prometheus"># HELP wis2downloader_downloads_total Total number of files downloaded.
-# TYPE wis2downloader_downloads_total counter
-wis2downloader_downloads_total{cache="example.cache.com",media_type="application/bufr"} 42.0
-
-# HELP wis2downloader_notifications_total Total notifications processed.
-# TYPE wis2downloader_notifications_total counter
-wis2downloader_notifications_total{status="success"} 42.0
-wis2downloader_notifications_total{status="skipped"} 5.0</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_openapi_规范">4.3. OpenAPI 规范</h3>
-<div class="paragraph">
-<p>以 JSON 格式返回 OpenAPI 3.0 规范。</p>
-</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /openapi</code></pre>
@@ -790,7 +836,7 @@ wis2downloader_notifications_total{status="skipped"} 5.0</code></pre>
 <div class="sect2">
 <h3 id="_swagger_ui">4.4. Swagger UI</h3>
 <div class="paragraph">
-<p>交互式 API 文档。</p>
+<p>可在以下地址访问交互式 API 文档：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -809,9 +855,7 @@ GET /swagger</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "error": "Error message describing the problem"
-}</code></pre>
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{ "error": "Error message describing the problem" }</code></pre>
 </div>
 </div>
 <div class="sect2">
@@ -833,17 +877,22 @@ GET /swagger</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">"No topic provided"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">POST /subscriptions 缺少 topic 字段</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POST /subscriptions 缺少 <code>topic</code> 字段</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">"No topic passed"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">GET/DELETE 使用空主题</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"credentials.type must be 'basic' or 'bearer'"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">凭据类型无效</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"queue must be one of: high_priority, large_files, small_files"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">未知队列名称</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">"Subscription for topic X not found"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">主题未订阅</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"Subscription '{id}' not found"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UUID 不存在</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
@@ -855,11 +904,6 @@ GET /swagger</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">"Failed to queue subscription command&#8230;&#8203;"</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Redis pub/sub 失败</p></td>
 </tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">"Failed to persist subscription&#8230;&#8203;"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Redis 写入失败</p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -870,50 +914,262 @@ GET /swagger</code></pre>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_订阅">6.1. 订阅</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "topic": "string (required) - WIS2 MQTT topic pattern",
-  "save_path": "string | null - Subdirectory for downloads",
-  "filters": {
-    "accepted_media_types": ["array of MIME type strings"]
-  }
-}</code></pre>
+<div class="paragraph">
+<p>API 存储和返回的完整订阅记录。</p>
 </div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">字段</th>
+<th class="tableblock halign-left valign-top">类型</th>
+<th class="tableblock halign-left valign-top">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (UUID)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">创建时分配的唯一标识符</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">WIS2 MQTT 主题模式</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>save_path</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string | null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">数据根目录下保存文件的子目录</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">对象</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">基于规则的过滤器（空对象 <code>{}</code> 表示不过滤）</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">对象 | null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">用于下载的凭据。密钥在响应中被隐藏。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">下载队列：<code>high_priority</code>、<code>small_files</code> 或 <code>large_files</code></p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect2">
-<h3 id="_过滤器">6.2. 过滤器</h3>
+<h3 id="_过滤器模式">6.2. 过滤器模式</h3>
+<div class="paragraph">
+<p>过滤器使用有序规则列表。规则按顺序评估；应用第一条匹配规则的动作。如果没有规则匹配，则接受文件。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">字段</th>
+<th class="tableblock halign-left valign-top">类型</th>
+<th class="tableblock halign-left valign-top">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">用于标识的过滤器名称</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rules</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">数组</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#_过滤器规则模式">过滤器规则</a>的有序列表</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect3">
+<h4 id="_过滤器规则模式">6.2.1. 过滤器规则模式</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">字段</th>
+<th class="tableblock halign-left valign-top">类型</th>
+<th class="tableblock halign-left valign-top">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">唯一规则标识符</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>order</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">执行顺序 — 值越小越先执行</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>match</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">对象</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">要匹配的条件。参见 <a href="#_匹配条件">匹配条件</a>。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>action</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>accept</code>、<code>reject</code> 或 <code>continue</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_匹配条件">6.2.2. 匹配条件</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">条件</th>
+<th class="tableblock halign-left valign-top">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>media_type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">按文件的 MIME 类型匹配</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">按文件大小（字节）匹配</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>centre_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">按来源中心 ID 匹配（如 <code>de-dwd</code>、<code>fr-meteofrance</code>）。第一个字段是 ISO2C 国家代码，第二个字段是中心的描述性名称。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">按 WIS2 数据 ID 匹配</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>href</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">按下载 URL 匹配</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>always: true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">无条件匹配（用作默认兜底规则）</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>字符串运算符：<code>equals</code>、<code>not_equals</code>、<code>in</code>、<code>not_in</code>、<code>pattern</code>（glob）、<code>regex</code></p>
+</div>
+<div class="paragraph">
+<p>大小/数值运算符：<code>gt_bytes</code>、<code>lt_bytes</code>、<code>gte_bytes</code>、<code>lte_bytes</code>、<code>between_bytes</code></p>
+</div>
+<div class="paragraph">
+<p>逻辑组合器：<code>all</code>（与）、<code>any</code>（或）、<code>not</code></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_过滤器示例">6.2.3. 过滤器示例</h4>
+<div class="paragraph">
+<p>只接受小于 10 MB 的 BUFR 文件；拒绝其他所有内容：</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "accepted_media_types": [
-    "application/bufr",
-    "application/grib",
-    "application/x-netcdf*"
+  "name": "bufr-small",
+  "rules": [
+    {
+      "id": "accept-small-bufr",
+      "order": 1,
+      "match": {
+        "all": [
+          { "media_type": { "equals": "application/bufr" } },
+          { "size": { "lt_bytes": 10485760 } }
+        ]
+      },
+      "action": "accept"
+    },
+    {
+      "id": "default-reject",
+      "order": 999,
+      "match": { "always": true },
+      "action": "reject"
+    }
   ]
 }</code></pre>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_默认接受的媒体类型">6.2.1. 默认接受的媒体类型</h4>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_凭据模式">6.3. 凭据模式</h3>
 <div class="paragraph">
-<p>未指定过滤器时，接受以下类型：</p>
+<p>用于从访问受控的数据集中认证 HTTP 下载。</p>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
-  "image/gif", "image/jpeg", "image/png", "image/tiff",
-  "application/pdf", "application/postscript",
-  "application/bufr", "application/grib",
-  "application/x-hdf", "application/x-hdf5",
-  "application/x-netcdf", "application/x-netcdf4",
-  "text/plain", "text/html", "text/xml", "text/csv",
-  "text/tab-separated-values"
-]</code></pre>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>password</code> 和 <code>token</code> 是只写的——在请求中被接受，但永不在响应中返回。
+</td>
+</tr>
+</table>
 </div>
-</div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">字段</th>
+<th class="tableblock halign-left valign-top">类型</th>
+<th class="tableblock halign-left valign-top">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic</code> 或 <code>bearer</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>username</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">当 <code>type</code> 为 <code>basic</code> 时必填</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string（只写）</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">当 <code>type</code> 为 <code>basic</code> 时必填</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>token</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string（只写）</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">当 <code>type</code> 为 <code>bearer</code> 时必填</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -930,19 +1186,19 @@ GET /swagger</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p><code>origin</code> - 来自数据提供者的原始数据</p>
+<p><code>origin</code> — 来自数据提供商的原始数据</p>
 </li>
 <li>
-<p><code>cache</code> - 来自全球缓存的缓存副本（推荐用于可靠性）</p>
+<p><code>cache</code> — 来自全球缓存的缓存副本（建议用于可靠性）</p>
 </li>
 <li>
-<p><code>{centre-id}</code> - 中心标识符，第一字段为 ISO2C 国家代码，第二字段为该中心的描述性名称（如 <code>de-dwd</code>）</p>
+<p><code>{centre-id}</code> — 中心标识符。第一个字段是 ISO2C 国家代码，第二个是中心的描述性名称（如 <code>de-dwd</code> 代表 Deutscher Wetterdienst，<code>fr-meteofrance</code> 代表 Météo-France）</p>
 </li>
 <li>
-<p><code>{data-policy}</code> - WMO 统一数据政策：<code>core</code> 或 <code>recommended</code></p>
+<p><code>{data-policy}</code> — WMO 统一数据政策：<code>core</code>（免费提供）或 <code>recommended</code>（可能需要凭据）</p>
 </li>
 <li>
-<p><code>{earth-system-domain}</code> - WMO 统一数据政策中的地球系统领域</p>
+<p><code>{earth-system-domain}</code> — WMO 统一数据政策中的地球系统领域</p>
 </li>
 </ul>
 </div>
@@ -959,7 +1215,7 @@ GET /swagger</code></pre>
 <tr>
 <th class="tableblock halign-left valign-top">模式</th>
 <th class="tableblock halign-left valign-top">符号</th>
-<th class="tableblock halign-left valign-top">说明</th>
+<th class="tableblock halign-left valign-top">描述</th>
 </tr>
 </thead>
 <tbody>
@@ -986,25 +1242,25 @@ GET /swagger</code></pre>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">模式</th>
-<th class="tableblock halign-left valign-top">匹配内容</th>
+<th class="tableblock halign-left valign-top">匹配</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>cache/a/wis2/de-dwd/data/#</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">来自 Deutscher Wetterdienst 的所有数据</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Deutscher Wetterdienst 的所有数据</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>cache/a/wis2/+/data/core/weather/surface-based-observations/#</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">来自所有中心的地面观测数据</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">所有中心的地面观测</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>cache/a/wis2/+/data/core/#</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">来自任意中心的所有核心数据</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">任何中心的所有核心数据</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>cache/a/wis2//data//weather/#</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">来自任意中心的所有天气数据（任意政策）</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">任何中心的所有天气数据（任何政策）</p></td>
 </tr>
 </tbody>
 </table>
@@ -1014,7 +1270,7 @@ GET /swagger</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

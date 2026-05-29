@@ -221,7 +221,7 @@ Si obtiene un error durante la instalación, compruebe su arquitectura con <code
 <h2 id="_4_configurar_el_directorio_de_descargas">4. Configurar el directorio de descargas</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Los contenedores se ejecutan como un usuario no-root (UID 10001, GID 988). En Linux debe configurar el directorio de descargas antes de iniciar:</p>
+<p>Los contenedores se ejecutan como un usuario no-root (UID 10001, GID 988 por defecto). En Linux debe configurar el directorio de descargas antes de iniciar:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -230,6 +230,18 @@ sudo useradd -u 10001 -g wis2 -M -s /usr/sbin/nologin wis2
 mkdir -p downloads
 sudo chown wis2:wis2 downloads</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Si UID 10001 o GID 988 entran en conflicto con usuarios existentes en su sistema, sobrescríbalos estableciendo <code>WIS2DOWNLOADER_UID</code> y <code>WIS2DOWNLOADER_GID</code> en su <code>.env</code> antes de ejecutar <code>docker compose up</code>. Use los valores correspondientes en los comandos anteriores. Si cambia <code>WIS2DOWNLOADER_UID</code> o <code>WIS2DOWNLOADER_GID</code> después de haber construido las imágenes, reconstruya con <code>docker compose build</code> antes de reiniciar.
+</td>
+</tr>
+</table>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -257,7 +269,7 @@ En macOS y Windows (Docker Desktop) este paso no es necesario — Docker Desktop
 </div>
 </div>
 <div class="paragraph">
-<p>Este comando inicia todos los servicios: gestor de suscripciones, suscriptores MQTT (Global Brokers de Francia y Brasil), workers Celery de descarga, Redis, Prometheus, Grafana y Loki.</p>
+<p>Este comando inicia todos los servicios: gestor de suscripciones, suscriptores MQTT (Global Brokers de Francia y Brasil), workers Celery (colas de alta prioridad, archivos pequeños y archivos grandes), Redis, Prometheus, Grafana y Loki.</p>
 </div>
 <div class="paragraph">
 <p>Compruebe que todo esté funcionando:</p>
@@ -373,7 +385,7 @@ Cambie la contraseña predeterminada de Grafana tras el primer inicio de sesión
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

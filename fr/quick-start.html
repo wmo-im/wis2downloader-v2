@@ -237,7 +237,7 @@ En cas d&#8217;erreur lors de l&#8217;installation, vérifiez votre architecture
 <h2 id="_4_configuration_du_répertoire_de_téléchargement">4. Configuration du répertoire de téléchargement</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Les conteneurs s&#8217;exécutent en tant qu&#8217;utilisateur non-root (UID 10001, GID 988). Sur Linux, vous devez configurer le répertoire de téléchargement avant de démarrer :</p>
+<p>Les conteneurs s&#8217;exécutent en tant qu&#8217;utilisateur non-root (UID 10001, GID 988 par défaut). Sur Linux, vous devez configurer le répertoire de téléchargement avant de démarrer :</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -246,6 +246,18 @@ sudo useradd -u 10001 -g wis2 -M -s /usr/sbin/nologin wis2
 mkdir -p downloads
 sudo chown wis2:wis2 downloads</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Si UID 10001 ou GID 988 entrent en conflit avec des utilisateurs existants sur votre système, surchargez-les en définissant <code>WIS2DOWNLOADER_UID</code> et <code>WIS2DOWNLOADER_GID</code> dans votre <code>.env</code> avant d&#8217;exécuter <code>docker compose up</code>. Utilisez les valeurs correspondantes dans les commandes ci-dessus. Si vous modifiez <code>WIS2DOWNLOADER_UID</code> ou <code>WIS2DOWNLOADER_GID</code> après avoir déjà construit les images, reconstruisez-les avec <code>docker compose build</code> avant de redémarrer.
+</td>
+</tr>
+</table>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -273,7 +285,7 @@ Sur macOS et Windows (Docker Desktop), cette étape n&#8217;est pas nécessaire 
 </div>
 </div>
 <div class="paragraph">
-<p>Cette commande démarre tous les services : gestionnaire d&#8217;abonnements, abonnés MQTT (Global Brokers France et Brésil), workers Celery de téléchargement, Redis, Prometheus, Grafana et Loki.</p>
+<p>Cette commande démarre tous les services : gestionnaire d&#8217;abonnements, abonnés MQTT (Global Brokers France et Brésil), workers Celery (files haute priorité, petits fichiers et grands fichiers), Redis, Prometheus, Grafana et Loki.</p>
 </div>
 <div class="paragraph">
 <p>Vérifiez que tout fonctionne :</p>
@@ -389,7 +401,7 @@ Changez le mot de passe Grafana par défaut après la première connexion.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

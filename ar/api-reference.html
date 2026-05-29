@@ -114,7 +114,7 @@ pre, code, .listingblock, .literalblock {
 <li><a href="#_المصادقة">2. المصادقة</a></li>
 <li><a href="#_api_الاشتراكات">3. API الاشتراكات</a>
 <ul class="sectlevel2">
-<li><a href="#_عرض_الاشتراكات">3.1. عرض الاشتراكات</a>
+<li><a href="#_عرض_قائمة_الاشتراكات">3.1. عرض قائمة الاشتراكات</a>
 <ul class="sectlevel3">
 <li><a href="#_الاستجابة">3.1.1. الاستجابة</a></li>
 <li><a href="#_مثال">3.1.2. مثال</a></li>
@@ -125,39 +125,38 @@ pre, code, .listingblock, .literalblock {
 <li><a href="#_جسم_الطلب">3.2.1. جسم الطلب</a></li>
 <li><a href="#_الاستجابة_2">3.2.2. الاستجابة</a></li>
 <li><a href="#_ترويسات_الاستجابة">3.2.3. ترويسات الاستجابة</a></li>
-<li><a href="#_مثال_2">3.2.4. مثال</a></li>
+<li><a href="#_أمثلة">3.2.4. أمثلة</a></li>
 </ul>
 </li>
 <li><a href="#_الحصول_على_اشتراك">3.3. الحصول على اشتراك</a>
 <ul class="sectlevel3">
 <li><a href="#_معاملات_المسار">3.3.1. معاملات المسار</a></li>
-<li><a href="#_ترميز_url">3.3.2. ترميز URL</a></li>
-<li><a href="#_الاستجابة_3">3.3.3. الاستجابة</a></li>
-<li><a href="#_مثال_3">3.3.4. مثال</a></li>
+<li><a href="#_الاستجابة_3">3.3.2. الاستجابة</a></li>
+<li><a href="#_مثال_2">3.3.3. مثال</a></li>
 </ul>
 </li>
-<li><a href="#_حذف_اشتراك">3.4. حذف اشتراك</a>
+<li><a href="#_تحديث_اشتراك">3.4. تحديث اشتراك</a>
 <ul class="sectlevel3">
-<li><a href="#_معاملات_المسار_2">3.4.1. معاملات المسار</a></li>
+<li><a href="#_جسم_الطلب_2">3.4.1. جسم الطلب</a></li>
 <li><a href="#_الاستجابة_4">3.4.2. الاستجابة</a></li>
-<li><a href="#_مثال_4">3.4.3. مثال</a></li>
+<li><a href="#_مثال_3">3.4.3. مثال</a></li>
+</ul>
+</li>
+<li><a href="#_حذف_اشتراك">3.5. حذف اشتراك</a>
+<ul class="sectlevel3">
+<li><a href="#_الاستجابة_5">3.5.1. الاستجابة</a></li>
+<li><a href="#_مثال_4">3.5.2. مثال</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li><a href="#_api_المراقبة">4. API المراقبة</a>
 <ul class="sectlevel2">
-<li><a href="#_فحص_الصحة">4.1. فحص الصحة</a>
-<ul class="sectlevel3">
-<li><a href="#_الاستجابة_5">4.1.1. الاستجابة</a></li>
-<li><a href="#_مثال_5">4.1.2. مثال</a></li>
-</ul>
-</li>
+<li><a href="#_فحص_الصحة">4.1. فحص الصحة</a></li>
 <li><a href="#_مقاييس_prometheus">4.2. مقاييس Prometheus</a>
 <ul class="sectlevel3">
-<li><a href="#_الاستجابة_6">4.2.1. الاستجابة</a></li>
-<li><a href="#_المقاييس_المتاحة">4.2.2. المقاييس المتاحة</a></li>
-<li><a href="#_مثال_6">4.2.3. مثال</a></li>
+<li><a href="#_المقاييس_المتاحة">4.2.1. المقاييس المتاحة</a></li>
+<li><a href="#_مثال_5">4.2.2. مثال</a></li>
 </ul>
 </li>
 <li><a href="#_مواصفة_openapi">4.3. مواصفة OpenAPI</a></li>
@@ -172,18 +171,21 @@ pre, code, .listingblock, .literalblock {
 <li><a href="#_مخططات_البيانات">6. مخططات البيانات</a>
 <ul class="sectlevel2">
 <li><a href="#_الاشتراك">6.1. الاشتراك</a></li>
-<li><a href="#_الفلاتر">6.2. الفلاتر</a>
+<li><a href="#_مخطط_الفلتر">6.2. مخطط الفلتر</a>
 <ul class="sectlevel3">
-<li><a href="#_أنواع_الوسائط_المقبولة_افتراضيًا">6.2.1. أنواع الوسائط المقبولة افتراضيًا</a></li>
+<li><a href="#_مخطط_قاعدة_الفلتر">6.2.1. مخطط قاعدة الفلتر</a></li>
+<li><a href="#_شروط_التطابق">6.2.2. شروط التطابق</a></li>
+<li><a href="#_مثال_على_الفلتر">6.2.3. مثال على الفلتر</a></li>
 </ul>
 </li>
+<li><a href="#_مخطط_بيانات_الاعتماد">6.3. مخطط بيانات الاعتماد</a></li>
 </ul>
 </li>
-<li><a href="#_مرجع_أنماط_الموضوعات">7. مرجع أنماط الموضوعات</a>
+<li><a href="#_مرجع_أنماط_المواضيع">7. مرجع أنماط المواضيع</a>
 <ul class="sectlevel2">
-<li><a href="#_هيكل_موضوع_wis2">7.1. هيكل موضوع WIS2</a></li>
+<li><a href="#_هيكل_مواضيع_wis2">7.1. هيكل مواضيع WIS2</a></li>
 <li><a href="#_أحرف_البدل">7.2. أحرف البدل</a></li>
-<li><a href="#_أمثلة">7.3. أمثلة</a></li>
+<li><a href="#_أمثلة_2">7.3. أمثلة</a></li>
 </ul>
 </li>
 </ul>
@@ -214,7 +216,7 @@ pre, code, .listingblock, .literalblock {
 <h2 id="_نظرة_عامة">1. نظرة عامة</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>يوفر WIS2 Downloader واجهة برمجية REST لإدارة الاشتراكات ومراقبة النظام.</p>
+<p>يُتيح WIS2 Downloader واجهة REST API لإدارة الاشتراكات ومراقبة النظام.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -222,12 +224,24 @@ pre, code, .listingblock, .literalblock {
 <p><strong>عنوان URL الأساسي:</strong> <code><a href="http://localhost:5002" class="bare">http://localhost:5002</a></code></p>
 </li>
 <li>
-<p><strong>مواصفات OpenAPI:</strong> <code><a href="http://localhost:5002/openapi" class="bare">http://localhost:5002/openapi</a></code></p>
+<p><strong>مواصفة OpenAPI:</strong> <code><a href="http://localhost:5002/openapi" class="bare">http://localhost:5002/openapi</a></code></p>
 </li>
 <li>
 <p><strong>واجهة Swagger:</strong> <code><a href="http://localhost:5002/swagger" class="bare">http://localhost:5002/swagger</a></code></p>
 </li>
 </ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+استبدل <code>localhost:5002</code> بعنوان خادمك في حال النشر عن بُعد. يُهيَّأ عنوان URL الأساسي عبر <code>WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL</code> في <code>.env</code>.
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -235,17 +249,20 @@ pre, code, .listingblock, .literalblock {
 <h2 id="_المصادقة">2. المصادقة</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>لا تتطلب واجهة API حاليًا أي مصادقة. في بيئة الإنتاج، يُنصح بوضعها خلف بروكسي عكسي يوفر المصادقة.</p>
+<p>لا تتطلب الـ API مصادقة. في بيئة الإنتاج، ضعها خلف وكيل عكسي مع المصادقة (راجع قسم <a href="admin-guide.html#_access_control">التحكم في الوصول</a> في دليل الإدارة).</p>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_api_الاشتراكات">3. API الاشتراكات</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_عرض_الاشتراكات">3.1. عرض الاشتراكات</h3>
 <div class="paragraph">
-<p>يعيد جميع الاشتراكات النشطة.</p>
+<p>يُعرَّف كل اشتراك بـ UUID ويربط موضوع MQTT ومسار حفظ وفلتر اختياري وبيانات اعتماد اختيارية وقائمة انتظار. يمكن أن تشترك اشتراكات متعددة في نفس الموضوع — يُفتح اتصال MQTT مرة واحدة وتُوجَّه الرسائل إلى جميع الاشتراكات المطابقة.</p>
+</div>
+<div class="sect2">
+<h3 id="_عرض_قائمة_الاشتراكات">3.1. عرض قائمة الاشتراكات</h3>
+<div class="paragraph">
+<p>يُعيد جميع الاشتراكات النشطة مجمَّعةً حسب الموضوع.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -268,11 +285,11 @@ pre, code, .listingblock, .literalblock {
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">200</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">نجاح — يعيد خريطة من الموضوع إلى تفاصيل الاشتراك</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">نجاح — خريطة موضوع → خريطة UUID اشتراك → تفاصيل الاشتراك</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Redis غير متاح</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Redis غير متوفر</p></td>
 </tr>
 </tbody>
 </table>
@@ -288,10 +305,18 @@ pre, code, .listingblock, .literalblock {
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
   "cache/a/wis2/+/data/core/weather/surface-based-observations/#": {
-    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-    "save_path": "surface-obs",
-    "filters": {
-      "accepted_media_types": ["application/bufr", "application/grib"]
+    "550e8400-e29b-41d4-a716-446655440000": {
+      "save_path": "surface-obs",
+      "filter": {}
+    },
+    "661f9511-f30c-52e5-b827-557766551111": {
+      "save_path": "surface-obs-bufr",
+      "filter": {
+        "name": "bufr-only",
+        "rules": [
+          { "id": "accept-bufr", "order": 1, "match": { "media_type": { "equals": "application/bufr" } }, "action": "accept" }
+        ]
+      }
     }
   }
 }</code></pre>
@@ -302,7 +327,10 @@ pre, code, .listingblock, .literalblock {
 <div class="sect2">
 <h3 id="_إنشاء_اشتراك">3.2. إنشاء اشتراك</h3>
 <div class="paragraph">
-<p>ينشئ اشتراكًا جديدًا في موضوع WIS2.</p>
+<p>يُنشئ اشتراكًا جديدًا. يُعيِّن UUID ويُعيد سجل الاشتراك الكامل.</p>
+</div>
+<div class="paragraph">
+<p>إذا كان هذا أول اشتراك للموضوع المحدد، يُفتح اتصال MQTT. تستخدم الاشتراكات الإضافية لنفس الموضوع الاتصال القائم.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -332,25 +360,31 @@ Content-Type: application/json</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">نعم</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">نمط موضوع MQTT في WIS2. يدعم <code>+</code> (مستوى واحد) و`#` (متعدد المستويات) كأحرف بدل.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">نمط موضوع MQTT لـ WIS2. يدعم أحرف البدل <code>+</code> (مستوى واحد) و`#` (متعدد المستويات).</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>target</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">لا</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">مجلد فرعي تحت <code>/data</code> لحفظ الملفات فيه.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">المجلد الفرعي تحت جذر البيانات حيث تُحفظ الملفات.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filters</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">كائن</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">لا</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">إعداد الفلتر.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">فلتر قائم على قواعد. راجع <a href="#_مخطط_الفلتر">مخطط الفلتر</a>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filters.accepted_media_types</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">array</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">كائن</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">لا</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">قائمة أنواع MIME المسموح بها. تدعم أحرف البدل (مثل <code>application/x-grib*</code>).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">بيانات اعتماد HTTP لمجموعات البيانات ذات الوصول المقيَّد. راجع <a href="#_مخطط_بيانات_الاعتماد">مخطط بيانات الاعتماد</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">لا</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">قائمة انتظار التنزيل: <code>high_priority</code> أو <code>small_files</code> (الافتراضي) أو <code>large_files</code>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -370,12 +404,12 @@ Content-Type: application/json</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">202</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">مقبول — تم إدراج الاشتراك في قائمة الانتظار للمعالجة</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">201</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">تم الإنشاء — يُعيد سجل الاشتراك الكامل</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">طلب غير صحيح — الموضوع مفقود أو غير صالح</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">طلب غير صالح — حقول مفقودة أو غير صحيحة</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
@@ -400,32 +434,75 @@ Content-Type: application/json</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Location</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">عنوان URL لاسترداد تفاصيل الاشتراك</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">عنوان URL لاسترداد الاشتراك المُنشأ (<code>/subscriptions/{id}</code>)</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_مثال_2">3.2.4. مثال</h4>
+<h4 id="_أمثلة">3.2.4. أمثلة</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X POST http://localhost:5002/subscriptions \
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># اشتراك بسيط
+curl -X POST http://localhost:5002/subscriptions \
   -H "Content-Type: application/json" \
   -d '{
     "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-    "target": "surface-obs",
-    "filters": {
-      "accepted_media_types": ["application/bufr", "application/grib"]
+    "target": "surface-obs"
+  }'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># اشتراك مع فلتر
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+    "target": "surface-obs-bufr",
+    "filter": {
+      "name": "bufr-only",
+      "rules": [
+        { "id": "accept-bufr", "order": 1, "match": { "media_type": { "equals": "application/bufr" } }, "action": "accept" },
+        { "id": "default-reject", "order": 999, "match": { "always": true }, "action": "reject" }
+      ]
     }
   }'</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># اشتراك في مجموعة بيانات ذات وصول مقيَّد باستخدام المصادقة الأساسية
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/recommended/weather/surface-based-observations/#",
+    "target": "restricted-obs",
+    "credentials": { "type": "basic", "username": "myuser", "password": "s3cr3t" }
+  }'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># توجيه التنزيلات الكبيرة إلى قائمة انتظار large-files
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/fr-meteofrance/data/core/weather/space-based-observations/noaa-21/cris",
+    "target": "space-obs",
+    "queue": "large_files"
+  }'</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "status": "accepted",
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-  "target": "surface-obs"
+  "save_path": "surface-obs",
+  "filter": {},
+  "credentials": null,
+  "queue": "small_files"
 }</code></pre>
 </div>
 </div>
@@ -434,11 +511,11 @@ Content-Type: application/json</code></pre>
 <div class="sect2">
 <h3 id="_الحصول_على_اشتراك">3.3. الحصول على اشتراك</h3>
 <div class="paragraph">
-<p>يعيد تفاصيل اشتراك محدد.</p>
+<p>يُعيد السجل الكامل لاشتراك محدد.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /subscriptions/{topic}</code></pre>
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /subscriptions/{id}</code></pre>
 </div>
 </div>
 <div class="sect3">
@@ -458,54 +535,15 @@ Content-Type: application/json</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">موضوع WIS2 (يتطلب <code>#</code> فقط ترميز URL كـ <code>%23</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (UUID)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UUID الاشتراك المُعاد عند إنشائه</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_ترميز_url">3.3.2. ترميز URL</h4>
-<div class="paragraph">
-<p>يتطلب ترميز URL للحرف <code>#</code> فقط:</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">الحرف</th>
-<th class="tableblock halign-left valign-top">المُرمَّز</th>
-<th class="tableblock halign-left valign-top">السبب</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>#</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>%23</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">وإلا يُفسَّر كجزء من URL</p></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-لا تتطلب الشُّرَط المائلة (<code>/</code>) والـ`+` أي ترميز في المسار.
-</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_الاستجابة_3">3.3.3. الاستجابة</h4>
+<h4 id="_الاستجابة_3">3.3.2. الاستجابة</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -523,52 +561,61 @@ Content-Type: application/json</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">نجاح</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">موضوع غير صالح</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">الاشتراك غير موجود</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Redis غير متاح</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_مثال_3">3.3.4. مثال</h4>
+<h4 id="_مثال_2">3.3.3. مثال</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000</code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
   "save_path": "surface-obs",
-  "filters": {
-    "accepted_media_types": ["application/bufr", "application/grib"]
-  }
+  "filter": {},
+  "credentials": null,
+  "queue": "small_files"
 }</code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+لا تُعاد أسرار بيانات الاعتماد (<code>password</code> و`token`) أبدًا. تُضمَّن في الاستجابات <code>type</code> و`username` فقط (للمصادقة الأساسية).
+</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_حذف_اشتراك">3.4. حذف اشتراك</h3>
+<h3 id="_تحديث_اشتراك">3.4. تحديث اشتراك</h3>
 <div class="paragraph">
-<p>يزيل اشتراكًا.</p>
+<p>يُحدِّث مسار الحفظ أو الفلتر أو بيانات الاعتماد أو قائمة الانتظار لاشتراك قائم. لا يمكن تغيير الموضوع — احذف الاشتراك وأعد إنشاءه لتغيير الموضوع.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">DELETE /subscriptions/{topic}</code></pre>
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">PUT /subscriptions/{id}
+Content-Type: application/json</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_معاملات_المسار_2">3.4.1. معاملات المسار</h4>
+<h4 id="_جسم_الطلب_2">3.4.1. جسم الطلب</h4>
+<div class="paragraph">
+<p>جميع الحقول اختيارية. تُحدَّث الحقول المُقدَّمة فقط.</p>
+</div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -577,16 +624,31 @@ Content-Type: application/json</code></pre>
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">المعامل</th>
+<th class="tableblock halign-left valign-top">الحقل</th>
 <th class="tableblock halign-left valign-top">النوع</th>
 <th class="tableblock halign-left valign-top">الوصف</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>target</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">موضوع WIS2 مُرمَّز بـ URL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">المجلد الفرعي الجديد تحت جذر البيانات</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">كائن</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">الفلتر الجديد القائم على قواعد (يستبدل الفلتر الحالي)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">كائن</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">بيانات الاعتماد الجديدة (تستبدل بيانات الاعتماد الحالية)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">قائمة الانتظار الجديدة: <code>high_priority</code> أو <code>small_files</code> أو <code>large_files</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -607,101 +669,46 @@ Content-Type: application/json</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">200</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">تم الحذف بنجاح</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">سجل الاشتراك المُحدَّث</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">موضوع غير صالح</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">قيمة حقل غير صالحة</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">الاشتراك غير موجود</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Redis غير متاح</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Redis غير متوفر</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_مثال_4">3.4.3. مثال</h4>
+<h4 id="_مثال_3">3.4.3. مثال</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "status": "deleted",
-  "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#"
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_api_المراقبة">4. API المراقبة</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_فحص_الصحة">4.1. فحص الصحة</h3>
-<div class="paragraph">
-<p>يعيد حالة صحة الخدمة.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /health</code></pre>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_الاستجابة_5">4.1.1. الاستجابة</h4>
-<div class="paragraph">
-<p>يعيد دائمًا 200. تحقق من حقل <code>status</code> للحالة الفعلية.</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 75%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">الحقل</th>
-<th class="tableblock halign-left valign-top">القيم</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>status</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>healthy</code> أو <code>unhealthy</code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_مثال_5">4.1.2. مثال</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/health</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{"status": "healthy"}</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X PUT http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Content-Type: application/json" \
+  -d '{ "target": "surface-obs-v2", "queue": "high_priority" }'</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_مقاييس_prometheus">4.2. مقاييس Prometheus</h3>
+<h3 id="_حذف_اشتراك">3.5. حذف اشتراك</h3>
 <div class="paragraph">
-<p>يعيد المقاييس بصيغة نص Prometheus.</p>
+<p>يحذف اشتراكًا. إذا كان آخر اشتراك لموضوعه، يُغلَق اتصال MQTT لذلك الموضوع.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /metrics</code></pre>
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">DELETE /subscriptions/{id}</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_الاستجابة_6">4.2.1. الاستجابة</h4>
+<h4 id="_الاستجابة_5">3.5.1. الاستجابة</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -716,17 +723,71 @@ Content-Type: application/json</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">200</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">مقاييس بصيغة نص Prometheus</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">تم الحذف بنجاح</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">500</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">خطأ في توليد المقاييس</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">الاشتراك غير موجود</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Redis غير متوفر</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_المقاييس_المتاحة">4.2.2. المقاييس المتاحة</h4>
+<h4 id="_مثال_4">3.5.2. مثال</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl -X DELETE http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{ "status": "deleted", "id": "550e8400-e29b-41d4-a716-446655440000" }</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_api_المراقبة">4. API المراقبة</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_فحص_الصحة">4.1. فحص الصحة</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /health</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>يُعيد دائمًا 200. تحقق من حقل <code>status</code> للحالة الفعلية.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/health</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{ "status": "healthy" }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_مقاييس_prometheus">4.2. مقاييس Prometheus</h3>
+<div class="paragraph">
+<p>يُعيد المقاييس بتنسيق نص Prometheus.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /metrics</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_المقاييس_المتاحة">4.2.1. المقاييس المتاحة</h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -747,7 +808,7 @@ Content-Type: application/json</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>wis2downloader_notifications_total</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counter</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">status</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">إجمالي الإشعارات المعالَجة</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">إجمالي الإشعارات المعالَجة بواسطة Celery</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>wis2downloader_downloads_total</code></p></td>
@@ -777,37 +838,22 @@ Content-Type: application/json</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>wis2downloader_celery_queue_length</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Gauge</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">queue_name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">المهام الحالية في قائمة انتظار Celery</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">المهام الحالية في جميع قوائع انتظار Celery</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_مثال_6">4.2.3. مثال</h4>
+<h4 id="_مثال_5">4.2.2. مثال</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">curl http://localhost:5002/metrics</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-prometheus hljs" data-lang="prometheus"># HELP wis2downloader_downloads_total Total number of files downloaded.
-# TYPE wis2downloader_downloads_total counter
-wis2downloader_downloads_total{cache="example.cache.com",media_type="application/bufr"} 42.0
-
-# HELP wis2downloader_notifications_total Total notifications processed.
-# TYPE wis2downloader_notifications_total counter
-wis2downloader_notifications_total{status="success"} 42.0
-wis2downloader_notifications_total{status="skipped"} 5.0</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_مواصفة_openapi">4.3. مواصفة OpenAPI</h3>
-<div class="paragraph">
-<p>تعيد مواصفة OpenAPI 3.0 بصيغة JSON.</p>
-</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-http hljs" data-lang="http">GET /openapi</code></pre>
@@ -817,7 +863,7 @@ wis2downloader_notifications_total{status="skipped"} 5.0</code></pre>
 <div class="sect2">
 <h3 id="_واجهة_swagger">4.4. واجهة Swagger</h3>
 <div class="paragraph">
-<p>توثيق API تفاعلي.</p>
+<p>وثائق API التفاعلية متاحة على:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -836,9 +882,7 @@ GET /swagger</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "error": "Error message describing the problem"
-}</code></pre>
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{ "error": "Error message describing the problem" }</code></pre>
 </div>
 </div>
 <div class="sect2">
@@ -860,32 +904,32 @@ GET /swagger</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">"No topic provided"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">POST /subscriptions بدون حقل الموضوع</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POST /subscriptions بدون حقل <code>topic</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">"No topic passed"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">GET/DELETE بموضوع فارغ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"credentials.type must be 'basic' or 'bearer'"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">نوع بيانات اعتماد غير صالح</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">400</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"queue must be one of: high_priority, large_files, small_files"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">اسم قائمة انتظار غير معروف</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">404</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">"Subscription for topic X not found"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">الموضوع غير مشترك</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">"Subscription '{id}' not found"</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UUID غير موجود</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">"Failed to connect to Redis: &#8230;&#8203;"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Redis غير متاح</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Redis غير متوفر</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">"Failed to queue subscription command&#8230;&#8203;"</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">فشل Redis pub/sub</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">503</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">"Failed to persist subscription&#8230;&#8203;"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">فشل الكتابة في Redis</p></td>
 </tr>
 </tbody>
 </table>
@@ -897,58 +941,270 @@ GET /swagger</code></pre>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_الاشتراك">6.1. الاشتراك</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "topic": "string (required) - WIS2 MQTT topic pattern",
-  "save_path": "string | null - Subdirectory for downloads",
-  "filters": {
-    "accepted_media_types": ["array of MIME type strings"]
-  }
-}</code></pre>
+<div class="paragraph">
+<p>سجل الاشتراك الكامل كما يُخزَّن ويُعاد بواسطة الـ API.</p>
 </div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">الحقل</th>
+<th class="tableblock halign-left valign-top">النوع</th>
+<th class="tableblock halign-left valign-top">الوصف</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (UUID)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">معرِّف فريد يُعيَّن عند الإنشاء</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>topic</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">نمط موضوع MQTT لـ WIS2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>save_path</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string | null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">المجلد الفرعي تحت جذر البيانات حيث تُحفظ الملفات</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>filter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">كائن</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">فلتر قائم على قواعد (الكائن الفارغ <code>{}</code> يعني عدم الفلترة)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>credentials</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">كائن | null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">بيانات الاعتماد المستخدمة للتنزيل. تُخفى الأسرار في الاستجابات.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>queue</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">قائمة انتظار التنزيل: <code>high_priority</code> أو <code>small_files</code> أو <code>large_files</code></p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect2">
-<h3 id="_الفلاتر">6.2. الفلاتر</h3>
+<h3 id="_مخطط_الفلتر">6.2. مخطط الفلتر</h3>
+<div class="paragraph">
+<p>تستخدم الفلاتر قائمة مرتَّبة من القواعد. تُقيَّم القواعد بالترتيب؛ يُطبَّق إجراء أول قاعدة مطابقة. إذا لم تتطابق أي قاعدة، يُقبَل الملف.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">الحقل</th>
+<th class="tableblock halign-left valign-top">النوع</th>
+<th class="tableblock halign-left valign-top">الوصف</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">اسم الفلتر للتعريف</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rules</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">مصفوفة</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">قائمة مرتَّبة من <a href="#_مخطط_قاعدة_الفلتر">قواعد الفلتر</a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect3">
+<h4 id="_مخطط_قاعدة_الفلتر">6.2.1. مخطط قاعدة الفلتر</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">الحقل</th>
+<th class="tableblock halign-left valign-top">النوع</th>
+<th class="tableblock halign-left valign-top">الوصف</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">معرِّف القاعدة الفريد</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>order</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ترتيب التنفيذ — القيم الأصغر تُنفَّذ أولًا</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>match</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">كائن</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">الشرط للتحقق منه. راجع <a href="#_شروط_التطابق">شروط التطابق</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>action</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>accept</code> أو <code>reject</code> أو <code>continue</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_شروط_التطابق">6.2.2. شروط التطابق</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">الشرط</th>
+<th class="tableblock halign-left valign-top">الوصف</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>media_type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">التطابق على نوع MIME للملف</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">التطابق على حجم الملف بالبايت</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>centre_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">التطابق على معرِّف المركز المُصدِر (مثال: <code>de-dwd</code>، <code>fr-meteofrance</code>). الحقل الأول هو رمز البلد ISO2C، والثاني هو اسم وصفي للمركز.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data_id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">التطابق على معرِّف بيانات WIS2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>href</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">التطابق على عنوان URL التنزيل</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>always: true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">تطابق غير مشروط (يُستخدم كقاعدة افتراضية شاملة)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>عوامل السلسلة النصية: <code>equals</code>، <code>not_equals</code>، <code>in</code>، <code>not_in</code>، <code>pattern</code> (glob)، <code>regex</code></p>
+</div>
+<div class="paragraph">
+<p>عوامل الحجم/العددية: <code>gt_bytes</code>، <code>lt_bytes</code>، <code>gte_bytes</code>، <code>lte_bytes</code>، <code>between_bytes</code></p>
+</div>
+<div class="paragraph">
+<p>المجمِّعات المنطقية: <code>all</code> (AND)، <code>any</code> (OR)، <code>not</code></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_مثال_على_الفلتر">6.2.3. مثال على الفلتر</h4>
+<div class="paragraph">
+<p>قبول ملفات BUFR فقط بحجم أقل من 10 ميجابايت؛ رفض كل شيء آخر:</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
-  "accepted_media_types": [
-    "application/bufr",
-    "application/grib",
-    "application/x-netcdf*"
+  "name": "bufr-small",
+  "rules": [
+    {
+      "id": "accept-small-bufr",
+      "order": 1,
+      "match": {
+        "all": [
+          { "media_type": { "equals": "application/bufr" } },
+          { "size": { "lt_bytes": 10485760 } }
+        ]
+      },
+      "action": "accept"
+    },
+    {
+      "id": "default-reject",
+      "order": 999,
+      "match": { "always": true },
+      "action": "reject"
+    }
   ]
 }</code></pre>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_أنواع_الوسائط_المقبولة_افتراضيًا">6.2.1. أنواع الوسائط المقبولة افتراضيًا</h4>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_مخطط_بيانات_الاعتماد">6.3. مخطط بيانات الاعتماد</h3>
 <div class="paragraph">
-<p>عند عدم تحديد أي فلتر، تُقبل هذه الأنواع:</p>
+<p>يُستخدم لمصادقة تنزيلات HTTP من مجموعات البيانات ذات الوصول المقيَّد.</p>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">[
-  "image/gif", "image/jpeg", "image/png", "image/tiff",
-  "application/pdf", "application/postscript",
-  "application/bufr", "application/grib",
-  "application/x-hdf", "application/x-hdf5",
-  "application/x-netcdf", "application/x-netcdf4",
-  "text/plain", "text/html", "text/xml", "text/csv",
-  "text/tab-separated-values"
-]</code></pre>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>password</code> و`token` للكتابة فقط — تُقبَل في الطلبات لكنها لا تُعاد أبدًا في الاستجابات.
+</td>
+</tr>
+</table>
 </div>
-</div>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">الحقل</th>
+<th class="tableblock halign-left valign-top">النوع</th>
+<th class="tableblock halign-left valign-top">الوصف</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>type</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>basic</code> أو <code>bearer</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>username</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">مطلوب عندما يكون <code>type</code> هو <code>basic</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (كتابة فقط)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">مطلوب عندما يكون <code>type</code> هو <code>basic</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>token</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string (كتابة فقط)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">مطلوب عندما يكون <code>type</code> هو <code>bearer</code></p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_مرجع_أنماط_الموضوعات">7. مرجع أنماط الموضوعات</h2>
+<h2 id="_مرجع_أنماط_المواضيع">7. مرجع أنماط المواضيع</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_هيكل_موضوع_wis2">7.1. هيكل موضوع WIS2</h3>
+<h3 id="_هيكل_مواضيع_wis2">7.1. هيكل مواضيع WIS2</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-none hljs">{origin|cache}/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...</code></pre>
@@ -957,19 +1213,19 @@ GET /swagger</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p><code>origin</code> - البيانات الأصلية من مزود البيانات</p>
+<p><code>origin</code> — البيانات الأصلية من مزود البيانات</p>
 </li>
 <li>
-<p><code>cache</code> - نسخة مخزنة مؤقتًا من ذاكرة تخزين عالمية (مُنصح به للموثوقية)</p>
+<p><code>cache</code> — نسخة مخزَّنة مؤقتًا من ذاكرة تخزين عالمية (مُوصى به للموثوقية)</p>
 </li>
 <li>
-<p><code>{centre-id}</code> - رمز الدولة/المنظمة، مسبوقًا برمز الدولة ISO2C (مثل <code>de-dwd</code>)</p>
+<p><code>{centre-id}</code> — معرِّف المركز. الحقل الأول هو رمز البلد ISO2C والثاني هو اسم وصفي للمركز (مثال: <code>de-dwd</code> لـ Deutscher Wetterdienst، <code>fr-meteofrance</code> لـ Météo-France)</p>
 </li>
 <li>
-<p><code>{data-policy}</code> - سياسة البيانات الموحدة لـ WMO: <code>core</code> أو <code>recommended</code></p>
+<p><code>{data-policy}</code> — سياسة بيانات WMO الموحَّدة: <code>core</code> (متاح مجانًا) أو <code>recommended</code> (قد يتطلب بيانات اعتماد)</p>
 </li>
 <li>
-<p><code>{earth-system-domain}</code> - نطاق النظام الأرضي من سياسة البيانات الموحدة لـ WMO</p>
+<p><code>{earth-system-domain}</code> — مجال نظام الأرض من سياسة بيانات WMO الموحَّدة</p>
 </li>
 </ul>
 </div>
@@ -993,7 +1249,7 @@ GET /swagger</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">مستوى واحد</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>+</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">يطابق مستوى واحدًا تمامًا</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">يطابق مستوى واحدًا بالضبط</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">متعدد المستويات</p></td>
@@ -1004,7 +1260,7 @@ GET /swagger</code></pre>
 </table>
 </div>
 <div class="sect2">
-<h3 id="_أمثلة">7.3. أمثلة</h3>
+<h3 id="_أمثلة_2">7.3. أمثلة</h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 40%;">
@@ -1013,17 +1269,17 @@ GET /swagger</code></pre>
 <thead>
 <tr>
 <th class="tableblock halign-left valign-top">النمط</th>
-<th class="tableblock halign-left valign-top">ما يطابقه</th>
+<th class="tableblock halign-left valign-top">يطابق</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>cache/a/wis2/de-dwd/data/#</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">جميع البيانات من Deutscher Wetterdienst</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">جميع بيانات Deutscher Wetterdienst</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>cache/a/wis2/+/data/core/weather/surface-based-observations/#</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ملاحظات سطحية من جميع المراكز</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">رصد السطح من جميع المراكز</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>cache/a/wis2/+/data/core/#</code></p></td>
@@ -1031,7 +1287,7 @@ GET /swagger</code></pre>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>cache/a/wis2//data//weather/#</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">جميع بيانات الطقس (أي سياسة) من أي مركز</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">جميع البيانات الجوية (أي سياسة) من أي مركز</p></td>
 </tr>
 </tbody>
 </table>
@@ -1041,7 +1297,7 @@ GET /swagger</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-03-30 07:41:48 UTC
+Last updated 2026-05-29 11:15:51 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
