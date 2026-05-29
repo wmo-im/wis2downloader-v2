@@ -73,11 +73,11 @@ The navigation drawer on the left (right in Arabic RTL mode) gives access to six
 
 |kbd:[Alt+4]
 |*Manual Subscribe*
-|Enter a topic, save directory, and filter directly without browsing the catalogue
+|Enter a topic, save directory, filter, queue, and credentials directly without browsing the catalogue
 
 |kbd:[Alt+5]
 |*Manage Subscriptions*
-|List all active subscriptions and unsubscribe from topics
+|List all active subscriptions, edit their settings, and unsubscribe from topics
 
 |kbd:[Alt+6]
 |*Settings*
@@ -118,7 +118,10 @@ Each result card shows:
 * Source catalogue chips (CMA = blue, DWD = teal, ECCC = orange)
 * A warning icon if the record content differs between catalogues
 * *Show Metadata* — opens a dialog with full record details and an interactive map of the dataset's geographic extent
+* *View License* — opens the dataset's license URL in a new tab (only shown when the record includes a license link)
 * *Select* / *Unselect* — adds or removes the dataset's MQTT topic to the subscription sidebar
+
+NOTE: If a dataset carries a license, clicking *Select* shows a license confirmation dialog. You must view and accept the license before the topic is added to the subscription sidebar.
 
 === Tree View
 
@@ -154,13 +157,41 @@ When a topic is selected (from catalogue search or the tree view), the subscript
 
 |Custom filters
 |Dataset-specific filter fields from the GDC record's link metadata (catalogue view only)
+
+|Queue
+|Priority queue for download processing: `high_priority`, `small_files` (default), or `large_files`. Use `large_files` for bulk or large-file topics to avoid blocking smaller downloads.
 |===
 
 Click *Subscribe* to open a confirmation dialog showing the full JSON payload. Review it, then click *Confirm* to create the subscription, or *Cancel* to go back.
 
+=== Credentials (Manual Subscribe)
+
+The *Manual Subscribe* view (kbd:[Alt+4]) includes an authentication section for data sources that require credentials.  Select the authentication type with the radio button:
+
+[cols="1,3"]
+|===
+|Type |Fields
+
+|None (default)
+|No authentication — used for public data sources
+
+|Basic
+|Username and password
+
+|Bearer
+|Token (sent as `Authorization: Bearer <token>`)
+|===
+
+NOTE: Credentials are stored in Redis and sent with each download request for the subscription. The password and token are redacted in API responses.
+
 === Managing Subscriptions
 
-The Subscriptions view lists all active subscriptions with their save paths. Click *Unsubscribe* on any entry to remove it. Use *Reload Subscriptions* to refresh the list after any changes made via the API.
+The Subscriptions view lists all active subscriptions with their topic, save path, and filter summary. Two actions are available on each entry:
+
+* *Edit* — opens a dialog to modify the subscription's save directory, filter, queue, and credentials. The topic cannot be changed; to subscribe to a different topic you must create a new subscription.
+* *Unsubscribe* — removes the subscription. If it was the last subscription for that topic, the MQTT connection is also closed.
+
+Use *Reload Subscriptions* to refresh the list after any changes made via the API.
 
 === Settings
 
@@ -254,6 +285,14 @@ Response:
 |`filter`
 |No
 |Filter configuration (see <<Filtering>>)
+
+|`queue`
+|No
+|Priority queue for processing: `high_priority`, `small_files` (default), or `large_files`
+
+|`credentials`
+|No
+|Authentication for the data source (see <<Credentials>>)
 |===
 
 === Listing Subscriptions
@@ -296,6 +335,22 @@ Response:
 }
 ----
 
+=== Updating a Subscription
+
+Update a subscription's save directory, filter, queue, or credentials without recreating it:
+
+[source,bash]
+----
+curl -X PUT http://localhost:5002/subscriptions/<id> \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target": "new-directory",
+    "queue": "large_files"
+  }'
+----
+
+Only the fields you include are changed; omitted fields keep their current values. `credentials` can be set to `null` to remove authentication.
+
 === Deleting a Subscription
 
 [source,bash]
@@ -304,6 +359,38 @@ curl -X DELETE http://localhost:5002/subscriptions/<id>
 ----
 
 Where `<id>` is the subscription UUID from `GET /subscriptions`. If this is the last subscription for the topic, the MQTT connection is also closed.
+
+[[Credentials]]
+== Credentials
+
+Subscriptions that download from password-protected or token-protected sources accept an optional `credentials` object.
+
+=== Basic Authentication
+
+[source,json]
+----
+{
+  "credentials": {
+    "type": "basic",
+    "username": "myuser",
+    "password": "mypassword"
+  }
+}
+----
+
+=== Bearer Token
+
+[source,json]
+----
+{
+  "credentials": {
+    "type": "bearer",
+    "token": "eyJhbGciOi..."
+  }
+}
+----
+
+NOTE: The API redacts secrets in responses — `password` is omitted and `token` is replaced with `***`. The full credentials are stored in Redis and used only during download.
 
 [[Filtering]]
 == Filtering

@@ -98,16 +98,18 @@ location / {
 |`wis2`
 
 |Идентификатор пользователя (UID)
-|`10001`
+|`10001` (по умолчанию — настраивается через `WIS2DOWNLOADER_UID` в `.env`)
 
 |Имя группы
 |`wis2`
 
 |Идентификатор группы (GID)
-|`988`
+|`988` (по умолчанию — настраивается через `WIS2DOWNLOADER_GID` в `.env`)
 |===
 
-Воркер Celery записывает файлы в `/data` внутри контейнера, что соответствует `./downloads/` на хосте.
+Воркер Celery записывает файлы в `/data` внутри контейнера, что соответствует `HOST_DATA_PATH` на хосте (по умолчанию: `./downloads/`).
+
+IMPORTANT: Если вы изменяете `WIS2DOWNLOADER_UID` или `WIS2DOWNLOADER_GID` в `.env`, пересоберите образы командой `docker compose build` перед перезапуском и используйте соответствующие значения в командах ниже.
 
 ==== Вариант 1: Создание совпадающего пользователя/группы (Рекомендуется)
 
@@ -226,13 +228,8 @@ docker-compose logs -f subscriber
 
 |`LOG_LEVEL`
 |string
-|`DEBUG`
+|`INFO`
 |Уровень логирования: DEBUG, INFO, WARNING, ERROR
-
-|`DATA_PATH`
-|path
-|`/data`
-|Базовый каталог для загруженных файлов
 
 |`FLASK_SECRET_KEY`
 |string
@@ -252,7 +249,27 @@ docker-compose logs -f subscriber
 |`FLASK_PORT`
 |integer
 |`5001`
-|Порт привязки API (внутренний)
+|Порт привязки API (внутренний порт контейнера)
+
+|`WIS2DOWNLOADER_UID`
+|integer
+|`10001`
+|Идентификатор пользователя, используемый при сборке образов. Должен совпадать с владельцем каталога на хосте для записи в том.
+
+|`WIS2DOWNLOADER_GID`
+|integer
+|`988`
+|Идентификатор группы, используемый при сборке образов. Должен совпадать с группой каталога на хосте для записи в том.
+
+|`HOST_DATA_PATH`
+|path
+|`./downloads`
+|Путь на хосте, монтируемый как том загрузок
+
+|`CONTAINER_DATA_PATH`
+|path
+|`/data`
+|Точка монтирования внутри контейнеров
 |===
 
 ==== Настройки брокера MQTT
@@ -364,15 +381,20 @@ docker-compose logs -f subscriber
 |===
 |Переменная |Тип |По умолчанию |Описание
 
+|`WIS2DOWNLOADER_BASE_URL`
+|string
+|`http://localhost`
+|Публичный базовый URL развёртывания (IP-адрес или имя хоста сервера). Установите адрес вашего сервера при удалённом развёртывании.
+
 |`WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL`
 |string
-|`http://subscription-manager:5001`
-|Внутренний URL, используемый интерфейсом для обращения к API менеджера подписок
+|`${WIS2DOWNLOADER_BASE_URL}:5002`
+|Публичный URL API менеджера подписок (на стороне браузера)
 
 |`WIS2DOWNLOADER_GRAFANA_URL`
 |string
-|`http://localhost:3000`
-|URL для встраивания панелей Grafana в вид Панели управления
+|`${WIS2DOWNLOADER_BASE_URL}:3000`
+|Публичный URL для встраивания панелей Grafana в вид Панели управления
 
 |`STORAGE_SECRET`
 |string
@@ -425,21 +447,37 @@ wis2downloader/
 
 === Масштабирование воркеров
 
-Увеличьте параллелизм воркера Celery для повышения производительности:
+Стек запускает три пула воркеров Celery, каждый из которых обслуживает отдельную очередь:
+
+[cols="2,1,1,3"]
+|===
+|Сервис |Очередь |Параллелизм по умолчанию |Назначение
+
+|`celery-workers-high-priority`
+|`high_priority`
+|8
+|Высокоприоритетные загрузки
+
+|`celery-workers-small-files`
+|`small_files`
+|24
+|Очередь по умолчанию для небольших файлов
+
+|`celery-workers-large-files`
+|`large_files`
+|8
+|Загрузка больших файлов
+|===
+
+Настройте параллелизм, изменив флаг `--concurrency` в команде соответствующего сервиса в `docker-compose.yaml`:
 
 [source,yaml]
 ----
-# docker-compose.yaml
-celery:
-  command: ["... --concurrency=16 ..."]
+celery-workers-small-files:
+  command: ["/bin/bash", "-c", "source .venv/bin/activate && task_manager_start worker --pool=threads --concurrency=32 --loglevel=info -Q small_files"]
 ----
 
-Или запустите несколько контейнеров воркеров:
-
-[source,bash]
-----
-docker-compose up -d --scale celery=3
-----
+При создании подписки через API используйте поле `queue` для маршрутизации загрузок в конкретный пул (`high_priority`, `small_files` или `large_files`). Значение по умолчанию: `small_files`.
 
 === Добавление глобальных брокеров
 
@@ -601,7 +639,7 @@ IMPORTANT: Измените пароль Grafana по умолчанию пос�
 docker-compose logs -f
 
 # Конкретный сервис
-docker-compose logs -f celery
+docker-compose logs -f celery-workers-small-files
 
 # С временными метками
 docker-compose logs -f -t subscriber
@@ -698,7 +736,7 @@ curl http://localhost:5002/subscriptions
 +
 [source,bash]
 ----
-docker-compose logs celery | tail -50
+docker-compose logs celery-workers-small-files | tail -50
 ----
 
 4. Проверьте глубину очереди:

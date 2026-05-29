@@ -68,7 +68,7 @@ NOTE: 如果安装时出现错误，请通过 `uname -m` 确认您的系统架�
 
 == 4. 设置下载目录
 
-容器以非 root 用户身份运行（UID 10001，GID 988）。在 Linux 上，启动前必须配置下载目录权限：
+容器以非 root 用户身份运行（默认 UID 10001，GID 988）。在 Linux 上，启动前必须配置下载目录权限：
 
 [source,bash]
 ----
@@ -77,6 +77,8 @@ sudo useradd -u 10001 -g wis2 -M -s /usr/sbin/nologin wis2
 mkdir -p downloads
 sudo chown wis2:wis2 downloads
 ----
+
+NOTE: 如果 UID 10001 或 GID 988 与系统中已有用户冲突，可在运行 `docker compose up` 前，在 `.env` 中设置 `WIS2DOWNLOADER_UID` 和 `WIS2DOWNLOADER_GID` 来覆盖默认值，并在上述命令中使用对应的值。如果在已构建镜像之后修改了 `WIS2DOWNLOADER_UID` 或 `WIS2DOWNLOADER_GID`，请先执行 `docker compose build` 重新构建镜像，再重启服务。
 
 NOTE: 在 macOS 和 Windows（Docker Desktop）上无需此步骤——Docker Desktop 会自动处理卷权限。
 
@@ -89,7 +91,7 @@ NOTE: 在 macOS 和 Windows（Docker Desktop）上无需此步骤——Docker De
 docker compose up -d
 ----
 
-此命令将启动所有服务：订阅管理器、MQTT 订阅者（法国和巴西 Global Broker）、Celery 下载工作进程、Redis、Prometheus、Grafana 和 Loki。
+此命令将启动所有服务：订阅管理器、MQTT 订阅者（法国和巴西 Global Broker）、Celery 工作进程（高优先级、小文件和大文件队列）、Redis、Prometheus、Grafana 和 Loki。
 
 检查所有服务是否正常运行：
 

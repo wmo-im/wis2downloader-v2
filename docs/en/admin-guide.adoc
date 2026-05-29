@@ -91,16 +91,18 @@ The application containers run as a non-root user (`wis2`) for security. To allo
 |`wis2`
 
 |User ID (UID)
-|`10001`
+|`10001` (default — configurable via `WIS2DOWNLOADER_UID` in `.env`)
 
 |Group name
 |`wis2`
 
 |Group ID (GID)
-|`988`
+|`988` (default — configurable via `WIS2DOWNLOADER_GID` in `.env`)
 |===
 
-The Celery worker writes files to `/data` inside the container, which maps to `./downloads/` on the host.
+The Celery worker writes files to `/data` inside the container, which maps to `HOST_DATA_PATH` on the host (default: `./downloads/`).
+
+IMPORTANT: If you change `WIS2DOWNLOADER_UID` or `WIS2DOWNLOADER_GID` in `.env`, rebuild the images with `docker compose build` before restarting, and update the host user/group commands below to match.
 
 ==== Option 1: Create Matching User/Group (Recommended)
 
@@ -219,13 +221,8 @@ docker-compose logs -f subscriber
 
 |`LOG_LEVEL`
 |string
-|`DEBUG`
+|`INFO`
 |Logging level: DEBUG, INFO, WARNING, ERROR
-
-|`DATA_PATH`
-|path
-|`/data`
-|Base directory for downloaded files
 
 |`FLASK_SECRET_KEY`
 |string
@@ -245,7 +242,27 @@ docker-compose logs -f subscriber
 |`FLASK_PORT`
 |integer
 |`5001`
-|API bind port (internal)
+|API bind port (internal container port)
+
+|`WIS2DOWNLOADER_UID`
+|integer
+|`10001`
+|User ID used when building container images. Must match the host directory owner for volume writes.
+
+|`WIS2DOWNLOADER_GID`
+|integer
+|`988`
+|Group ID used when building container images. Must match the host directory group for volume writes.
+
+|`HOST_DATA_PATH`
+|path
+|`./downloads`
+|Host path mounted as the download volume
+
+|`CONTAINER_DATA_PATH`
+|path
+|`/data`
+|Mount point inside containers
 |===
 
 ==== MQTT Broker Settings
@@ -357,15 +374,20 @@ docker-compose logs -f subscriber
 |===
 |Variable |Type |Default |Description
 
+|`WIS2DOWNLOADER_BASE_URL`
+|string
+|`http://localhost`
+|Public base URL of the deployment (server IP or hostname). Drives the defaults for the two variables below. Set this to your server's address when deploying remotely.
+
 |`WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL`
 |string
-|`http://subscription-manager:5001`
-|Internal URL the UI uses to reach the subscription manager API
+|`${WIS2DOWNLOADER_BASE_URL}:5002`
+|Browser-facing URL of the subscription manager API
 
 |`WIS2DOWNLOADER_GRAFANA_URL`
 |string
-|`http://localhost:3000`
-|URL used to embed Grafana panels in the Dashboard view
+|`${WIS2DOWNLOADER_BASE_URL}:3000`
+|Browser-facing URL used to embed Grafana panels in the Dashboard view
 
 |`STORAGE_SECRET`
 |string
@@ -418,21 +440,37 @@ The system uses a single Redis instance and does not provide high availability. 
 
 === Scaling Workers
 
-Increase Celery worker concurrency for higher throughput:
+The stack runs three Celery worker pools, each targeting a dedicated queue:
+
+[cols="2,1,1,3"]
+|===
+|Service |Queue |Default Concurrency |Purpose
+
+|`celery-workers-high-priority`
+|`high_priority`
+|8
+|High-priority downloads
+
+|`celery-workers-small-files`
+|`small_files`
+|24
+|Default queue for small files
+
+|`celery-workers-large-files`
+|`large_files`
+|8
+|Large file downloads
+|===
+
+Adjust concurrency by editing the `--concurrency` flag in the relevant service's `command` in `docker-compose.yaml`:
 
 [source,yaml]
 ----
-# docker-compose.yaml
-celery:
-  command: ["... --concurrency=16 ..."]
+celery-workers-small-files:
+  command: ["/bin/bash", "-c", "source .venv/bin/activate && task_manager_start worker --pool=threads --concurrency=32 --loglevel=info -Q small_files"]
 ----
 
-Or run multiple worker containers:
-
-[source,bash]
-----
-docker-compose up -d --scale celery=3
-----
+When creating a subscription via the API, use the `queue` field to route downloads to a specific pool (`high_priority`, `small_files`, or `large_files`). The default is `small_files`.
 
 === Adding Global Brokers
 
@@ -593,8 +631,8 @@ View logs via Docker:
 # All services
 docker-compose logs -f
 
-# Specific service
-docker-compose logs -f celery
+# Specific service (use the worker queue name)
+docker-compose logs -f celery-workers-small-files
 
 # With timestamps
 docker-compose logs -f -t subscriber
@@ -691,7 +729,7 @@ curl http://localhost:5002/subscriptions
 +
 [source,bash]
 ----
-docker-compose logs celery | tail -50
+docker-compose logs celery-workers-small-files | tail -50
 ----
 
 4. Check queue depth:

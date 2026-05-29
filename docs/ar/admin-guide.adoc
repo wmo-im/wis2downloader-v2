@@ -100,16 +100,18 @@ location / {
 |`wis2`
 
 |معرّف المستخدم (UID)
-|`10001`
+|`10001` (الافتراضي — قابل للتهيئة عبر `WIS2DOWNLOADER_UID` في `.env`)
 
 |اسم المجموعة
 |`wis2`
 
 |معرّف المجموعة (GID)
-|`988`
+|`988` (الافتراضي — قابل للتهيئة عبر `WIS2DOWNLOADER_GID` في `.env`)
 |===
 
-يكتب عامل Celery الملفات في `/data` داخل الحاوية، والذي يُخصَّص لمسار `./downloads/` على المضيف.
+يكتب عامل Celery الملفات في `/data` داخل الحاوية، والذي يُخصَّص للمسار `HOST_DATA_PATH` على المضيف (الافتراضي: `./downloads/`).
+
+IMPORTANT: إذا غيّرت `WIS2DOWNLOADER_UID` أو `WIS2DOWNLOADER_GID` في `.env`، أعد بناء الصور بـ `docker compose build` قبل إعادة التشغيل، واستخدم القيم المطابقة في الأوامر أدناه.
 
 ==== الخيار 1: إنشاء مستخدم/مجموعة مطابقَيْن (موصى به)
 
@@ -228,13 +230,8 @@ docker-compose logs -f subscriber
 
 |`LOG_LEVEL`
 |string
-|`DEBUG`
+|`INFO`
 |مستوى التسجيل: DEBUG، INFO، WARNING، ERROR
-
-|`DATA_PATH`
-|path
-|`/data`
-|المجلد الأساسي للملفات المُنزَّلة
 
 |`FLASK_SECRET_KEY`
 |string
@@ -255,6 +252,26 @@ docker-compose logs -f subscriber
 |integer
 |`5001`
 |منفذ ربط API (داخلي)
+
+|`WIS2DOWNLOADER_UID`
+|integer
+|`10001`
+|معرّف المستخدم المستخدم عند بناء صور الحاويات. يجب أن يتطابق مع مالك مجلد المضيف لعمليات الكتابة على وحدة التخزين.
+
+|`WIS2DOWNLOADER_GID`
+|integer
+|`988`
+|معرّف المجموعة المستخدم عند بناء صور الحاويات. يجب أن يتطابق مع مجموعة مجلد المضيف لعمليات الكتابة على وحدة التخزين.
+
+|`HOST_DATA_PATH`
+|path
+|`./downloads`
+|مسار المضيف المُثبَّت كوحدة تخزين التنزيل
+
+|`CONTAINER_DATA_PATH`
+|path
+|`/data`
+|نقطة التثبيت داخل الحاوية حيث تُكتب الملفات المُنزَّلة
 |===
 
 ==== إعدادات الوسيط MQTT
@@ -366,14 +383,19 @@ docker-compose logs -f subscriber
 |===
 |المتغير |النوع |القيمة الافتراضية |الوصف
 
+|`WIS2DOWNLOADER_BASE_URL`
+|string
+|`http://localhost`
+|عنوان URL العام الأساسي للنشر (IP الخادم أو اسم المضيف). يُشكِّل الافتراضيات للمتغيرَيْن أدناه. عيِّنه بعنوان خادمك عند النشر عن بُعد.
+
 |`WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL`
 |string
-|`http://subscription-manager:5001`
-|عنوان URL الداخلي الذي تستخدمه الواجهة للوصول إلى API مدير الاشتراكات
+|`${WIS2DOWNLOADER_BASE_URL}:5002`
+|عنوان URL لـ API مدير الاشتراكات المواجه للمتصفح
 
 |`WIS2DOWNLOADER_GRAFANA_URL`
 |string
-|`http://localhost:3000`
+|`${WIS2DOWNLOADER_BASE_URL}:3000`
 |عنوان URL المستخدم لتضمين لوحات Grafana في عرض لوحة التحكم
 
 |`STORAGE_SECRET`
@@ -427,21 +449,37 @@ wis2downloader/
 
 === توسع العمال
 
-زيادة تزامن عامل Celery لإنتاجية أعلى:
+يُشغِّل المكدّس ثلاثة مجموعات من عمال Celery، كل منها يستهدف قائمة انتظار مخصصة:
+
+[cols="2,1,1,3"]
+|===
+|الخدمة |قائمة الانتظار |التزامن الافتراضي |الغرض
+
+|`celery-workers-high-priority`
+|`high_priority`
+|8
+|التنزيلات ذات الأولوية العالية
+
+|`celery-workers-small-files`
+|`small_files`
+|24
+|قائمة الانتظار الافتراضية للملفات الصغيرة
+
+|`celery-workers-large-files`
+|`large_files`
+|8
+|تنزيلات الملفات الكبيرة
+|===
+
+عدِّل التزامن بتغيير خيار `--concurrency` في `command` الخاصة بالخدمة المعنية في `docker-compose.yaml`:
 
 [source,yaml]
 ----
-# docker-compose.yaml
-celery:
-  command: ["... --concurrency=16 ..."]
+celery-workers-small-files:
+  command: ["/bin/bash", "-c", "source .venv/bin/activate && task_manager_start worker --pool=threads --concurrency=32 --loglevel=info -Q small_files"]
 ----
 
-أو تشغيل حاويات عمال متعددة:
-
-[source,bash]
-----
-docker-compose up -d --scale celery=3
-----
+عند إنشاء اشتراك عبر API، استخدم حقل `queue` لتوجيه التنزيلات إلى مجموعة محددة (`high_priority`، `small_files`، أو `large_files`). القيمة الافتراضية هي `small_files`.
 
 === إضافة وسطاء عالميين
 
@@ -603,7 +641,7 @@ IMPORTANT: غيِّر كلمة مرور Grafana الافتراضية بعد تس
 docker-compose logs -f
 
 # خدمة محددة
-docker-compose logs -f celery
+docker-compose logs -f celery-workers-small-files
 
 # مع الطوابع الزمنية
 docker-compose logs -f -t subscriber
@@ -700,7 +738,7 @@ curl http://localhost:5002/subscriptions
 +
 [source,bash]
 ----
-docker-compose logs celery | tail -50
+docker-compose logs celery-workers-small-files | tail -50
 ----
 
 4. تحقق من عمق قائمة الانتظار:

@@ -78,11 +78,11 @@ Le tiroir de navigation à gauche (à droite en mode arabe RTL) donne accès à 
 
 |kbd:[Alt+4]
 |*Abonnement manuel*
-|Saisissez une rubrique, un répertoire de sauvegarde et un filtre directement sans parcourir le catalogue
+|Saisissez une rubrique, un répertoire de sauvegarde, un filtre, une file d'attente et des identifiants directement sans parcourir le catalogue
 
 |kbd:[Alt+5]
 |*Gérer les abonnements*
-|Liste tous les abonnements actifs et permet de se désabonner des rubriques
+|Liste tous les abonnements actifs, permet de modifier leurs paramètres et de se désabonner des rubriques
 
 |kbd:[Alt+6]
 |*Paramètres*
@@ -123,7 +123,10 @@ Chaque carte de résultat affiche :
 * Les puces de catalogue source (CMA = bleu, DWD = cyan, ECCC = orange)
 * Une icône d'avertissement si le contenu de l'enregistrement diffère entre les catalogues
 * *Afficher les métadonnées* — ouvre un dialogue avec les détails complets de l'enregistrement et une carte interactive de l'étendue géographique du jeu de données
+* *Voir la licence* — ouvre l'URL de la licence du jeu de données dans un nouvel onglet (affiché uniquement lorsque l'enregistrement contient un lien de licence)
 * *Sélectionner* / *Désélectionner* — ajoute ou supprime la rubrique MQTT du jeu de données dans le panneau d'abonnement
+
+NOTE: Si un jeu de données est soumis à une licence, cliquer sur *Sélectionner* affiche un dialogue de confirmation de licence. Vous devez consulter et accepter la licence avant que la rubrique soit ajoutée au panneau d'abonnement.
 
 === Vue Arborescence
 
@@ -159,13 +162,41 @@ Lorsqu'une rubrique est sélectionnée (depuis la Vue Catalogue ou la Vue Arbore
 
 |Filtres personnalisés
 |Champs de filtre spécifiques au jeu de données provenant des métadonnées de lien de l'enregistrement GDC (vue catalogue uniquement)
+
+|File d'attente
+|File d'attente prioritaire pour le traitement des téléchargements : `high_priority`, `small_files` (par défaut) ou `large_files`. Utilisez `large_files` pour les rubriques volumineuses afin d'éviter de bloquer les téléchargements plus petits.
 |===
 
 Cliquez sur *S'abonner* pour ouvrir un dialogue de confirmation affichant la charge utile JSON complète. Vérifiez-la, puis cliquez sur *Confirmer* pour créer l'abonnement, ou sur *Annuler* pour revenir en arrière.
 
+=== Identifiants (Abonnement manuel)
+
+La vue *Abonnement manuel* (kbd:[Alt+4]) inclut une section d'authentification pour les sources nécessitant des identifiants. Sélectionnez le type d'authentification avec le bouton radio :
+
+[cols="1,3"]
+|===
+|Type |Champs
+
+|Aucun (par défaut)
+|Sans authentification — pour les sources de données publiques
+
+|Basique
+|Nom d'utilisateur et mot de passe
+
+|Bearer
+|Jeton (envoyé en tant que `Authorization: Bearer <token>`)
+|===
+
+NOTE: Les identifiants sont stockés dans Redis et envoyés avec chaque requête de téléchargement de l'abonnement. Le mot de passe et le jeton sont masqués dans les réponses de l'API.
+
 === Gestion des abonnements
 
-La vue Abonnements liste tous les abonnements actifs avec leurs chemins de sauvegarde. Cliquez sur *Se désabonner* sur n'importe quelle entrée pour la supprimer. Utilisez *Recharger les abonnements* pour actualiser la liste après des modifications effectuées via l'API.
+La vue Abonnements liste tous les abonnements actifs avec leur rubrique, chemin de sauvegarde et résumé du filtre. Deux actions sont disponibles sur chaque entrée :
+
+* *Modifier* — ouvre un dialogue pour modifier le répertoire de sauvegarde, le filtre, la file d'attente et les identifiants de l'abonnement. La rubrique ne peut pas être modifiée ; pour s'abonner à une rubrique différente, vous devez créer un nouvel abonnement.
+* *Se désabonner* — supprime l'abonnement. Si c'était le dernier abonnement pour cette rubrique, la connexion MQTT est également fermée.
+
+Utilisez *Recharger les abonnements* pour actualiser la liste après des modifications effectuées via l'API.
 
 === Paramètres
 
@@ -259,6 +290,14 @@ Réponse :
 |`filter`
 |Non
 |Configuration du filtre (voir <<Filtrage>>)
+
+|`queue`
+|Non
+|File d'attente prioritaire pour le traitement : `high_priority`, `small_files` (par défaut) ou `large_files`
+
+|`credentials`
+|Non
+|Authentification pour la source de données (voir <<Identifiants-API>>)
 |===
 
 === Liste des abonnements
@@ -301,6 +340,22 @@ Réponse :
 }
 ----
 
+=== Mise à jour d'un abonnement
+
+Mettez à jour le répertoire de sauvegarde, le filtre, la file d'attente ou les identifiants d'un abonnement sans le recréer :
+
+[source,bash]
+----
+curl -X PUT http://localhost:5002/subscriptions/<id> \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target": "new-directory",
+    "queue": "large_files"
+  }'
+----
+
+Seuls les champs inclus sont modifiés ; les champs omis conservent leurs valeurs actuelles. `credentials` peut être défini à `null` pour supprimer l'authentification.
+
 === Suppression d'un abonnement
 
 [source,bash]
@@ -309,6 +364,38 @@ curl -X DELETE http://localhost:5002/subscriptions/<id>
 ----
 
 NOTE: `<id>` désigne l'UUID d'abonnement obtenu via `GET /subscriptions`. Si c'est le dernier abonnement pour cette rubrique, la connexion MQTT est également fermée.
+
+[[Identifiants-API]]
+== Identifiants
+
+Les abonnements téléchargeant depuis des sources protégées par mot de passe ou jeton acceptent un objet `credentials` optionnel.
+
+=== Authentification basique
+
+[source,json]
+----
+{
+  "credentials": {
+    "type": "basic",
+    "username": "myuser",
+    "password": "mypassword"
+  }
+}
+----
+
+=== Jeton Bearer
+
+[source,json]
+----
+{
+  "credentials": {
+    "type": "bearer",
+    "token": "eyJhbGciOi..."
+  }
+}
+----
+
+NOTE: L'API masque les secrets dans les réponses — `password` est omis et `token` est remplacé par `***`. Les identifiants complets sont stockés dans Redis et utilisés uniquement lors du téléchargement.
 
 [[Filtrage]]
 == Filtrage

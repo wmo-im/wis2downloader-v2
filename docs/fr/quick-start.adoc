@@ -68,7 +68,7 @@ NOTE: En cas d'erreur lors de l'installation, vérifiez votre architecture avec 
 
 == 4. Configuration du répertoire de téléchargement
 
-Les conteneurs s'exécutent en tant qu'utilisateur non-root (UID 10001, GID 988). Sur Linux, vous devez configurer le répertoire de téléchargement avant de démarrer :
+Les conteneurs s'exécutent en tant qu'utilisateur non-root (UID 10001, GID 988 par défaut). Sur Linux, vous devez configurer le répertoire de téléchargement avant de démarrer :
 
 [source,bash]
 ----
@@ -77,6 +77,8 @@ sudo useradd -u 10001 -g wis2 -M -s /usr/sbin/nologin wis2
 mkdir -p downloads
 sudo chown wis2:wis2 downloads
 ----
+
+NOTE: Si UID 10001 ou GID 988 entrent en conflit avec des utilisateurs existants sur votre système, surchargez-les en définissant `WIS2DOWNLOADER_UID` et `WIS2DOWNLOADER_GID` dans votre `.env` avant d'exécuter `docker compose up`. Utilisez les valeurs correspondantes dans les commandes ci-dessus. Si vous modifiez `WIS2DOWNLOADER_UID` ou `WIS2DOWNLOADER_GID` après avoir déjà construit les images, reconstruisez-les avec `docker compose build` avant de redémarrer.
 
 NOTE: Sur macOS et Windows (Docker Desktop), cette étape n'est pas nécessaire — Docker Desktop gère automatiquement les permissions des volumes.
 
@@ -89,7 +91,7 @@ Si vous ne pouvez pas créer un utilisateur correspondant, consultez la section 
 docker compose up -d
 ----
 
-Cette commande démarre tous les services : gestionnaire d'abonnements, abonnés MQTT (Global Brokers France et Brésil), workers Celery de téléchargement, Redis, Prometheus, Grafana et Loki.
+Cette commande démarre tous les services : gestionnaire d'abonnements, abonnés MQTT (Global Brokers France et Brésil), workers Celery (files haute priorité, petits fichiers et grands fichiers), Redis, Prometheus, Grafana et Loki.
 
 Vérifiez que tout fonctionne :
 

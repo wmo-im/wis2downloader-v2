@@ -61,7 +61,7 @@ NOTE: If you see an error on install, check your architecture with `uname -m`. T
 
 == 4. Set Up Download Directory
 
-The containers run as a non-root user (UID 10001, GID 988). On Linux you must set up the downloads directory before starting:
+The containers run as a non-root user (UID 10001, GID 988 by default). On Linux you must set up the downloads directory before starting:
 
 [source,bash]
 ----
@@ -70,6 +70,8 @@ sudo useradd -u 10001 -g wis2 -M -s /usr/sbin/nologin wis2
 mkdir -p downloads
 sudo chown wis2:wis2 downloads
 ----
+
+NOTE: If UID 10001 or GID 988 conflict with existing users on your system, override them by setting `WIS2DOWNLOADER_UID` and `WIS2DOWNLOADER_GID` in your `.env` before running `docker compose up`. Use the matching values in the commands above. If you change `WIS2DOWNLOADER_UID` or `WIS2DOWNLOADER_GID` after having already built the images, rebuild them with `docker compose build` before restarting.
 
 NOTE: On macOS and Windows (Docker Desktop) this step is not required — Docker Desktop handles volume permissions automatically.
 
@@ -82,7 +84,7 @@ If you cannot create a matching user, see the link:admin-guide.html#_volume_perm
 docker compose up -d
 ----
 
-This starts all services: subscription manager, MQTT subscribers (France and Brazil Global Brokers), Celery download workers, Redis, Prometheus, Grafana, and Loki.
+This starts all services: subscription manager, MQTT subscribers (France and Brazil Global Brokers), Celery workers (high-priority, small-files, and large-files queues), Redis, Prometheus, Grafana, and Loki.
 
 Check everything is running:
 

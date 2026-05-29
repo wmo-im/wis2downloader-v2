@@ -21,15 +21,19 @@ WIS2 Downloader предоставляет REST API для управления 
 * **Спецификация OpenAPI:** `http://localhost:5002/openapi`
 * **Swagger UI:** `http://localhost:5002/swagger`
 
+NOTE: Замените `localhost:5002` на адрес вашего сервера при удалённом развёртывании. Базовый URL настраивается через `WIS2DOWNLOADER_SUBSCRIPTION_MANAGER_URL` в `.env`.
+
 == Аутентификация
 
-В настоящее время API не требует аутентификации. В производственной среде рекомендуется разместить его за обратным прокси-сервером с аутентификацией.
+API не требует аутентификации. В production-среде разместите его за обратным прокси с аутентификацией (см. раздел link:admin-guide.html#_access_control[Контроль доступа] руководства администратора).
 
 == API подписок
 
+Каждая подписка идентифицируется UUID и связывает MQTT-топик, путь сохранения, необязательный фильтр, необязательные учётные данные и очередь. Несколько подписок могут использовать один топик — MQTT-соединение открывается один раз, а сообщения маршрутизируются ко всем совпадающим подпискам.
+
 === Список подписок
 
-Возвращает все активные подписки.
+Возвращает все активные подписки, сгруппированные по топику.
 
 [source,http]
 ----
@@ -43,7 +47,7 @@ GET /subscriptions
 |Статус |Описание
 
 |200
-|Успех — возвращает карту тема → детали подписки
+|Успех — карта топик → карта UUID подписки → детали подписки
 
 |503
 |Redis недоступен
@@ -60,10 +64,18 @@ curl http://localhost:5002/subscriptions
 ----
 {
   "cache/a/wis2/+/data/core/weather/surface-based-observations/#": {
-    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-    "save_path": "surface-obs",
-    "filters": {
-      "accepted_media_types": ["application/bufr", "application/grib"]
+    "550e8400-e29b-41d4-a716-446655440000": {
+      "save_path": "surface-obs",
+      "filter": {}
+    },
+    "661f9511-f30c-52e5-b827-557766551111": {
+      "save_path": "surface-obs-bufr",
+      "filter": {
+        "name": "bufr-only",
+        "rules": [
+          { "id": "accept-bufr", "order": 1, "match": { "media_type": { "equals": "application/bufr" } }, "action": "accept" }
+        ]
+      }
     }
   }
 }
@@ -71,7 +83,9 @@ curl http://localhost:5002/subscriptions
 
 === Создание подписки
 
-Создаёт новую подписку на тему WIS2.
+Создаёт новую подписку. Присваивает UUID и возвращает полную запись подписки.
+
+Если это первая подписка для указанного топика, открывается MQTT-соединение. Дополнительные подписки для того же топика используют существующее соединение.
 
 [source,http]
 ----
@@ -88,22 +102,27 @@ Content-Type: application/json
 |`topic`
 |string
 |Да
-|Шаблон темы MQTT WIS2. Поддерживает `+` (один уровень) и `#` (несколько уровней) как подстановочные знаки.
+|Шаблон MQTT-топика WIS2. Поддерживает подстановочные символы `+` (один уровень) и `#` (несколько уровней).
 
 |`target`
 |string
 |Нет
-|Подкаталог под `/data` для сохранения файлов.
+|Подкаталог в корне данных, куда сохраняются файлы.
 
-|`filters`
-|object
+|`filter`
+|объект
 |Нет
-|Конфигурация фильтра.
+|Фильтр на основе правил. См. <<_схема_фильтра>>.
 
-|`filters.accepted_media_types`
-|array
+|`credentials`
+|объект
 |Нет
-|Список разрешённых типов MIME. Поддерживает подстановочные знаки (например, `application/x-grib*`).
+|HTTP-учётные данные для наборов данных с контролируемым доступом. См. <<_схема_учётных_данных>>.
+
+|`queue`
+|string
+|Нет
+|Очередь загрузки: `high_priority`, `small_files` (по умолчанию) или `large_files`.
 |===
 
 ==== Ответ
@@ -112,14 +131,14 @@ Content-Type: application/json
 |===
 |Статус |Описание
 
-|202
-|Принято — подписка поставлена в очередь на обработку
+|201
+|Создано — возвращает полную запись подписки
 
 |400
-|Неверный запрос — тема отсутствует или недействительна
+|Неверный запрос — отсутствующие или недопустимые поля
 
 |503
-|Сервис недоступен — ошибка подключения к Redis
+|Сервис недоступен — сбой подключения к Redis
 |===
 
 ==== Заголовки ответа
@@ -129,40 +148,83 @@ Content-Type: application/json
 |Заголовок |Описание
 
 |`Location`
-|URL для получения деталей подписки
+|URL для получения созданной подписки (`/subscriptions/{id}`)
 |===
 
-==== Пример
+==== Примеры
 
 [source,bash]
 ----
+# Простая подписка
 curl -X POST http://localhost:5002/subscriptions \
   -H "Content-Type: application/json" \
   -d '{
     "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-    "target": "surface-obs",
-    "filters": {
-      "accepted_media_types": ["application/bufr", "application/grib"]
+    "target": "surface-obs"
+  }'
+----
+
+[source,bash]
+----
+# Подписка с фильтром
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+    "target": "surface-obs-bufr",
+    "filter": {
+      "name": "bufr-only",
+      "rules": [
+        { "id": "accept-bufr", "order": 1, "match": { "media_type": { "equals": "application/bufr" } }, "action": "accept" },
+        { "id": "default-reject", "order": 999, "match": { "always": true }, "action": "reject" }
+      ]
     }
+  }'
+----
+
+[source,bash]
+----
+# Подписка на набор данных с контролируемым доступом с базовой аутентификацией
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/+/data/recommended/weather/surface-based-observations/#",
+    "target": "restricted-obs",
+    "credentials": { "type": "basic", "username": "myuser", "password": "s3cr3t" }
+  }'
+----
+
+[source,bash]
+----
+# Направить крупные загрузки в очередь large-files
+curl -X POST http://localhost:5002/subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "cache/a/wis2/fr-meteofrance/data/core/weather/space-based-observations/noaa-21/cris",
+    "target": "space-obs",
+    "queue": "large_files"
   }'
 ----
 
 [source,json]
 ----
 {
-  "status": "accepted",
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-  "target": "surface-obs"
+  "save_path": "surface-obs",
+  "filter": {},
+  "credentials": null,
+  "queue": "small_files"
 }
 ----
 
 === Получение подписки
 
-Возвращает детали конкретной подписки.
+Возвращает полную запись конкретной подписки.
 
 [source,http]
 ----
-GET /subscriptions/{topic}
+GET /subscriptions/{id}
 ----
 
 ==== Параметры пути
@@ -171,25 +233,10 @@ GET /subscriptions/{topic}
 |===
 |Параметр |Тип |Описание
 
-|`topic`
-|string
-|Тема WIS2 (только `#` требует кодирования как `%23`)
+|`id`
+|string (UUID)
+|UUID подписки, возвращённый при её создании
 |===
-
-==== Кодирование URL
-
-Только символ `#` требует URL-кодирования:
-
-[cols="1,1,2"]
-|===
-|Символ |Закодированный |Причина
-
-|`#`
-|`%23`
-|Иначе интерпретируется как фрагмент URL
-|===
-
-NOTE: Слэши (`/`) и `+` не требуют кодирования в пути.
 
 ==== Ответ
 
@@ -200,8 +247,77 @@ NOTE: Слэши (`/`) и `+` не требуют кодирования в пу
 |200
 |Успех
 
+|404
+|Подписка не найдена
+|===
+
+==== Пример
+
+[source,bash]
+----
+curl http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000
+----
+
+[source,json]
+----
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
+  "save_path": "surface-obs",
+  "filter": {},
+  "credentials": null,
+  "queue": "small_files"
+}
+----
+
+NOTE: Секреты учётных данных (`password`, `token`) никогда не возвращаются. В ответах включаются только `type` и `username` (для базовой аутентификации).
+
+=== Обновление подписки
+
+Обновляет путь сохранения, фильтр, учётные данные или очередь существующей подписки. Топик изменить нельзя — удалите подписку и создайте новую, чтобы изменить топик.
+
+[source,http]
+----
+PUT /subscriptions/{id}
+Content-Type: application/json
+----
+
+==== Тело запроса
+
+Все поля необязательны. Обновляются только предоставленные поля.
+
+[cols="1,1,3"]
+|===
+|Поле |Тип |Описание
+
+|`target`
+|string
+|Новый подкаталог в корне данных
+
+|`filter`
+|объект
+|Новый фильтр на основе правил (заменяет существующий)
+
+|`credentials`
+|объект
+|Новые учётные данные (заменяют существующие)
+
+|`queue`
+|string
+|Новая очередь: `high_priority`, `small_files` или `large_files`
+|===
+
+==== Ответ
+
+[cols="1,3"]
+|===
+|Статус |Описание
+
+|200
+|Обновлённая запись подписки
+
 |400
-|Недействительная тема
+|Недопустимое значение поля
 
 |404
 |Подписка не найдена
@@ -214,39 +330,19 @@ NOTE: Слэши (`/`) и `+` не требуют кодирования в пу
 
 [source,bash]
 ----
-curl "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"
-----
-
-[source,json]
-----
-{
-  "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#",
-  "save_path": "surface-obs",
-  "filters": {
-    "accepted_media_types": ["application/bufr", "application/grib"]
-  }
-}
+curl -X PUT http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Content-Type: application/json" \
+  -d '{ "target": "surface-obs-v2", "queue": "high_priority" }'
 ----
 
 === Удаление подписки
 
-Удаляет подписку.
+Удаляет подписку. Если это последняя подписка для топика, MQTT-соединение для этого топика закрывается.
 
 [source,http]
 ----
-DELETE /subscriptions/{topic}
+DELETE /subscriptions/{id}
 ----
-
-==== Параметры пути
-
-[cols="1,1,3"]
-|===
-|Параметр |Тип |Описание
-
-|`topic`
-|string
-|URL-кодированная тема WIS2
-|===
 
 ==== Ответ
 
@@ -257,8 +353,8 @@ DELETE /subscriptions/{topic}
 |200
 |Успешно удалено
 
-|400
-|Недействительная тема
+|404
+|Подписка не найдена
 
 |503
 |Redis недоступен
@@ -268,41 +364,24 @@ DELETE /subscriptions/{topic}
 
 [source,bash]
 ----
-curl -X DELETE "http://localhost:5002/subscriptions/cache/a/wis2/+/data/core/weather/surface-based-observations/%23"
+curl -X DELETE http://localhost:5002/subscriptions/550e8400-e29b-41d4-a716-446655440000
 ----
 
 [source,json]
 ----
-{
-  "status": "deleted",
-  "topic": "cache/a/wis2/+/data/core/weather/surface-based-observations/#"
-}
+{ "status": "deleted", "id": "550e8400-e29b-41d4-a716-446655440000" }
 ----
 
 == API мониторинга
 
 === Проверка работоспособности
 
-Возвращает состояние работоспособности сервиса.
-
 [source,http]
 ----
 GET /health
 ----
 
-==== Ответ
-
 Всегда возвращает 200. Проверьте поле `status` для фактического состояния.
-
-[cols="1,3"]
-|===
-|Поле |Значения
-
-|`status`
-|`healthy` или `unhealthy`
-|===
-
-==== Пример
 
 [source,bash]
 ----
@@ -311,7 +390,7 @@ curl http://localhost:5002/health
 
 [source,json]
 ----
-{"status": "healthy"}
+{ "status": "healthy" }
 ----
 
 === Метрики Prometheus
@@ -323,19 +402,6 @@ curl http://localhost:5002/health
 GET /metrics
 ----
 
-==== Ответ
-
-[cols="1,3"]
-|===
-|Статус |Описание
-
-|200
-|Метрики в текстовом формате Prometheus
-
-|500
-|Ошибка генерации метрик
-|===
-
 ==== Доступные метрики
 
 [cols="2,1,2,3"]
@@ -345,7 +411,7 @@ GET /metrics
 |`wis2downloader_notifications_total`
 |Counter
 |status
-|Всего обработанных уведомлений
+|Всего уведомлений, обработанных Celery
 
 |`wis2downloader_downloads_total`
 |Counter
@@ -370,7 +436,7 @@ GET /metrics
 |`wis2downloader_celery_queue_length`
 |Gauge
 |queue_name
-|Текущее количество задач в очереди Celery
+|Текущие задачи во всех очередях Celery
 |===
 
 ==== Пример
@@ -380,21 +446,7 @@ GET /metrics
 curl http://localhost:5002/metrics
 ----
 
-[source,prometheus]
-----
-# HELP wis2downloader_downloads_total Total number of files downloaded.
-# TYPE wis2downloader_downloads_total counter
-wis2downloader_downloads_total{cache="example.cache.com",media_type="application/bufr"} 42.0
-
-# HELP wis2downloader_notifications_total Total notifications processed.
-# TYPE wis2downloader_notifications_total counter
-wis2downloader_notifications_total{status="success"} 42.0
-wis2downloader_notifications_total{status="skipped"} 5.0
-----
-
 === Спецификация OpenAPI
-
-Возвращает спецификацию OpenAPI 3.0 в формате JSON.
 
 [source,http]
 ----
@@ -403,7 +455,7 @@ GET /openapi
 
 === Swagger UI
 
-Интерактивная документация API.
+Интерактивная документация API доступна по адресу:
 
 [source,http]
 ----
@@ -411,15 +463,13 @@ GET /
 GET /swagger
 ----
 
-== Ответы с ошибками
+== Ответы об ошибках
 
-Все ответы с ошибками следуют этому формату:
+Все ответы об ошибках имеют следующий формат:
 
 [source,json]
 ----
-{
-  "error": "Error message describing the problem"
-}
+{ "error": "Error message describing the problem" }
 ----
 
 === Распространённые сообщения об ошибках
@@ -430,15 +480,19 @@ GET /swagger
 
 |400
 |"No topic provided"
-|POST /subscriptions без поля topic
+|POST /subscriptions без поля `topic`
 
 |400
-|"No topic passed"
-|GET/DELETE с пустой темой
+|"credentials.type must be 'basic' or 'bearer'"
+|Недопустимый тип учётных данных
+
+|400
+|"queue must be one of: high_priority, large_files, small_files"
+|Неизвестное имя очереди
 
 |404
-|"Subscription for topic X not found"
-|Тема не подписана
+|"Subscription '{id}' not found"
+|UUID не существует
 
 |503
 |"Failed to connect to Redis: ..."
@@ -446,74 +500,188 @@ GET /swagger
 
 |503
 |"Failed to queue subscription command..."
-|Ошибка Redis pub/sub
-
-|503
-|"Failed to persist subscription..."
-|Ошибка записи Redis
+|Сбой Redis pub/sub
 |===
 
 == Схемы данных
 
 === Подписка
 
+Полная запись подписки, как она хранится и возвращается API.
+
+[cols="1,1,3"]
+|===
+|Поле |Тип |Описание
+
+|`id`
+|string (UUID)
+|Уникальный идентификатор, присваиваемый при создании
+
+|`topic`
+|string
+|Шаблон MQTT-топика WIS2
+
+|`save_path`
+|string \| null
+|Подкаталог в корне данных, куда сохраняются файлы
+
+|`filter`
+|объект
+|Фильтр на основе правил (пустой объект `{}` означает отсутствие фильтрации)
+
+|`credentials`
+|объект \| null
+|Учётные данные для загрузки. Секреты скрыты в ответах.
+
+|`queue`
+|string
+|Очередь загрузки: `high_priority`, `small_files` или `large_files`
+|===
+
+=== Схема фильтра [[_схема_фильтра]]
+
+Фильтры используют упорядоченный список правил. Правила оцениваются по порядку; применяется действие первого совпавшего правила. Если ни одно правило не совпадает, файл принимается.
+
+[cols="1,1,3"]
+|===
+|Поле |Тип |Описание
+
+|`name`
+|string
+|Имя фильтра для идентификации
+
+|`rules`
+|массив
+|Упорядоченный список <<_схема_правила_фильтра,правил фильтра>>
+|===
+
+==== Схема правила фильтра [[_схема_правила_фильтра]]
+
+[cols="1,1,3"]
+|===
+|Поле |Тип |Описание
+
+|`id`
+|string
+|Уникальный идентификатор правила
+
+|`order`
+|integer
+|Порядок выполнения — меньшие значения выполняются первыми
+
+|`match`
+|объект
+|Условие для проверки. См. <<_условия_совпадения>>.
+
+|`action`
+|string
+|`accept`, `reject` или `continue`
+|===
+
+==== Условия совпадения [[_условия_совпадения]]
+
+[cols="1,3"]
+|===
+|Условие |Описание
+
+|`media_type`
+|Совпадение по MIME-типу файла
+
+|`size`
+|Совпадение по размеру файла в байтах
+
+|`centre_id`
+|Совпадение по идентификатору источника данных (напр. `de-dwd`, `fr-meteofrance`). Первое поле — код страны ISO2C, второе — описательное название центра.
+
+|`data_id`
+|Совпадение по идентификатору данных WIS2
+
+|`href`
+|Совпадение по URL загрузки
+
+|`always: true`
+|Безусловное совпадение (используется как правило по умолчанию для всех)
+|===
+
+Строковые операторы: `equals`, `not_equals`, `in`, `not_in`, `pattern` (glob), `regex`
+
+Операторы размера/чисел: `gt_bytes`, `lt_bytes`, `gte_bytes`, `lte_bytes`, `between_bytes`
+
+Логические комбинаторы: `all` (И), `any` (ИЛИ), `not`
+
+==== Пример фильтра
+
+Принимать только BUFR-файлы размером менее 10 МБ; отклонять всё остальное:
+
 [source,json]
 ----
 {
-  "topic": "string (required) - WIS2 MQTT topic pattern",
-  "save_path": "string | null - Subdirectory for downloads",
-  "filters": {
-    "accepted_media_types": ["array of MIME type strings"]
-  }
-}
-----
-
-=== Фильтры
-
-[source,json]
-----
-{
-  "accepted_media_types": [
-    "application/bufr",
-    "application/grib",
-    "application/x-netcdf*"
+  "name": "bufr-small",
+  "rules": [
+    {
+      "id": "accept-small-bufr",
+      "order": 1,
+      "match": {
+        "all": [
+          { "media_type": { "equals": "application/bufr" } },
+          { "size": { "lt_bytes": 10485760 } }
+        ]
+      },
+      "action": "accept"
+    },
+    {
+      "id": "default-reject",
+      "order": 999,
+      "match": { "always": true },
+      "action": "reject"
+    }
   ]
 }
 ----
 
-==== Принимаемые типы медиа по умолчанию
+=== Схема учётных данных [[_схема_учётных_данных]]
 
-Если фильтр не указан, принимаются следующие типы:
+Используется для аутентификации HTTP-загрузок из наборов данных с контролируемым доступом.
 
-[source,json]
-----
-[
-  "image/gif", "image/jpeg", "image/png", "image/tiff",
-  "application/pdf", "application/postscript",
-  "application/bufr", "application/grib",
-  "application/x-hdf", "application/x-hdf5",
-  "application/x-netcdf", "application/x-netcdf4",
-  "text/plain", "text/html", "text/xml", "text/csv",
-  "text/tab-separated-values"
-]
-----
+NOTE: `password` и `token` доступны только для записи — принимаются в запросах, но никогда не возвращаются в ответах.
 
-== Справочник по шаблонам тем
+[cols="1,1,3"]
+|===
+|Поле |Тип |Описание
 
-=== Структура темы WIS2
+|`type`
+|string
+|`basic` или `bearer`
+
+|`username`
+|string
+|Обязательно, когда `type` равно `basic`
+
+|`password`
+|string (только запись)
+|Обязательно, когда `type` равно `basic`
+
+|`token`
+|string (только запись)
+|Обязательно, когда `type` равно `bearer`
+|===
+
+== Справочник шаблонов топиков
+
+=== Структура топиков WIS2
 
 [source]
 ----
 {origin|cache}/a/wis2/{centre-id}/data/{data-policy}/{earth-system-domain}/{category}/...
 ----
 
-* `origin` - Исходные данные от поставщика данных
-* `cache` - Кэшированная копия из глобального кэша (рекомендуется для надёжности)
-* `{centre-id}` - Код страны/организации, с префиксом ISO2C кода страны (например, `de-dwd`)
-* `{data-policy}` - Единая политика данных WMO: `core` или `recommended`
-* `{earth-system-domain}` - Область системы Земли из Единой политики данных WMO
+* `origin` — Исходные данные от поставщика данных
+* `cache` — Кэшированная копия из Global Cache (рекомендуется для надёжности)
+* `{centre-id}` — Идентификатор центра. Первое поле — код страны ISO2C, второе — описательное название центра (напр. `de-dwd` для Deutscher Wetterdienst, `fr-meteofrance` для Météo-France)
+* `{data-policy}` — Единая политика данных ВМО: `core` (свободный доступ) или `recommended` (может требовать учётные данные)
+* `{earth-system-domain}` — Домен системы Земли из единой политики данных ВМО
 
-=== Подстановочные знаки
+=== Подстановочные символы
 
 [cols="1,1,3"]
 |===
@@ -521,28 +689,28 @@ GET /swagger
 
 |Один уровень
 |`+`
-|Соответствует ровно одному уровню
+|Совпадает ровно с одним уровнем
 
 |Несколько уровней
 |`#`
-|Соответствует нулю или более уровней (должен быть в конце)
+|Совпадает с нулём или более уровнями (должен стоять в конце)
 |===
 
 === Примеры
 
 [cols="2,3"]
 |===
-|Шаблон |Соответствует
+|Шаблон |Совпадает с
 
 |`cache/a/wis2/de-dwd/data/#`
-|Все данные от Deutscher Wetterdienst
+|Все данные Deutscher Wetterdienst
 
 |`cache/a/wis2/+/data/core/weather/surface-based-observations/#`
-|Приземные наблюдения со всех центров
+|Наземные наблюдения от всех центров
 
 |`cache/a/wis2/+/data/core/#`
-|Все основные данные из любого центра
+|Все основные данные любого центра
 
 |`cache/a/wis2/+/data/+/weather/#`
-|Все метеорологические данные (любая политика) из любого центра
+|Все метеорологические данные (любая политика) от любого центра
 |===
