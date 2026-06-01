@@ -6,6 +6,14 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
+ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+if docker plugin ls | grep -q 'loki'; then
+    echo "Loki Docker plugin already installed."
+else
+    docker plugin install grafana/loki-docker-driver:3.6.7-${ARCH} --alias loki --grant-all-permissions
+    echo "Loki Docker plugin installed."
+fi
+
 if [ -f .env ]; then
     echo ".env already exists — remove it first if you want to regenerate secrets."
     exit 1
@@ -70,8 +78,8 @@ else
 fi
 echo "WIS2DOWNLOADER_GID set to $INPUT_GID in .env."
 
-SELECTED_USER=$(getent passwd "$INPUT_UID" | cut -d: -f1)
-WIS2_GROUP=$(getent group "$INPUT_GID" | cut -d: -f1)
+SELECTED_USER=$(getent passwd "$INPUT_UID" | cut -d: -f1 || true)
+WIS2_GROUP=$(getent group "$INPUT_GID" | cut -d: -f1 || true)
 if [ -n "$SELECTED_USER" ] && [ -n "$WIS2_GROUP" ] && ! id -nG "$SELECTED_USER" | grep -qw "$WIS2_GROUP"; then
     usermod -aG "$WIS2_GROUP" "$SELECTED_USER"
     echo "Added user '$SELECTED_USER' to group '$WIS2_GROUP'. Log out and back in for this to take effect."
@@ -83,5 +91,7 @@ if [ -n "$EFFECTIVE_DATA_PATH" ]; then
     chown -R "$INPUT_UID:$INPUT_GID" "$EFFECTIVE_DATA_PATH"
     echo "Download path '$EFFECTIVE_DATA_PATH' created and owned by $INPUT_UID:$INPUT_GID."
 fi
+
+chown "$INPUT_UID:$INPUT_GID" .env
 
 echo "Review .env and adjust any settings before running: docker compose up -d"
