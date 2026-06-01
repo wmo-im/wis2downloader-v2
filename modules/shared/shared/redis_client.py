@@ -1,6 +1,7 @@
 """Redis client"""
 from functools import lru_cache
 import os
+import time
 from typing import Optional
 
 import redis
@@ -30,19 +31,27 @@ def get_redis_client() -> redis.Redis:
     global _redis_client
     if _redis_client is None:
         LOGGER.info(f"Connecting to Redis at {REDIS_HOST}:{REDIS_PORT}")
-        try:
-            _redis_client = redis.Redis(
-                host=REDIS_HOST,
-                port=REDIS_PORT,
-                db=REDIS_DB,
-                password=REDIS_PASSWORD,
-                socket_timeout=5,
-                socket_connect_timeout=5,
-                retry_on_timeout=True
-            )
-            _redis_client.ping()
-            LOGGER.info("Successfully connected to Redis")
-        except Exception as e:
-            LOGGER.error(f"Error connecting to Redis: {e}")
-            raise ConnectionError(f"Could not connect to Redis: {e}")
+        while True:
+            try:
+                _redis_client = redis.Redis(
+                    host=REDIS_HOST,
+                    port=REDIS_PORT,
+                    db=REDIS_DB,
+                    password=REDIS_PASSWORD,
+                    socket_timeout=5,
+                    socket_connect_timeout=5,
+                    retry_on_timeout=True
+                )
+                _redis_client.ping()
+                LOGGER.info("Successfully connected to Redis")
+                break
+            except redis.exceptions.BusyLoadingError:
+                _redis_client = None
+                LOGGER.warning(
+                    "Redis is loading dataset, retrying in 5s..."
+                )
+                time.sleep(5)
+            except Exception as e:
+                LOGGER.error(f"Error connecting to Redis: {e}")
+                raise ConnectionError(f"Could not connect to Redis: {e}")
     return _redis_client
