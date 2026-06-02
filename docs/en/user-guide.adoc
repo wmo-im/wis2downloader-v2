@@ -53,7 +53,7 @@ NOTE: The interface translations are machine-generated.  If you notice an inaccu
 
 === Navigation
 
-The navigation drawer on the left (right in Arabic RTL mode) gives access to six views. Each can also be reached with a keyboard shortcut:
+The navigation drawer on the left (right in Arabic RTL mode) gives access to seven views. Each can also be reached with a keyboard shortcut:
 
 [cols="1,1,3"]
 |===
@@ -82,6 +82,10 @@ The navigation drawer on the left (right in Arabic RTL mode) gives access to six
 |kbd:[Alt+6]
 |*Settings*
 |View GDC record counts per catalogue and trigger a manual data refresh
+
+|kbd:[Alt+7]
+|*Documentation*
+|Shows the project documentation
 |===
 
 === Catalogue View

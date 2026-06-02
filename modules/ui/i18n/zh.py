@@ -14,7 +14,7 @@ STRINGS: dict[str, str] = {
     'nav.manual':     '手动订阅',
     'nav.manage':     '管理订阅',
     'nav.settings':   '设置',
-    'nav.help':       '帮助',
+    'nav.help':       '文档',
 
     # ------------------------------------------------------------------ #
     # Buttons                                                              #
@@ -23,7 +23,7 @@ STRINGS: dict[str, str] = {
     'btn.confirm':          '确认',
     'btn.cancel':           '取消',
     'btn.close':            '关闭',
-    'btn.filter':           '筛选',
+    'btn.filter':           '搜索',
     'btn.reload':           '重新加载订阅',
     'btn.unsubscribe':      '取消订阅',
     'btn.refresh_gdc':      '刷新 GDC 数据',

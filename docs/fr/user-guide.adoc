@@ -58,7 +58,7 @@ NOTE: Les traductions de l'interface sont générées automatiquement. Si vous r
 
 === Navigation
 
-Le tiroir de navigation à gauche (à droite en mode arabe RTL) donne accès à six vues. Chacune est également accessible par un raccourci clavier :
+Le tiroir de navigation à gauche (à droite en mode arabe RTL) donne accès à sept vues. Chacune est également accessible par un raccourci clavier :
 
 [cols="1,1,3"]
 |===
@@ -87,6 +87,10 @@ Le tiroir de navigation à gauche (à droite en mode arabe RTL) donne accès à 
 |kbd:[Alt+6]
 |*Paramètres*
 |Affiche le nombre d'enregistrements GDC par catalogue et permet de déclencher une actualisation manuelle des données
+
+|kbd:[Alt+7]
+|*Documentation*
+|Affiche la documentation du projet
 |===
 
 === Vue Catalogue

@@ -10,12 +10,12 @@ NAV_ITEMS = [
     ('manual',    'nav.manual',    'edit_note'),
     ('manage',    'nav.manage',    'manage_history'),
     ('settings',  'nav.settings',  'settings'),
-    ('help',      'nav.help',      'help_outline'),
+    ('docs',      'nav.help',      'help_outline'),
 ]
 
 
 def build_nav_drawer(layout, on_navigate):
-    is_mini = app.storage.user.get('is_mini', True)
+    is_mini = app.storage.user.get('is_mini', False)
     props = f"{'mini ' if is_mini else ''}width=250 behavior=desktop"
 
     with ui.left_drawer(value=True).props(props) as drawer:

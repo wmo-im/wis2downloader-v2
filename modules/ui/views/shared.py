@@ -1,4 +1,4 @@
-import copy
+import dataclasses
 import json
 import re
 import httpx
@@ -554,21 +554,7 @@ async def show_metadata(dataset_id):
                 LOGGER.error(f"Metadata not found for: {dataset_id}")
                 ui.label(t('metadata.not_available', id=dataset_id)).classes("result-label")
             else:
-                ui.label(t('metadata.id', id=dataset.id)).classes("result-label")
-                ui.label(t('metadata.title', title=dataset.title or 'N/A')).classes("result-label")
-                ui.label(t('metadata.description', description=dataset.description or 'N/A')).classes("result-description")
-                with ui.row():
-                    ui.label(t('metadata.keywords')).classes("result-label")
-                    for keyword in dataset.keywords:
-                        ui.button(keyword).classes("keyword-btn")
-                if dataset.geometry:
-                    coordinates = copy.deepcopy(dataset.geometry.coordinates)
-                    coordinates[0] = coordinates[0][:-1]
-                    coordinates = [[(coord[1], coord[0]) for coord in coordinates[0]]]
-                    map_widget = ui.leaflet(center=coordinates[0][0], zoom=5, options={'attributionControl': False})
-                    map_widget.generic_layer(name='polygon', args=coordinates)
-                    map_widget.on('init', lambda ev: map_widget.run_map_method(
-                        'fitBounds', [coordinates[0][0], coordinates[0][2]]
-                    ))
+                raw = json.dumps(dataclasses.asdict(dataset), indent=2)
+                ui.code(raw, language='json').classes("w-full")
         ui.button(t('btn.close')).on('click', lambda: dialog.close())
     dialog.open()
