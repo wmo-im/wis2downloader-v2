@@ -25,7 +25,7 @@ app = Celery('tasks',
              result_backend=CELERY_RESULT_BACKEND)
 
 app.conf.worker_log_level = os.getenv("LOG_LEVEL", "DEBUG").upper()
-app.conf.result_expires = 86400  # 1 day, or do we want 1 hour? (TBD)
+app.conf.result_expires = 300
 app.conf.update(
     task_serializer='json',
     accept_content=['json'],
