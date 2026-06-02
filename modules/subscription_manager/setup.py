@@ -21,6 +21,7 @@
 
 import io
 import os
+import re
 from setuptools import Command, find_packages, setup
 
 
@@ -37,6 +38,15 @@ class PyTest(Command):
         import subprocess
         errno = subprocess.call(['pytest'])
         raise SystemExit(errno)
+
+
+def get_version():
+    init = os.path.join(os.path.dirname(__file__), '..', 'shared', 'shared', '__init__.py')
+    with open(init) as f:
+        m = re.search(r"^__version__ = ['\"]([^'\"]+)['\"]", f.read(), re.M)
+    if m:
+        return m.group(1)
+    raise RuntimeError("Cannot find __version__ in shared/__init__.py")
 
 
 def read(filename, encoding='utf-8'):
@@ -63,6 +73,7 @@ if (os.path.exists('MANIFEST')):
 
 setup(
     name='subscription_manager',
+    version=get_version(),
     description=DESCRIPTION,
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
