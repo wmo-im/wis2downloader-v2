@@ -1,7 +1,7 @@
 """Shared utilities for wis2downloader modules."""
 
 # Version of the shared utilities. This can be used by other modules to ensure compatibility.
-__version__ = '1.0.0b1'
+__version__ = "1.0.0b1"+"rc4"
 
 from .redis_client import get_redis_client
 from .logging import setup_logging
