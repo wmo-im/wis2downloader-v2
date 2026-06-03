@@ -428,7 +428,7 @@ chmod 777 downloads</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Start the celery container
-docker-compose up -d celery
+docker compose up -d celery
 
 # Test write access from inside the container
 docker exec celery touch /data/test-write &amp;&amp; echo "Write OK" || echo "Write FAILED"
@@ -485,7 +485,7 @@ The examples below use <code>localhost</code>. If the system is deployed on a re
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Check all services are running
-docker-compose ps
+docker compose ps
 
 # Check health endpoint (subscription manager)
 curl http://localhost:5002/health
@@ -494,7 +494,7 @@ curl http://localhost:5002/health
 curl -o /dev/null -s -w "%{http_code}" http://localhost:8080
 
 # View logs
-docker-compose logs -f subscriber</code></pre>
+docker compose logs -f subscriber</code></pre>
 </div>
 </div>
 </div>
@@ -1155,13 +1155,13 @@ Change the default Grafana password after first login or configure via <code>GF_
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># All services
-docker-compose logs -f
+docker compose logs -f
 
 # Specific service (use the worker queue name)
-docker-compose logs -f celery-workers-small-files
+docker compose logs -f celery-workers-small-files
 
 # With timestamps
-docker-compose logs -f -t subscriber</code></pre>
+docker compose logs -f -t subscriber</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1229,13 +1229,13 @@ rm -rf downloads/*</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Restart single service
-docker-compose restart subscriber
+docker compose restart subscriber
 
 # Restart all services
-docker-compose restart
+docker compose restart
 
 # Full rebuild (after code changes)
-docker-compose build &amp;&amp; docker-compose up -d</code></pre>
+docker compose build &amp;&amp; docker compose up -d</code></pre>
 </div>
 </div>
 </div>
@@ -1249,13 +1249,13 @@ docker-compose build &amp;&amp; docker-compose up -d</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Check logs
-docker-compose logs &lt;service-name&gt;
+docker compose logs &lt;service-name&gt;
 
 # Check container status
-docker-compose ps
+docker compose ps
 
 # Verify environment
-docker-compose config</code></pre>
+docker compose config</code></pre>
 </div>
 </div>
 </div>
@@ -1267,7 +1267,7 @@ docker-compose config</code></pre>
 <p>Check subscriber is connected:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose logs subscriber | grep -i connect</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker compose logs subscriber | grep -i connect</code></pre>
 </div>
 </div>
 </li>
@@ -1283,7 +1283,7 @@ docker-compose config</code></pre>
 <p>Check Celery worker is processing:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose logs celery-workers-small-files | tail -50</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker compose logs celery-workers-small-files | tail -50</code></pre>
 </div>
 </div>
 </li>
@@ -1364,7 +1364,7 @@ docker-compose config</code></pre>
 <p>Check whether the UI container started successfully:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose logs wis2downloader-ui | tail -30</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker compose logs wis2downloader-ui | tail -30</code></pre>
 </div>
 </div>
 </li>
@@ -1383,7 +1383,7 @@ docker-compose config</code></pre>
 <p>Force a fresh fetch from the Settings view (<code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code>) by clicking <strong>Refresh GDC data</strong>, or by restarting the UI container:</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose restart wis2downloader-ui</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker compose restart wis2downloader-ui</code></pre>
 </div>
 </div>
 </li>
@@ -1404,7 +1404,7 @@ docker-compose config</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-05-29 11:15:51 UTC
+Last updated 2026-06-03 08:30:59 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>

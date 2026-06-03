@@ -1306,7 +1306,7 @@ _STRINGS: dict[str, dict[str, str]] = {
 <div class="listingblock">
 <div class="title">Step 4 — Restart the UI</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker-compose restart wis2downloader-ui</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">docker compose restart wis2downloader-ui</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1607,7 +1607,7 @@ pytest --cov=modules modules/</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Start services
-docker-compose up -d
+docker compose up -d
 
 # Create test subscription
 curl -X POST http://localhost:5002/subscriptions \
@@ -1615,7 +1615,7 @@ curl -X POST http://localhost:5002/subscriptions \
   -d '{"topic": "cache/a/wis2/de-dwd/data/#", "target": "test"}'
 
 # Watch logs
-docker-compose logs -f subscriber celery
+docker compose logs -f subscriber celery
 
 # Check downloads
 ls -la downloads/test/</code></pre>
@@ -1668,13 +1668,13 @@ celery -A task_manager.worker worker --loglevel=DEBUG</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Build all images
-docker-compose build
+docker compose build
 
 # Build specific service
-docker-compose build celery
+docker compose build celery
 
 # Rebuild without cache
-docker-compose build --no-cache</code></pre>
+docker compose build --no-cache</code></pre>
 </div>
 </div>
 </div>
@@ -1748,7 +1748,7 @@ mosquitto_sub -h globalbroker.meteo.fr -p 443 \
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-05-29 11:15:51 UTC
+Last updated 2026-06-03 08:30:59 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
