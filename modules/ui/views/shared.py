@@ -161,6 +161,7 @@ def _try_parse_filter(filter_cfg: dict) -> dict | None:
         'east': None, 'west': None,
         'start_date': None, 'end_date': None,
         'start_time': None, 'end_time': None,
+        'custom_filters': {},
     }
 
     for cond in conditions:
@@ -196,6 +197,15 @@ def _try_parse_filter(filter_cfg: dict) -> dict | None:
             ids = cond['metadata_id'].get('in')
             if isinstance(ids, list):
                 result['dataset_ids'] = ids
+        elif 'property' in cond and 'type' in cond:
+            fname = cond['property']
+            ftype = cond['type']
+            if 'in' in cond and isinstance(cond['in'], list):
+                result['custom_filters'][fname] = {'type': ftype, 'in': cond['in']}
+            elif 'equals' in cond:
+                result['custom_filters'][fname] = {'type': ftype, 'equals': cond['equals']}
+            else:
+                return None  # unrecognised property condition → fall back to textarea
         else:
             return None  # unrecognised condition → fall back to textarea
 
