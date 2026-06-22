@@ -102,6 +102,8 @@ def render(container):
                 filter_area = media_type_select = None
                 north = south = east = west = None
                 start_date = end_date = start_time = end_time = None
+                custom_inputs: dict = {}
+                custom_filter_defs: dict = {}
 
                 if not use_controls:
                     ui.notify(t('subscriptions.filter_parse_warning'), type='warning')
@@ -175,6 +177,25 @@ def render(container):
                             validation=lambda v: None if not v or _TIME_RE.match(v) else t('validation.time_format'),
                         ).classes("filter-input")
 
+                    if parsed.get('custom_filters'):
+                        with ui.expansion(t('sidebar.custom_filters'), icon="tune").classes(
+                            "filter-expansion"
+                        ):
+                            for fname, fdef in parsed['custom_filters'].items():
+                                ftype = fdef.get('type', 'string')
+                                custom_filter_defs[fname] = {'type': ftype}
+                                if ftype in ('integer', 'number'):
+                                    inp = ui.number(
+                                        label=fname, value=fdef.get('equals'),
+                                    ).classes("filter-input")
+                                else:
+                                    inp = ui.input(
+                                        label=fname,
+                                        value=', '.join(fdef.get('in', [])),
+                                        placeholder='value1, value2, ...',
+                                    ).classes("filter-input")
+                                custom_inputs[fname] = inp
+
                 ui.separator()
                 ui.label(t('sidebar.queue')).classes("sidebar-section-title")
                 queue_radio = ui.radio(
@@ -240,7 +261,7 @@ def render(container):
                             [], media_type_select,
                             north, south, east, west,
                             start_date, end_date, start_time, end_time,
-                            {}, {},
+                            custom_inputs, custom_filter_defs,
                         )
                         if filter_result is None:
                             return  # date/time validation error already notified
