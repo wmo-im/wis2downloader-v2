@@ -33,6 +33,19 @@ else
     echo "Using default HOST_DATA_PATH from .env."
 fi
 
+read -p "Enter Grafana admin username (or press Enter to use default 'admin'): " GRAFANA_ADMIN_USER
+GRAFANA_ADMIN_USER="${GRAFANA_ADMIN_USER:-admin}"
+sed -i "s|^GRAFANA_ADMIN_USER=.*$|GRAFANA_ADMIN_USER=\"$GRAFANA_ADMIN_USER\"|" .env
+echo "GRAFANA_ADMIN_USER set to '$GRAFANA_ADMIN_USER' in .env."
+
+read -p "Enter Grafana admin password (or press Enter to auto-generate): " GRAFANA_ADMIN_PASSWORD
+if [ -z "$GRAFANA_ADMIN_PASSWORD" ]; then
+    GRAFANA_ADMIN_PASSWORD="$(openssl rand -hex 16)"
+    echo "Auto-generated Grafana password: $GRAFANA_ADMIN_PASSWORD"
+fi
+sed -i "s|^GRAFANA_ADMIN_PASSWORD=.*$|GRAFANA_ADMIN_PASSWORD=\"$GRAFANA_ADMIN_PASSWORD\"|" .env
+echo "GRAFANA_ADMIN_PASSWORD set in .env."
+
 read -p "Enter UID for file ownership (or press Enter to use current user's UID: $(id -u)): " INPUT_UID
 INPUT_UID="${INPUT_UID:-$(id -u)}"
 if grep -q '^WIS2DOWNLOADER_UID=' .env; then
