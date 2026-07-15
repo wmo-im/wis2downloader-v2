@@ -2,13 +2,16 @@ import base64
 from celery.exceptions import MaxRetriesExceededError, Retry
 from celery.utils.log import get_task_logger
 import datetime as dt
+import eccodes
 from functools import wraps
 import importlib
+import json
 import magic
 import mimetypes
 import os
 from pathlib import Path
 import tempfile
+import time
 import urllib3
 from urllib.parse import urlsplit
 
@@ -63,6 +66,28 @@ TRACKER = "wis2:notifications:data:tracker"
 
 mimetypes.add_type('application/bufr', '.bufr')
 mimetypes.add_type('application/grib', '.grib')
+
+# WIGOS station identifier is made up of these 4 BUFR descriptors:
+# 001125 series, 001126 issuer, 001127 issue number, 001128 local id
+WIGOS_ID_KEYS = (
+    'wigosIdentifierSeries',
+    'wigosIssuerOfIdentifier',
+    'wigosIssueNumber',
+    'wigosLocalIdentifierCharacter',
+)
+
+# Snow descriptors: 013012 depthOfFreshSnow, 013013 totalSnowDepth.
+# Bare key names resolve to the first occurrence (equivalent to '#1#<key>').
+SNOW_KEYS = (
+    'depthOfFreshSnow',
+    'totalSnowDepth',
+)
+
+STATIONS_REGISTRY_PATH = Path(CONTAINER_DATA_PATH) / "wigos_stations.json"
+STATIONS_REGISTRY_LOCK_KEY = "wis2:stations:registry:lock"
+STATIONS_REGISTRY_LOCK_TTL = 10  # seconds
+STATIONS_REGISTRY_LOCK_RETRIES = 10
+STATIONS_REGISTRY_LOCK_RETRY_DELAY = 0.2  # seconds
 
 DEFAULT_ACCEPTED_MEDIA_TYPES = [
     'image/gif', 'image/jpeg', 'image/png', 'image/tiff',
@@ -661,6 +686,97 @@ def download_from_wis2(self, job):
         set_status(filehash, 'by-hash', final_status)
 
 
+def _extract_wigos_id(bufr) -> str | None:
+    """Return the WIGOS id ('series-issuer-issue-local') encoded in *bufr*.
+
+    Returns None if any of the 4 WIGOS descriptors is absent from the
+    message or present but set to missing.
+    """
+    parts = []
+    for key in WIGOS_ID_KEYS:
+        try:
+            if eccodes.codes_is_missing(bufr, key):
+                return None
+        except eccodes.KeyValueNotFoundError:
+            return None
+        parts.append(str(eccodes.codes_get(bufr, key)))
+    return '-'.join(parts)
+
+
+def _has_snow_data(bufr) -> bool:
+    """Return True if at least one snow descriptor (013012/013013) is
+    present in *bufr* (first occurrence) and set to a non-missing value.
+    """
+    for key in SNOW_KEYS:
+        try:
+            if not eccodes.codes_is_missing(bufr, key):
+                return True
+        except eccodes.KeyValueNotFoundError:
+            continue
+    return False
+
+
+def _record_station(centre_id: str, wigos_id: str) -> None:
+    """Record that *wigos_id* has been seen for *centre_id*.
+
+    Stations are recorded in a shared JSON registry file
+    (STATIONS_REGISTRY_PATH) as {centre_id: [wigos_id, ...]}. A Redis lock
+    guards the read-modify-write since multiple celery workers may update
+    the file concurrently.
+    """
+    redis_client = get_redis_client()
+    lock_acquired = False
+    for _ in range(STATIONS_REGISTRY_LOCK_RETRIES):
+        lock_acquired = redis_client.set(
+            STATIONS_REGISTRY_LOCK_KEY, 1, nx=True, ex=STATIONS_REGISTRY_LOCK_TTL)
+        if lock_acquired:
+            break
+        time.sleep(STATIONS_REGISTRY_LOCK_RETRY_DELAY)
+    if not lock_acquired:
+        LOGGER.warning(f"Could not acquire station registry lock for {centre_id}/{wigos_id}")
+        return
+
+    try:
+        registry = {}
+        if STATIONS_REGISTRY_PATH.exists():
+            try:
+                registry = json.loads(STATIONS_REGISTRY_PATH.read_text())
+            except (OSError, json.JSONDecodeError) as e:
+                LOGGER.error(f"Error reading station registry {STATIONS_REGISTRY_PATH}: {e}")
+                registry = {}
+
+        stations = registry.setdefault(centre_id, [])
+        if wigos_id in stations:
+            return
+
+        stations.append(wigos_id)
+        STATIONS_REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True)
+        tmp_path = STATIONS_REGISTRY_PATH.with_name(STATIONS_REGISTRY_PATH.name + '.tmp')
+        tmp_path.write_text(json.dumps(registry, indent=2, sort_keys=True))
+        os.replace(tmp_path, STATIONS_REGISTRY_PATH)
+        LOGGER.info(f"Recorded new station {wigos_id} for centre {centre_id}")
+    finally:
+        redis_client.delete(STATIONS_REGISTRY_LOCK_KEY)
+
+
+def _decode_bufr(filepath: str, centre_id: str) -> None:
+    """Decode every BUFR message in *filepath* and record the station's
+    WIGOS id, but only when the message also carries snow data.
+    """
+    with open(filepath, 'rb') as fh:
+        while True:
+            bufr = eccodes.codes_bufr_new_from_file(fh)
+            if bufr is None:
+                break
+            try:
+                eccodes.codes_set(bufr, 'unpack', 1)
+                wigos_id = _extract_wigos_id(bufr)
+                if wigos_id and _has_snow_data(bufr):
+                    _record_station(centre_id, wigos_id)
+            finally:
+                eccodes.codes_release(bufr)
+
+
 # @ prov_dm_wrapper
 @app.task
 def decode_and_ingest(result):
@@ -669,6 +785,14 @@ def decode_and_ingest(result):
             f"Skipping decode for job {result.get('id')} due to previous status: {result.get('status')}")
         return result
 
-    LOGGER.info(f"Starting decode and ingest for {result.get('filepath')}")
-    # Add your data decoding and ingestion logic here
+    filepath = result.get('filepath')
+    media_type = result.get('media_type')
+    LOGGER.info(f"Starting decode and ingest for {filepath}")
+
+    if media_type == 'application/bufr':
+        try:
+            _decode_bufr(filepath, result.get('centre_id'))
+        except Exception as e:
+            LOGGER.warning(f"Could not decode {filepath} ({media_type}): {e}")
+
     return result

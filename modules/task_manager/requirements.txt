@@ -7,3 +7,4 @@ prometheus_client>=0.20.0
 certifi>=2024.2.2
 python-magic>=0.4.27
 shapely>=2.0.0
+eccodes
