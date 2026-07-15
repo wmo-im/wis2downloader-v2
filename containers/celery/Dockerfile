@@ -27,9 +27,10 @@ RUN python3.12 -m venv /home/wis2/.venv && \
 
 COPY --chown=wis2:wis2 ./modules/ ./app
 COPY containers/requirements-frozen.txt ./requirements-frozen.txt
+COPY containers/celery/requirements-eccodes.txt ./requirements-eccodes.txt
 
 RUN source /home/wis2/.venv/bin/activate && \
-    pip install -r requirements-frozen.txt && \
+    pip install -r requirements-frozen.txt -r requirements-eccodes.txt && \
     cd ./app && \
     pip install --no-deps -e shared && \
     pip install --no-deps -e task_manager && \
