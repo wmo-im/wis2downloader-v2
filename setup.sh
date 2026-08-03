@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# GNU sed (Linux, Git Bash on Windows) takes `-i suffix`, BSD sed (macOS)
+# requires the suffix as a separate argument even when empty.
+if sed --version >/dev/null 2>&1; then
+    sedi() { sed -i "$@"; }
+else
+    sedi() { sed -i '' "$@"; }
+fi
+
 ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
 if docker plugin ls | grep -q 'loki'; then
     echo "Loki Docker plugin already installed."
@@ -16,15 +24,15 @@ fi
 
 cp default.env .env
 
-sed -i "s/FLASK_SECRET_KEY=.*/FLASK_SECRET_KEY=\"$(openssl rand -hex 32)\"/" .env
-sed -i "s/REDIS_PASSWORD=.*/REDIS_PASSWORD=\"$(openssl rand -hex 16)\"/" .env
+sedi "s/FLASK_SECRET_KEY=.*/FLASK_SECRET_KEY=\"$(openssl rand -hex 32)\"/" .env
+sedi "s/REDIS_PASSWORD=.*/REDIS_PASSWORD=\"$(openssl rand -hex 16)\"/" .env
 
 echo ".env created with generated secrets."
 
 read -p "Enter download path in host (or press Enter to use default from .env): " HOST_DATA_PATH
 if [ ! -z "$HOST_DATA_PATH" ]; then
     if grep -q '^HOST_DATA_PATH=' .env; then
-        sed -i "s|^HOST_DATA_PATH=.*$|HOST_DATA_PATH=\"$HOST_DATA_PATH\"|" .env
+        sedi "s|^HOST_DATA_PATH=.*$|HOST_DATA_PATH=\"$HOST_DATA_PATH\"|" .env
     else
         echo "HOST_DATA_PATH=\"$HOST_DATA_PATH\"" >> .env
     fi
@@ -35,7 +43,7 @@ fi
 
 read -p "Enter Grafana admin username (or press Enter to use default 'admin'): " GRAFANA_ADMIN_USER
 GRAFANA_ADMIN_USER="${GRAFANA_ADMIN_USER:-admin}"
-sed -i "s|^GRAFANA_ADMIN_USER=.*$|GRAFANA_ADMIN_USER=\"$GRAFANA_ADMIN_USER\"|" .env
+sedi "s|^GRAFANA_ADMIN_USER=.*$|GRAFANA_ADMIN_USER=\"$GRAFANA_ADMIN_USER\"|" .env
 echo "GRAFANA_ADMIN_USER set to '$GRAFANA_ADMIN_USER' in .env."
 
 read -p "Enter Grafana admin password (or press Enter to auto-generate): " GRAFANA_ADMIN_PASSWORD
@@ -43,13 +51,13 @@ if [ -z "$GRAFANA_ADMIN_PASSWORD" ]; then
     GRAFANA_ADMIN_PASSWORD="$(openssl rand -hex 16)"
     echo "Auto-generated Grafana password: $GRAFANA_ADMIN_PASSWORD"
 fi
-sed -i "s|^GRAFANA_ADMIN_PASSWORD=.*$|GRAFANA_ADMIN_PASSWORD=\"$GRAFANA_ADMIN_PASSWORD\"|" .env
+sedi "s|^GRAFANA_ADMIN_PASSWORD=.*$|GRAFANA_ADMIN_PASSWORD=\"$GRAFANA_ADMIN_PASSWORD\"|" .env
 echo "GRAFANA_ADMIN_PASSWORD set in .env."
 
 read -p "Enter UID for file ownership (or press Enter to use current user's UID: $(id -u)): " INPUT_UID
 INPUT_UID="${INPUT_UID:-$(id -u)}"
 if grep -q '^WIS2DOWNLOADER_UID=' .env; then
-    sed -i "s|^WIS2DOWNLOADER_UID=.*$|WIS2DOWNLOADER_UID=\"$INPUT_UID\"|" .env
+    sedi "s|^WIS2DOWNLOADER_UID=.*$|WIS2DOWNLOADER_UID=\"$INPUT_UID\"|" .env
 else
     echo "WIS2DOWNLOADER_UID=\"$INPUT_UID\"" >> .env
 fi
@@ -58,7 +66,7 @@ echo "WIS2DOWNLOADER_UID set to $INPUT_UID in .env."
 read -p "Enter GID for file ownership (or press Enter to use current user's GID: $(id -g)): " INPUT_GID
 INPUT_GID="${INPUT_GID:-$(id -g)}"
 if grep -q '^WIS2DOWNLOADER_GID=' .env; then
-    sed -i "s|^WIS2DOWNLOADER_GID=.*$|WIS2DOWNLOADER_GID=\"$INPUT_GID\"|" .env
+    sedi "s|^WIS2DOWNLOADER_GID=.*$|WIS2DOWNLOADER_GID=\"$INPUT_GID\"|" .env
 else
     echo "WIS2DOWNLOADER_GID=\"$INPUT_GID\"" >> .env
 fi
